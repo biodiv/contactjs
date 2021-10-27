@@ -1,2 +1,2 @@
-# contact-js
+# contact.js
 Pointer gestures for your webapp
