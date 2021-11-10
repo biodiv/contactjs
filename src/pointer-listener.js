@@ -16,7 +16,7 @@ class PointerListener {
 
 	constructor (domElement, options){
 	
-		this.DEBUG = true;
+		this.DEBUG = false;
 	
 		var self = this;
 		
@@ -84,7 +84,7 @@ class PointerListener {
 		
 		domElement.addEventListener("pointerup", function(event){
 		
-			if (self.contact != null){
+			if (self.contact != null && self.contact.isActive == true){
 		
 				// use css: touch-action: none instead of js to disable scrolling
 				//self.domElement.classList.remove("disable-scrolling");
@@ -103,7 +103,7 @@ class PointerListener {
 		*/
 		domElement.addEventListener("pointerout", function(event){
 			
-			if (self.contact != null){
+			if (self.contact != null && self.contact.isActive == true){
 				self.contact.onPointerOut(event);
 				self.recognizeGestures();
 			}		

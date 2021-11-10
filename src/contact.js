@@ -20,7 +20,7 @@ class Contact {
 
 	constructor (pointerdownEvent, options) {
 	
-		this.DEBUG = true;
+		this.DEBUG = false;
 	
 		// a map of all active PointerInput instances
 		this.pointerInputs = {};
@@ -360,7 +360,7 @@ class PointerInput {
 
 	constructor (pointerdownEvent, options) {
 	
-		this.DEBUG = true;
+		this.DEBUG = false;
 		
 		var options = options || {};
 		

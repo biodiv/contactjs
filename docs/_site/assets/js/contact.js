@@ -37,7 +37,7 @@ class Contact {
 
 	constructor (pointerdownEvent, options) {
 	
-		this.DEBUG = false;
+		this.DEBUG = true;
 	
 		// a map of all active PointerInput instances
 		this.pointerInputs = {};
@@ -377,7 +377,7 @@ class PointerInput {
 
 	constructor (pointerdownEvent, options) {
 	
-		this.DEBUG = false;
+		this.DEBUG = true;
 		
 		var options = options || {};
 		
@@ -725,7 +725,7 @@ class Gesture {
 
 	constructor (domElement, options){
 	
-		this.DEBUG = false;
+		this.DEBUG = true;
 		
 		this.domElement = domElement;
 		
@@ -1342,7 +1342,7 @@ class PointerListener {
 
 	constructor (domElement, options){
 	
-		this.DEBUG = false;
+		this.DEBUG = true;
 	
 		var self = this;
 		
@@ -1410,7 +1410,7 @@ class PointerListener {
 		
 		domElement.addEventListener("pointerup", function(event){
 		
-			if (self.contact != null && self.contact.isActive == true){
+			if (self.contact != null){
 		
 				// use css: touch-action: none instead of js to disable scrolling
 				//self.domElement.classList.remove("disable-scrolling");
@@ -1429,7 +1429,7 @@ class PointerListener {
 		*/
 		domElement.addEventListener("pointerout", function(event){
 			
-			if (self.contact != null && self.contact.isActive == true){
+			if (self.contact != null){
 				self.contact.onPointerOut(event);
 				self.recognizeGestures();
 			}		

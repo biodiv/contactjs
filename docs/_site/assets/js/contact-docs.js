@@ -27,12 +27,12 @@ var transform = {
 
 function loadContact (){
 
-	rectangle = document.getElementById("rectangle");
+	rectangle = document.getElementById("touch-me");
 	
 	START_X = rectangle.getBoundingClientRect().left;
 	START_Y = rectangle.getBoundingClientRect().top;
 	
-	var output = document.getElementById("recognition-output");
+	//var output = document.getElementById("recognition-output");
 	
 	var pointerListener = new PointerListener(rectangle, {
 		pointerup: function (event, pointerListener){
@@ -44,19 +44,19 @@ function loadContact (){
 	
 	rectangle.addEventListener("pan", function(event){
 		onPan(event);
-		output.textContent = "Pan detected";
+		//output.textContent = "Pan detected";
 	});
 	
 	rectangle.addEventListener("panend", function(event){
 	
 		let recognizer = event.detail.recognizer;
 
-		if (recognizer.isSwipe == true){
+		/*if (recognizer.isSwipe == true){
 			output.textContent = "Pan end with SWIPE detected";
 		}
 		else {
 			output.textContent = "Pan end detected";
-		}
+		}*/
 		
 		onEnd(event);
 	});
@@ -66,7 +66,7 @@ function loadContact (){
 		TAP_ACTIVE = true;
 		onTap(event);
 	
-		output.textContent = "Tap detected";
+		//output.textContent = "Tap detected";
 		
 		setTimeout(function(){
 			TAP_ACTIVE = false;
@@ -77,14 +77,14 @@ function loadContact (){
 	
 		onPinch(event);
 	
-		output.textContent = "Pinch detected";
+		//output.textContent = "Pinch detected";
 	});
 	
 	rectangle.addEventListener("pinchend", function(event){
 	
 		onEnd(event);
 	
-		output.textContent = "Pinch end detected";
+		//output.textContent = "Pinch end detected";
 	});
 	
 	
@@ -92,14 +92,14 @@ function loadContact (){
 	
 		onRotation(event);
 		
-		output.textContent = "Rotation detected";
+		//output.textContent = "Rotation detected";
 	});
 	
 	rectangle.addEventListener("rotateend", function(event){
 	
 		onEnd(event);
 	
-		output.textContent = "Rotation end detected";
+		//output.textContent = "Rotation end detected";
 	});
 	
 	
@@ -107,14 +107,14 @@ function loadContact (){
 	
 		onTwoFingerPan (event);
 		
-		output.textContent = "Two finger pan detected";
+		//output.textContent = "Two finger pan detected";
 	});
 	
 	rectangle.addEventListener("twofingerpanend", function(event){
 	
 		onEnd(event);
 		
-		output.textContent = "Two finger pan end detected";
+		//output.textContent = "Two finger pan end detected";
 	});
 	
 }

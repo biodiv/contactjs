@@ -1,5 +1,7 @@
 "use strict";
 
+// contact.js - version 1.0.0
+
 const DIRECTION_NONE = "0";
 const DIRECTION_LEFT = "left";
 const DIRECTION_RIGHT = "right";
