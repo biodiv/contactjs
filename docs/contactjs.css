@@ -1,0 +1,150 @@
+body {
+	height: 100%;
+}
+
+header {
+	font-weight: bold;
+	color: white;
+}
+
+.navbar-light .navbar-nav .nav-link {
+	color: white;
+	font-weight: bold;
+}
+
+.navbar-brand {
+	font-size: 1.5rem;
+	line-height: 2.5rem;
+}
+
+.navbar-light .navbar-toggler {
+    color: #ffffff;
+    border-color: #ffffff;
+}
+
+.navbar-light .navbar-toggler-icon {
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.text-pastel-dark {
+	color: #822659;
+}
+
+
+.bg-pastel-dark {
+	background-color: #440A67;
+}
+
+.bg-pastel {
+	background-color: #93329E;
+}
+
+.bg-pastel-light {
+	background-color: #B4AEE8;
+}
+
+.bg-pastel-light-2 {
+	background-color: #FFE3FE;
+}
+
+.bg-alien {
+	background: #b6edff;
+}
+
+/*
+
+.bg-pastel-dark {
+	background-color: #7F7C82;
+}
+
+.bg-pastel {
+	background-color: #BFA2DB;
+}
+
+.bg-pastel-light {
+	background-color: #F0D9FF;
+}
+
+.bg-pastel-light-2 {
+	background-color: #F3F1F5;
+}*/
+
+
+.bg-pastel-dark {
+	background-color: #822659;
+}
+
+.bg-pastel {
+	background-color: #B34180;
+}
+
+.bg-pastel-light {
+	background-color: #E36BAE;
+}
+
+.bg-pastel-light-2 {
+	background-color: #F8A1D1;
+}
+
+/*
+.bg-pastel-dark {
+	background-color: #C3B4D2;
+}
+
+.bg-pastel {
+	background-color: #87A8D0;
+}
+
+.bg-pastel-light {
+	background-color: #B9CEEB;
+}
+
+.bg-pastel-light-2 {
+	background-color: #DEECFC;
+}*/
+
+
+.device {
+	background: #822659;
+	padding: 1.3rem;
+	border-radius: 2em;
+	height: 30rem;
+	
+}
+
+.device-screen {
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	perspective: 500px;
+	border-radius: 2em;
+}
+
+.animate {
+	transition: all 0.3s;
+}
+
+#touch-me {
+	background-color: #fff;
+	/*background-image: url('img/handofgod.jpg');*/
+	background-size: contain;
+	width: 10rem;
+	height: 10rem;
+	cursor: pointer;
+	touch-action: none;
+	user-select: none; /* prevents scrolling on pan */
+	transform-origin:center;
+	background-clip: border-box;
+}
+
+#sidenav {
+	border-right: 1px solid rgba(248, 161, 209, .5);
+}
+
+h1, h2, h3, h4, h5 {
+	color: #822659;
+}

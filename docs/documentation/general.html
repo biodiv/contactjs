@@ -1,0 +1,54 @@
+---
+title: CONTACT.JS
+layout: default
+permalink: /documentation/general/
+bg-color: bg-white
+---
+
+<div class="container">
+	<div class="row mt-5">
+		<div class="col-12 col-md-4 col-lg-2">
+			{% include_relative nav.html %}
+		</div>
+		<div class="col-12 col-md-8 col-lg-10">
+			<div class="row">
+				<div class="col-12">
+					<h2>Getting Started</h2>
+					
+					<div>
+						contact.js is a open-source library that can recognize gestures made by touch, pen and mouse using PointerEvents.
+					</div>
+					<div class="py-3">
+						<a class="btn btn-primary">Download contact.js</a>
+					</div>
+					<div>
+						<h5>Usage</h5>
+						First, initialize a <kbd>PointerListener</kbd> instance. This will active gesture detection on the <kbd>domElement</kbd> of your choice.
+						<div class="bg-light p-3 mt-3">
+{% highlight javascript %}
+var domElement = document.getElementById("idOfElement");
+var pointerListener = new PointerListener(domElement, options);
+domElement.addEventListener("tap", function(event){
+	// do something on tap
+});
+{% endhighlight %}
+						</div>
+
+						<div class="mt-3">
+							By default, all recognizers are active and their events are fired accordingly.
+						</div>
+						<div class="mt-3">
+							Also the viewport meta tag is recommended to scale the screen correctly. You do not have to add <kbd>user-scalable=no</kbd> or <kbd>maximum-scale=1</kbd>. Default browser gestures (pinch to zoom) can be prevented by adding <kbd>touch-action:none</kbd> to the <kbd>domElement</kbd> in css.
+							<div class="bg-light pt-3 pb-1 px-3 mt-3">
+{% highlight html %}
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% endhighlight %}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>

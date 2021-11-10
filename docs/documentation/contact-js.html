@@ -1,0 +1,239 @@
+---
+title: CONTACT.JS
+layout: default
+permalink: /documentation/contact-js/
+bg-color: bg-white
+---
+
+<div class="container">
+	<div class="row mt-5">
+		<div class="col-12 col-md-4 col-lg-2">
+			{% include_relative nav.html %}
+		</div>
+		<div class="col-12 col-md-8 col-lg-10">
+			<div class="row">
+				<div class="col-12">
+					<h2>Concept</h2>
+					contact.js uses a vector based recognition. In most cases, a "live vector" is used, which is the vector of the last 100ms.
+				</div>
+			</div>
+			<div id="PointerListener" class="row mt-5">
+				<div class="col-12">
+					<h2>PointerListener</h2>
+					The <kbd>PointerListener</kbd> prototype is used for activating gesture listening on dom elements. By default, all recognizers are active, but you can configure the gestures you want to be activated.
+					<div class="bg-light pt-3 pb-1 px-3 mt-3">
+{% highlight javascript %}
+var pointerListener = new PointerListener(domElement, options);
+{% endhighlight %}
+					</div>
+				</div>
+			</div>
+			<div id="Options" class="row mt-5">
+				<div class="col-12">
+					<h4>Options</h4>
+					Besides configuring the supported gestures, hooks for the native javascript events <kbd>pointerDown</kbd>, <kbd>pointerMove</kbd>, <kbd>pointerUp</kbd>, <kbd>pointerOut</kbd> and <kbd>pointerCancel</kbd> are provided.
+					<div class="bg-light pt-3 pb-1 px-3 mt-3">
+{% highlight javascript %}
+var options = {
+	supportedGestures : [Tap, Pan, Pinch, Rotate, TwoFingerPan],
+	pointerDown : function(event, pointerListener){},
+	pointerMove : function(event, pointerListener){},
+	pointerUp : function(event, pointerListener){},
+	pointerOut : function(event, pointerListener){},
+	pointerCancel : function(event, pointerListener){}
+};
+var pointerListener = new PointerListener(domElement, options);
+{% endhighlight %}
+					</div>
+				</div>
+			</div>
+			<div id="Events" class="row mt-5">
+				<div class="col-12">
+					<h2>Events</h2>
+					<div class="bg-light pt-3 pb-1 px-3 mt-3">
+{% highlight javascript %}
+domElement.addEventListener(EVENTNAME, function(event){
+	// do something
+});
+{% endhighlight %}
+					</div>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th scope="col">Event name</th>
+								<th scope="col">Recognizer</th>
+								<th scope="col">Simplified description</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<th scope="row">tap</th>
+								<td>Tap</td>
+								<td>fired after pointerUp</td>
+							</tr>
+							<tr>
+								<th scope="row">panstart</th>
+								<td>Pan</td>
+								<td>fired after pointerDown</td>
+							</tr>
+							<tr>
+								<th scope="row">pan</th>
+								<td>Pan</td>
+								<td>fired during pointerMove</td>
+							</tr>
+							<tr>
+								<th scope="row">panend</th>
+								<td>Pan</td>
+								<td>fired after pointerUp, pointerOut or pointerCancel</td>
+							</tr>
+							<tr>
+								<th scope="row">pinchstart</th>
+								<td>Pinch</td>
+								<td>fired if 2 active pointers (fingers) are present and the distance between those two changed</td>
+							</tr>
+							<tr>
+								<th scope="row">pinch</th>
+								<td>Pinch</td>
+								<td>fired during changes in distance between 2 pointers (fingers)</td>
+							</tr>
+							<tr>
+								<th scope="row">pinchend</th>
+								<td>Pinch</td>
+								<td>fired if 2 active pointers (fingers) had been present pinching, and one of them is removed</td>
+							</tr>
+							<tr>
+								<th scope="row">rotatestart</th>
+								<td>Rotate</td>
+								<td>fired if 2 active pointers (fingers) are present and are moved in a circular motion</td>
+							</tr>
+							<tr>
+								<th scope="row">rotate</th>
+								<td>Rotate</td>
+								<td>fired during changes in rotation performed with 2 pointers (fingers)</td>
+							</tr>
+							<tr>
+								<th scope="row">rotateend</th>
+								<td>Rotate</td>
+								<td>fired if 2 active pointers (fingers) had been present rotating, and one of them is removed</td>
+							</tr>
+							<tr>
+								<th scope="row">twofingerpanstart</th>
+								<td>TwoFingerPan</td>
+								<td>fired if 2 active pointers (fingers) are present and an initial, parallel movement in the same direction occurs</td>
+							</tr>
+							<tr>
+								<th scope="row">twofingerpan</th>
+								<td>TwoFingerPan</td>
+								<td>fired during the parallel movement of 2 fingers</td>
+							</tr>
+							<tr>
+								<th scope="row">twofingerpanend</th>
+								<td>TwoFingerPan</td>
+								<td>fired if 2 active pointers (fingers) had been present panning, and one of them is removed</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div id="EventObject" class="row mt-5">
+				<div class="col-12">
+					<h4>EventObject</h4>
+					All events that contact.js triggers all receive an event object which has the following structure.
+					<div class="bg-light pt-3 pb-1 px-3 mt-3">
+{% highlight javascript %}
+{
+	detail : {
+		contact : contactInstance,
+		gesture : gestureInstance, // instance of Tap, Pan recognizer etc
+		global : { 		// global covers data spanning the whole pointer contact duration
+			deltaX : Number, // traveled distance along the x-axis in px, whole contact duration
+			deltaY : Number, // traveled distance along the y-axis in px, whole contact duration
+			distance: Number, // traveled distance / length of the vector in px, whole contact duration
+			speedX : Number, // px/ms along the x-axis, whole contact duration
+			speedY : Number, // px/ms along the y-axis, whole contact duration
+			speed : Number, // px/ms, whole contact curation
+			direction : DIRECTION, // matches the DIRECTION constants, direction from start to end of whole contact duration
+			scale : Number, // scaling if multi pointer, 1 if single pointer, whole contact duration
+			rotation : Number, // degrees if multi pointer, 0 if single pointer, whole contact duration
+			srcEvent : Event // original Event (pointerUp, pointerMove, ...)
+		},
+		live : {	// live covers data spanning the last 100ms
+			deltaX : Number, // traveled distance along the x-axis within the last 100ms in px
+			deltaY : Number, // traveled distance along the y-axis within the last 100ms in px
+			distance: Number, // traveled distance / length of the vector in px, last 100ms
+			speedX : Number, // px/ms along the x-axis, whole contact duration, last 100ms
+			speedY : Number, // px/ms along the y-axis, whole contact duration, last 100ms
+			speed : Number, // px/ms, last 100ms
+			direction : DIRECTION, // matches the DIRECTION constants, direction of the last 100ms
+			scale : Number, // scaling if multi pointer, 1 if single pointer, last 100ms
+			rotation : Number, // degrees if multi pointer, 0 if single pointer, last 100ms
+			center : { // center between two pointers if multi pointer, last 100ms
+				x : Number,
+				y : Number
+			},
+			srcEvent : Event // original Event (pointerUp, pointerMove, ...)
+		}
+	}
+}
+{% endhighlight %}
+					</div>
+				</div>
+			</div>
+			<div id="Constants" class="row mt-5">
+				<div class="col-12">
+					<h4>Constants</h4>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th scope="col">Name</th>
+								<th scope="col">Value</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>DIRECTION_LEFT</td>
+								<td>"left"</td>
+							</tr>
+							<tr>
+								<td>DIRECTION_LEFT</td>
+								<td>"left"</td>
+							</tr>
+							<tr>
+								<td>DIRECTION_RIGHT</td>
+								<td>"right"</td>
+							</tr>
+							<tr>
+								<td>DIRECTION_UP</td>
+								<td>"up"</td>
+							</tr>
+							<tr>
+								<td>DIRECTION_DOWN</td>
+								<td>"down"</td>
+							</tr>
+							<tr>
+								<td>DIRECTION_HORIZONTAL</td>
+								<td>[DIRECTION_LEFT, DIRECTION_RIGHT]</td>
+							</tr>
+							<tr>
+								<td>DIRECTION_VERTICAL</td>
+								<td>[DIRECTION_UP, DIRECTION_DOWN]</td>
+							</tr>
+							<tr>
+								<td>DIRECTION_ALL</td>
+								<td>[DIRECTION_UP, DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT]</td>
+							</tr>
+							<tr>
+								<td>DIRECTION_CLOCKWISE</td>
+								<td>1</td>
+							</tr>
+							<tr>
+								<td>DIRECTION_COUNTER_CLOCKWISE</td>
+								<td>-1</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
