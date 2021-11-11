@@ -1347,6 +1347,9 @@ class PointerListener {
 		var self = this;
 		var supportedGestures = ALL_GESTURE_CLASSES;
 		
+		this.options = {
+			supportedGestures : []
+		};
 		
 		if (options.hasOwnProperty("supportedGestures")){
 			supportedGestures = options.supportedGestures;

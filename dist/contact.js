@@ -1,4 +1,4 @@
-// contact.js version 1.0.2
+// contact.js version 1.0.3
 
 "use strict";
 
@@ -1349,6 +1349,9 @@ class PointerListener {
 		var self = this;
 		var supportedGestures = ALL_GESTURE_CLASSES;
 		
+		this.options = {
+			supportedGestures : []
+		};
 		
 		if (options.hasOwnProperty("supportedGestures")){
 			supportedGestures = options.supportedGestures;
