@@ -1,4 +1,4 @@
-// contact.js version 1.0.3
+// contact.js version 1.0.4
 
 "use strict";
 
@@ -1347,6 +1347,9 @@ class PointerListener {
 		this.DEBUG = false;
 	
 		var self = this;
+		
+		var options = options || {};
+		
 		var supportedGestures = ALL_GESTURE_CLASSES;
 		
 		this.options = {
