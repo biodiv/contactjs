@@ -19,20 +19,20 @@ class PointerListener {
 		this.DEBUG = false;
 	
 		var self = this;
+		var supportedGestures = ALL_GESTURE_CLASSES;
 		
-		this.options = options || {};
 		
-		if (!this.options.hasOwnProperty("supportedGestures")){
-			// activate all gestures in default mode
-			
-			this.options.supportedGestures = [];
-			
-			for (let i=0; i<ALL_GESTURE_CLASSES.length; i++){
-				let GestureClass = ALL_GESTURE_CLASSES[i];
-				let gesture = new GestureClass(domElement);
-				this.options.supportedGestures.push(gesture);
-			}
+		if (options.hasOwnProperty("supportedGestures")){
+			supportedGestures = options.supportedGestures;
 		}
+		
+			
+		for (let i=0; i<supportedGestures.length; i++){
+			let GestureClass = supportedGestures[i];
+			let gesture = new GestureClass(domElement);
+			this.options.supportedGestures.push(gesture);
+		}
+		
 		
 		this.domElement = domElement;
 		
