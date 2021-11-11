@@ -19,6 +19,9 @@ class PointerListener {
 		this.DEBUG = false;
 	
 		var self = this;
+		
+		var options = options || {};
+		
 		var supportedGestures = ALL_GESTURE_CLASSES;
 		
 		this.options = {
