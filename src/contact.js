@@ -461,13 +461,13 @@ class PointerInput {
 		
 		var timedPointerEvents = this.getTimedPointerEvents();
 		
-		var vector = this.getVector(timedPointerEvents[0], timedPointerEvents[1]);
+		var liveVector = this.getVector(timedPointerEvents[0], timedPointerEvents[1]);
 		
-		this.liveParameters.vector = vector;
+		this.liveParameters.vector = liveVector;
 		
-		if (vector != null){
+		if (liveVector != null){
 	
-			this.liveParameters.speed = this.getSpeed(vector, timedPointerEvents[0].timeStamp, timedPointerEvents[1].timeStamp);
+			this.liveParameters.speed = this.getSpeed(liveVector, timedPointerEvents[0].timeStamp, timedPointerEvents[1].timeStamp);
 		
 			// update global parameters
 			if (this.liveParameters.speed > this.globalParameters.maximumSpeed){
@@ -476,8 +476,8 @@ class PointerInput {
 			this.globalParameters.currentTimestamp = pointerEvent.timeStamp;
 			this.globalParameters.duration = pointerEvent.timeStamp - this.globalParameters.startTimestamp;
 			
-			this.globalParameters.deltaX = vector.endPoint.x - this.globalParameters.startX;
-			this.globalParameters.deltaY = vector.endPoint.y - this.globalParameters.startY;
+			this.globalParameters.deltaX = liveVector.endPoint.x - this.globalParameters.startX;
+			this.globalParameters.deltaY = liveVector.endPoint.y - this.globalParameters.startY;
 			
 			var globalVector = this.getVector(this.initialPointerEvent, this.currentPointerEvent);
 			this.globalParameters.vector = globalVector;
@@ -504,9 +504,6 @@ class PointerInput {
 		var startPointerEvent = this.initialPointerEvent;
 		var endPointerEvent = this.recognizedEvents[ this.recognizedEvents.length -1 ];
 		
-		// also optimize this.recognizedEvents. Remove Events older than this.vectorTimespan
-		var optimizedRecognizedEvents = [];
-		
 		var startIndex = this.recognizedEvents.length - 1;
 		
 		var elapsedTime = 0;
@@ -517,12 +514,11 @@ class PointerInput {
 			startIndex = startIndex -1;
 						
 			if (startIndex < 0){
+				
 				break;
 			}
 			
 			startPointerEvent = this.recognizedEvents[startIndex];
-			
-			optimizedRecognizedEvents.unshift(startPointerEvent);
 						
 			elapsedTime = endTimeStamp - startPointerEvent.timeStamp;
 		
@@ -530,7 +526,7 @@ class PointerInput {
 		
 		var pointerEvents = [startPointerEvent, endPointerEvent];
 		
-		this.recognizedEvents = optimizedRecognizedEvents;
+		this.recognizedEvents = this.recognizedEvents.slice(-20);
 
 		return pointerEvents;
 	}

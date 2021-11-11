@@ -3,7 +3,7 @@ class Gesture {
 
 	constructor (domElement, options){
 	
-		this.DEBUG = false;
+		this.DEBUG = true;
 		
 		this.domElement = domElement;
 		
@@ -40,10 +40,6 @@ class Gesture {
 			finalSpeed : [null, null], // px/s
 			distance : [null, null] // px
 		}
-		
-		
-		
-		this.possibleEvents = []; // a list of currently possible events: ["panleft", "pan"]
 		
 		this.options = options || {};
 	
@@ -82,7 +78,8 @@ class Gesture {
 	}
 	
 	validateBool (parameterName, value) {
-	
+		
+		// requiresPointerMove = false -> it does not matter if the pointer has been moved
 		var requiredValue = this.boolParameters[parameterName];
 		
 		if (requiredValue != null && value != null && requiredValue === value){
@@ -138,8 +135,6 @@ class Gesture {
 		
 		var primaryPointerInput = contact.getPrimaryPointerInput();
 	
-		this.possibleEvents = [];
-	
 		if (this.DEBUG == true){
 			console.log("[Gestures] running recognition for " + this.constructor.name);
 		}
@@ -186,17 +181,6 @@ class Gesture {
 				
 				return false;
 			
-			}
-		}
-		
-		let eventName = this.constructor.name.toLowerCase();
-		this.possibleEvents.push(eventName);
-		
-		// add direction specific events to possible events
-		if (this.options.hasOwnProperty("supportedDirections") && this.options.supportedDirections.length > 0){
-			if (this.options.supportedDirections.indexOf(primaryPointerInput.liveParameters.vector.direction) >= 0){
-				let subeventName = eventName + primaryPointerInput.liveParameters.vector.direction;
-				this.possibleEvents.push(subeventName);
 			}
 		}
 		
@@ -252,6 +236,31 @@ class Gesture {
 		var event = new CustomEvent(eventName, { detail: eventData });
 		
 		this.domElement.dispatchEvent(event);
+		
+		// fire direction specific events
+		var currentDirection = eventData.live.direction;
+
+		if (this.options.hasOwnProperty("supportedDirections")){
+
+			for (let d=0; d<this.options.supportedDirections.length; d++){
+				let direction = this.options.supportedDirections[d];
+				
+				if (direction == currentDirection){
+				
+					let directionEventName = this.constructor.name.toLowerCase() + direction;
+				
+					if (this.DEBUG == true){
+						console.log("[Gestures] detected and firing event " + directionEventName);
+					}
+					
+					let directionEvent = new CustomEvent(directionEventName, { detail: eventData });
+		
+					this.domElement.dispatchEvent(directionEvent);
+					
+				}
+			}
+		
+		}
 		
 	}
 	
@@ -436,6 +445,9 @@ class Pan extends SinglePointerGesture {
 		super.onEnd(contact);
 		
 	}
+	
+	emitSwipe (contact){
+	}
 }
 
 /*
@@ -457,7 +469,7 @@ class Tap extends SinglePointerGesture {
 		
 		this.initialMinMaxParameters["distance"] = [null, 30]; // if a certain distance is detected, TAP becomes impossible
 		
-		this.boolParameters["requiresPointerMove"] = false;
+		this.boolParameters["requiresPointerMove"] = null;
 		this.boolParameters["requiresActivePointer"] = false;
 
 	}
@@ -490,8 +502,6 @@ class MultiPointerGesture extends Gesture {
 		this.activeStateMinMaxParameters = {
 			pointerCount : [2, null]
 		};
-		
-		this.possibleEvents = []; // a list of currently possible events: ["panleft", "pan"]
 		
 		this.options = options || {};
 	
@@ -530,11 +540,56 @@ class TwoPointerGesture extends MultiPointerGesture {
 		// negative distance change: distance was decreased, positive: distance was increased.
 		minMaxParameters.distanceChange = Math.abs(contact.multipointer.liveParameters.distanceChange);
 		
-		minMaxParameters.rotationAngle = Math.abs(contact.multipointer.globalParameters.rotationAngle);
+		minMaxParameters.rotationAngle = Math.abs(contact.multipointer.liveParameters.rotationAngle);
 		
 		return minMaxParameters;
 		
-	}	
+	}
+	
+	getEventData (contact) {
+	
+		// provide short-cuts to the values collected in the Contact object
+		// match this to the event used by hammer.js
+		var eventData = super.getEventData(contact);
+		
+		var globalDuration = contact.currentPointerEvent.timeStamp - this.initialPointerEvent.timeStamp;
+		var globalParameters = contact.multipointer.globalParameters;
+		var liveParameters = contact.multipointer.liveParameters;
+		
+		// global: global for this recognizer, not the Contact object
+		eventData["global"] = {
+			deltaX : globalParameters.centerMovementVector.x,
+			deltaY : globalParameters.centerMovementVector.y,
+			distance: globalParameters.centerMovement,
+			speedX : globalParameters.centerMovementVector.x / globalDuration,
+			speedY : globalParameters.centerMovementVector.y / globalDuration,
+			speed : globalParameters.centerMovementVector.vectorLength / globalDuration,
+			direction : globalParameters.centerMovementVector.direction,
+			scale : globalParameters.relativeDistanceChange,
+			rotation : globalParameters.rotationAngle,
+			srcEvent : contact.currentPointerEvent
+		};
+		
+		eventData["live"] = {
+			deltaX : liveParameters.centerMovementVector.x,
+			deltaY : liveParameters.centerMovementVector.y,
+			distance: liveParameters.centerMovement,
+			speedX : liveParameters.centerMovementVector.x / globalDuration,
+			speedY : liveParameters.centerMovementVector.y / globalDuration,
+			speed : liveParameters.centerMovementVector.vectorLength / globalDuration,
+			direction : liveParameters.centerMovementVector.direction,
+			scale : liveParameters.relativeDistanceChange,
+			rotation : liveParameters.rotationAngle,
+			center : {
+				x : liveParameters.centerMovementVector.startPoint.x,
+				y : liveParameters.centerMovementVector.startPoint.y
+			},
+			srcEvent : contact.currentPointerEvent
+		};
+		
+		return eventData;
+		
+	}
 
 }
 
@@ -554,7 +609,7 @@ class Pinch extends TwoPointerGesture {
 	
 		super(domElement, options);
 		
-		this.initialMinMaxParameters["centerMovement"] = [0, 500]; //px
+		this.initialMinMaxParameters["centerMovement"] = [0, 50]; //px
 		this.initialMinMaxParameters["distanceChange"] = [5, null]; // distance between 2 fingers
 		this.initialMinMaxParameters["rotationAngle"] = [null, 20]; // distance between 2 fingers
 		
@@ -577,8 +632,8 @@ class Rotate extends TwoPointerGesture {
 	
 		super(domElement, options);
 		
-		this.initialMinMaxParameters["centerMovement"] = [0, 500];
-		this.initialMinMaxParameters["distanceChange"] = [null, 500];
+		this.initialMinMaxParameters["centerMovement"] = [0, 50];
+		this.initialMinMaxParameters["distanceChange"] = [null, 50];
 		this.initialMinMaxParameters["rotationAngle"] = [5, null];
 
 	}
@@ -594,8 +649,8 @@ class TwoFingerPan extends TwoPointerGesture {
 	
 		super(domElement, options);
 		
-		this.initialMinMaxParameters["centerMovement"] = [10, null];
-		this.initialMinMaxParameters["distanceChange"] = [null, 5];
+		this.initialMinMaxParameters["centerMovement"] = [5, null];
+		this.initialMinMaxParameters["distanceChange"] = [null, 500];
 		this.initialMinMaxParameters["rotationAngle"] = [null, null];
 
 	}
