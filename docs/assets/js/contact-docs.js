@@ -170,7 +170,7 @@ function requestElementUpdate(wait) {
 	
 	var transformString = transformValues.join(" ");
 	
-	console.log(transformString);
+	//console.log(transformString);
 
 	if(!ticking) {
 		
