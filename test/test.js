@@ -52,13 +52,18 @@ function loadContact (){
 		let recognizer = event.detail.recognizer;
 
 		if (recognizer.isSwipe == true){
-			output.textContent = "Pan end with SWIPE detected";
+			//output.textContent = "Pan end with SWIPE detected";
 		}
 		else {
 			output.textContent = "Pan end detected";
 		}
 		
 		onEnd(event);
+	});
+	
+	rectangle.addEventListener("swipe", function(event){
+		onPan(event);
+		output.textContent = "swipe detected";
 	});
 	
 	rectangle.addEventListener("tap", function(event){

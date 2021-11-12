@@ -222,10 +222,10 @@ class Gesture {
 	}
 	
 	// fire events
-	emit (contact) {
+	emit (contact, eventName) {
 	
 		// fire general event like "pan" , "pinch", "rotate"
-		var eventName = this.constructor.name.toLowerCase();
+		var eventName = eventName || this.constructor.name.toLowerCase();
 		
 		if (this.DEBUG === true){
 			console.log("[Gestures] detected and firing event " + eventName);
@@ -247,7 +247,7 @@ class Gesture {
 				
 				if (direction == currentDirection){
 				
-					let directionEventName = this.constructor.name.toLowerCase() + direction;
+					let directionEventName = eventName + direction;
 				
 					if (this.DEBUG == true){
 						console.log("[Gestures] detected and firing event " + directionEventName);
@@ -438,15 +438,12 @@ class Pan extends SinglePointerGesture {
 		var primaryPointerInput = contact.getPrimaryPointerInput();
 
 		if (this.swipeFinalSpeed < primaryPointerInput.globalParameters.finalSpeed){
-			console.log("swipe")
 			this.isSwipe = true;
+			this.emit(contact, "swipe");
 		}
 		
 		super.onEnd(contact);
-		
-	}
 	
-	emitSwipe (contact){
 	}
 }
 
