@@ -121,7 +121,7 @@ function loadContact (){
 
 
 function onEnd (event){
-
+	
 	if (event.detail.contact.isActive == false){
 		resetElementTransform();
 	}
@@ -268,7 +268,7 @@ function onPinch (event){
 			z : 1
 		};
 		
-		console.log(transform)
+		//console.log(transform)
 		
 		requestElementUpdate();
 				
@@ -289,7 +289,7 @@ function onRotation (event) {
 		angle: contact.multipointer.globalParameters.rotationAngle 
 	};
 	
-	console.log(transform)
+	//console.log(transform)
 	requestElementUpdate();
 	
 }
