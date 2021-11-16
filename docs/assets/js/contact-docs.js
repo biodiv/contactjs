@@ -122,9 +122,9 @@ function loadContact (){
 
 function onEnd (event){
 	
-	if (event.detail.contact.isActive == false){
+	//if (event.detail.contact.isActive == false){
 		resetElementTransform();
-	}
+	//}
 }
 
 function resetElementTransform (){
