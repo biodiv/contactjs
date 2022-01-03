@@ -143,14 +143,15 @@ class Contact {
 	}
 	
 	// also covers pointerleave
-	onPointerOut (pointeroutEvent){
+	// not necessary - using element.setPointerCapture and element.releasePointerCapture instead
+	/*onPointerOut (pointeroutEvent){
 	
 		this.onPointerUp(pointeroutEvent);
 	
 		if (this.DEBUG == true){
 			console.log("[Contact] pointerout detected");
 		}
-	}
+	}*/
 	
 	// update this contact instance. invoked on pointermove, pointerup and pointercancel events
 	updateState () {

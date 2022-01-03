@@ -1,4 +1,4 @@
-// contact.js - version 1.0.6
+// contact.js - version 1.0.7
 
 "use strict";
 
@@ -162,14 +162,15 @@ class Contact {
 	}
 	
 	// also covers pointerleave
-	onPointerOut (pointeroutEvent){
+	// not necessary - using element.setPointerCapture and element.releasePointerCapture instead
+	/*onPointerOut (pointeroutEvent){
 	
 		this.onPointerUp(pointeroutEvent);
 	
 		if (this.DEBUG == true){
 			console.log("[Contact] pointerout detected");
 		}
-	}
+	}*/
 	
 	// update this contact instance. invoked on pointermove, pointerup and pointercancel events
 	updateState () {
@@ -1430,6 +1431,10 @@ class PointerListener {
 		// javascript fires the events "pointerdown", "pointermove", "pointerup" and "pointercancel"
 		// on each of these events, the contact instance is updated and GestureRecognizers of this.supported_events are run		
 		domElement.addEventListener("pointerdown", function(event){
+		
+			// re-target all pointerevents to the current element
+			// see https://developer.mozilla.org/en-US/docs/Web/API/Element/setPointerCapture
+			domElement.setPointerCapture(event.pointerId);
 			
 			if (self.contact == null || self.contact.isActive == false) {
 				self.contact = new Contact(event);
@@ -1466,6 +1471,8 @@ class PointerListener {
 		
 		domElement.addEventListener("pointerup", function(event){
 		
+			domElement.releasePointerCapture(event.pointerId);
+		
 			if (self.contact != null && self.contact.isActive == true){
 		
 				// use css: touch-action: none instead of js to disable scrolling
@@ -1481,18 +1488,28 @@ class PointerListener {
 		});
 		
 		/*
-		* stylus and mouse : respect pointerout and pointerleave
+		* case: user presses mouse button and moves element. while moving, the cursor leaves the element (fires pointerout)
+		*		while outside the element, the mouse button is released. pointerup is not fired.
+		*		during pan, pan should not end if the pointer leaves the element.
+		* MDN: Pointer capture allows events for a particular pointer event (PointerEvent) to be re-targeted to a particular element instead of the normal (or hit test) target at a pointer's location. This can be used to ensure that an element continues to receive pointer events even if the pointer device's contact moves off the element (such as by scrolling or panning). 
 		*/
-		domElement.addEventListener("pointerout", function(event){
+		
+		/*domElement.addEventListener("pointerout", function(event){
 			
 			if (self.contact != null && self.contact.isActive == true){
 				self.contact.onPointerOut(event);
 				self.recognizeGestures();
 			}		
-		});
-		
+		});*/
+
 		
 		domElement.addEventListener("pointercancel", function(event){
+		
+			domElement.releasePointerCapture(event.pointerId);
+		
+			if (this.DEBUG == true){
+				console.log("[TouchListener] pointercancel detected");
+			}
 		
 			//self.domElement.classList.remove("disable-scrolling");
 		
