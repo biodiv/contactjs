@@ -20,25 +20,46 @@ class PointerListener {
 	
 		var self = this;
 		
-		var options = options || {};
+		options = options || {};
 		
 		var supportedGestures = ALL_GESTURE_CLASSES;
 		
+		// default options
 		this.options = {
-			supportedGestures : []
+			supportedGestures : [], // default managed below, adding all gestures
+			handleTouchEvents : true
 		};
 		
-		if (options.hasOwnProperty("supportedGestures")){
+		// instantiate gesture classes on domElement and add them to this.options
+		var hasSupportedGestures = Object.prototype.hasOwnProperty.call(options, "supportedGestures");
+		if (hasSupportedGestures == true){
 			supportedGestures = options.supportedGestures;
 		}
 		
-			
 		for (let i=0; i<supportedGestures.length; i++){
+	
+			let gesture;
 			let GestureClass = supportedGestures[i];
-			let gesture = new GestureClass(domElement);
+
+			if (typeof GestureClass == "function"){
+				gesture = new GestureClass(domElement);
+			}
+			else if (typeof GestureClass == "object"){
+				gesture = GestureClass;
+			}
+			else {
+				throw new Error("unsupported gesture type: " + typeof GestureClass);
+			}
 			this.options.supportedGestures.push(gesture);
 		}
 		
+		for (let key in options){
+			if (key == "supportedGestures"){
+				continue;
+			}
+
+			this.options[key] = options[key];
+		}
 		
 		this.domElement = domElement;
 		
@@ -66,8 +87,9 @@ class PointerListener {
 				// use existing contact instance if a second pointer becomes present
 				self.contact.addPointer(event);
 			}
-					
-			if (self.options.hasOwnProperty("pointerdown")){
+			
+			var hasPointerDownHook = Object.prototype.hasOwnProperty.call(self.options, "pointerdown");
+			if (hasPointerDownHook == true){
 				self.options.pointerdown(event, self);
 			}
 			
@@ -85,7 +107,8 @@ class PointerListener {
 				self.contact.onPointerMove(event);
 				self.recognizeGestures();
 				
-				if (self.options.hasOwnProperty("pointermove")){
+				var hasPointerMoveHook = Object.prototype.hasOwnProperty.call(self.options, "pointermove");
+				if (hasPointerMoveHook == true){
 					self.options.pointermove(event, self);
 				}
 			}
@@ -104,7 +127,8 @@ class PointerListener {
 				self.contact.onPointerUp(event);
 				self.recognizeGestures();
 				
-				if (self.options.hasOwnProperty("pointerup")){
+				var hasPointerUpHook = Object.prototype.hasOwnProperty.call(self.options, "pointerup");
+				if (hasPointerUpHook == true){
 					self.options.pointerup(event, self);
 				}
 			}
@@ -117,13 +141,13 @@ class PointerListener {
 		* MDN: Pointer capture allows events for a particular pointer event (PointerEvent) to be re-targeted to a particular element instead of the normal (or hit test) target at a pointer's location. This can be used to ensure that an element continues to receive pointer events even if the pointer device's contact moves off the element (such as by scrolling or panning). 
 		*/
 		
-		/*domElement.addEventListener("pointerout", function(event){
+		domElement.addEventListener("pointerleave", function(event){
 			
 			if (self.contact != null && self.contact.isActive == true){
-				self.contact.onPointerOut(event);
+				self.contact.onPointerLeave(event);
 				self.recognizeGestures();
 			}		
-		});*/
+		});
 
 		
 		domElement.addEventListener("pointercancel", function(event){
@@ -131,7 +155,7 @@ class PointerListener {
 			domElement.releasePointerCapture(event.pointerId);
 		
 			if (this.DEBUG == true){
-				console.log("[TouchListener] pointercancel detected");
+				console.log("[PointerListener] pointercancel detected");
 			}
 		
 			//self.domElement.classList.remove("disable-scrolling");
@@ -139,14 +163,50 @@ class PointerListener {
 			self.contact.onPointerCancel(event);
 			self.recognizeGestures();
 			
-			if (self.options.hasOwnProperty("pointercancel")){
+			var hasPointerCancelHook = Object.prototype.hasOwnProperty.call(self.options, "pointercancel");
+			if (hasPointerCancelHook == true){
 				self.options.pointercancel(event, self);
 			}
 			
 			
 		}, { "passive": true });
 		
-	
+		
+		this.addTouchListeners();
+	}
+
+	// provide the ability to interact/prevent touch events
+	// scrolling (touchmove event) results in pointerCancel event, stopping horizontal panning if user scrolls vertically
+	// the better solution is using eg css: touch-action: pan-y;
+	addTouchListeners () {
+
+		var self = this;
+
+		if (self.options.handleTouchEvents == true){
+
+			/*this.domElement.addEventListener("touchstart", function(event){
+
+			});*/
+
+			this.domElement.addEventListener("touchmove", function(event){
+				
+				// fire onTouchMove for all gestures
+				for (let g=0; g<self.options.supportedGestures.length; g++){
+			
+					let gesture = self.options.supportedGestures[g];
+
+					gesture.onTouchMove(event);
+				}
+				
+			});
+
+			/*this.domElement.addEventListener("touchend", function(event){
+			});
+
+			this.domElement.addEventListener("touchcancel", function(event){
+			});*/
+		}
+
 	}
 	
 	// run all configured recognizers

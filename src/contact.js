@@ -18,7 +18,7 @@
 */
 class Contact {
 
-	constructor (pointerdownEvent, options) {
+	constructor (pointerdownEvent) {
 	
 		this.DEBUG = false;
 	
@@ -77,8 +77,10 @@ class Contact {
 	
 	// return a specific pointer input by its identifier
 	getPointerInput (pointerId) {
+
+		var hasPointerId = Object.prototype.hasOwnProperty.call(this.pointers, pointerId);
 	
-		if (this.pointers.hasOwnProperty(pointerId)){
+		if (hasPointerId){
 				
 			let pointerInput = this.pointers[pointerId];
 			
@@ -134,7 +136,7 @@ class Contact {
 	
 	onPointerCancel (pointercancelEvent) {
 	
-		this.onPointerUp(pointerupEvent);
+		this.onPointerUp(pointercancelEvent);
 		
 		if (this.DEBUG == true){
 			console.log("[Contact] pointercancel detected");
@@ -144,14 +146,14 @@ class Contact {
 	
 	// also covers pointerleave
 	// not necessary - using element.setPointerCapture and element.releasePointerCapture instead
-	/*onPointerOut (pointeroutEvent){
+	onPointerLeave (pointerleaveEvent){
 	
-		this.onPointerUp(pointeroutEvent);
+		this.onPointerUp(pointerleaveEvent);
 	
 		if (this.DEBUG == true){
-			console.log("[Contact] pointerout detected");
+			console.log("[Contact] pointerleave detected");
 		}
-	}*/
+	}
 	
 	// update this contact instance. invoked on pointermove, pointerup and pointercancel events
 	updateState () {
@@ -303,12 +305,12 @@ class Contact {
 		var translationVector_1 = new Vector(angleVector_1.startPoint, origin);
 		var translatedEndPoint_1 = translatePoint(angleVector_1.endPoint, translationVector_1);
 		
-		var v_1_translated = new Vector(origin, translatedEndPoint_1);
+		//var v_1_translated = new Vector(origin, translatedEndPoint_1);
 		
 		var translationVector_2 = new Vector(angleVector_2.startPoint, origin);
 		var translatedEndPoint_2 = translatePoint(angleVector_2.endPoint, translationVector_2);
 		
-		var v2_translated = new Vector(origin, translatedEndPoint_2);
+		//var v2_translated = new Vector(origin, translatedEndPoint_2);
 		
 		
 		// rotate the first angle vector so its y-coordinate becomes 0
@@ -321,17 +323,17 @@ class Contact {
 		var rotationAngle = calcAngleRad(translatedEndPoint_1) * (-1);
 		
 		// rottation matrix
-		var x_1_rotated =  ( translatedEndPoint_1.x * Math.cos(rotationAngle) ) - ( translatedEndPoint_1.y * Math.sin(rotationAngle) );
-		var y_1_rotated = Math.round(( translatedEndPoint_1.x * Math.sin(rotationAngle) ) + ( translatedEndPoint_1.y * Math.cos(rotationAngle) )); // should be 0
+		//var x_1_rotated =  ( translatedEndPoint_1.x * Math.cos(rotationAngle) ) - ( translatedEndPoint_1.y * Math.sin(rotationAngle) );
+		//var y_1_rotated = Math.round(( translatedEndPoint_1.x * Math.sin(rotationAngle) ) + ( translatedEndPoint_1.y * Math.cos(rotationAngle) )); // should be 0
 		
-		var v_1_rotated = new Vector(origin, new Point(x_1_rotated, y_1_rotated));
+		//var v_1_rotated = new Vector(origin, new Point(x_1_rotated, y_1_rotated));
 		
 		
 		// rotate the second vector (in time: after 1st)
 		var x_2_rotated =  ( translatedEndPoint_2.x * Math.cos(rotationAngle) ) - ( translatedEndPoint_2.y * Math.sin(rotationAngle) );
 		var y_2_rotated = Math.round(( translatedEndPoint_2.x * Math.sin(rotationAngle) ) + ( translatedEndPoint_2.y * Math.cos(rotationAngle) ));
 		
-		var v_2_rotated = new Vector(origin, new Point(x_2_rotated, y_2_rotated));
+		//var v_2_rotated = new Vector(origin, new Point(x_2_rotated, y_2_rotated));
 		
 		// calculate the angle between v_1 and v_2
 		
@@ -363,11 +365,12 @@ class PointerInput {
 	
 		this.DEBUG = false;
 		
-		var options = options || {};
+		options = options || {};
 		
 
 		this.pointerId = pointerdownEvent.pointerId;
-		this.vectorTimespan = options.hasOwnProperty("vectorTimespan") ? options.vectorTimespan : 100; // milliseconds
+		var hasVectorTimespan = Object.prototype.hasOwnProperty.call(options, "vectorTimespan");
+		this.vectorTimespan = hasVectorTimespan == true ? options.vectorTimespan : 100; // milliseconds
 
 		// events used for vector calculation
 		this.initialPointerEvent = pointerdownEvent;
@@ -622,7 +625,7 @@ class Vector {
 		}
 		else {
 			// up or down
-			if (this.startPoint.y > this.endPoint.y){
+			if (this.startPoint.y < this.endPoint.y){
 				this.direction = DIRECTION_UP;
 			}
 			else {

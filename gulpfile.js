@@ -10,6 +10,14 @@ const productionJSFiles = [
 	'src/pointer-listener.js'
 ];
 
+const productionJSFilesForModule = [
+	'src/input-consts.js',
+	'src/contact.js',
+	'src/gestures.js',
+	'src/pointer-listener.js',
+	'src/exports.js'
+];
+
 function transpile(cb) {
   // body omitted
   cb();
@@ -30,15 +38,23 @@ function bundleAndMinify(cb) {
 		.pipe(minify({
 			noSource : true,
 			ext : {
-            	src :'-debug.js',
-            	min :'.min.js'
-        	}
-        }))
+				src :'-debug.js',
+				min :'.min.js'
+			}
+		}))
 		.pipe(dest('build/'));
 		
 	cb();
 
 }
 
+function bundleAsModule(cb) {
+	src(productionJSFilesForModule)
+		.pipe(concat('contact.module.js'))
+		.pipe(dest('build/'));
+		
+	cb();
+}
 
-exports.build = series(transpile, bundle, bundleAndMinify);
+
+exports.build = series(transpile, bundle, bundleAndMinify, bundleAsModule);

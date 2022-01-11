@@ -35,7 +35,7 @@ const GESTURE_STATE_BLOCKED = "blocked";
 */
 class Contact {
 
-	constructor (pointerdownEvent, options) {
+	constructor (pointerdownEvent) {
 	
 		this.DEBUG = false;
 	
@@ -94,8 +94,10 @@ class Contact {
 	
 	// return a specific pointer input by its identifier
 	getPointerInput (pointerId) {
+
+		var hasPointerId = Object.prototype.hasOwnProperty.call(this.pointers, pointerId);
 	
-		if (this.pointers.hasOwnProperty(pointerId)){
+		if (hasPointerId){
 				
 			let pointerInput = this.pointers[pointerId];
 			
@@ -151,7 +153,7 @@ class Contact {
 	
 	onPointerCancel (pointercancelEvent) {
 	
-		this.onPointerUp(pointerupEvent);
+		this.onPointerUp(pointercancelEvent);
 		
 		if (this.DEBUG == true){
 			console.log("[Contact] pointercancel detected");
@@ -161,14 +163,14 @@ class Contact {
 	
 	// also covers pointerleave
 	// not necessary - using element.setPointerCapture and element.releasePointerCapture instead
-	/*onPointerOut (pointeroutEvent){
+	onPointerLeave (pointerleaveEvent){
 	
-		this.onPointerUp(pointeroutEvent);
+		this.onPointerUp(pointerleaveEvent);
 	
 		if (this.DEBUG == true){
-			console.log("[Contact] pointerout detected");
+			console.log("[Contact] pointerleave detected");
 		}
-	}*/
+	}
 	
 	// update this contact instance. invoked on pointermove, pointerup and pointercancel events
 	updateState () {
@@ -320,12 +322,12 @@ class Contact {
 		var translationVector_1 = new Vector(angleVector_1.startPoint, origin);
 		var translatedEndPoint_1 = translatePoint(angleVector_1.endPoint, translationVector_1);
 		
-		var v_1_translated = new Vector(origin, translatedEndPoint_1);
+		//var v_1_translated = new Vector(origin, translatedEndPoint_1);
 		
 		var translationVector_2 = new Vector(angleVector_2.startPoint, origin);
 		var translatedEndPoint_2 = translatePoint(angleVector_2.endPoint, translationVector_2);
 		
-		var v2_translated = new Vector(origin, translatedEndPoint_2);
+		//var v2_translated = new Vector(origin, translatedEndPoint_2);
 		
 		
 		// rotate the first angle vector so its y-coordinate becomes 0
@@ -338,17 +340,17 @@ class Contact {
 		var rotationAngle = calcAngleRad(translatedEndPoint_1) * (-1);
 		
 		// rottation matrix
-		var x_1_rotated =  ( translatedEndPoint_1.x * Math.cos(rotationAngle) ) - ( translatedEndPoint_1.y * Math.sin(rotationAngle) );
-		var y_1_rotated = Math.round(( translatedEndPoint_1.x * Math.sin(rotationAngle) ) + ( translatedEndPoint_1.y * Math.cos(rotationAngle) )); // should be 0
+		//var x_1_rotated =  ( translatedEndPoint_1.x * Math.cos(rotationAngle) ) - ( translatedEndPoint_1.y * Math.sin(rotationAngle) );
+		//var y_1_rotated = Math.round(( translatedEndPoint_1.x * Math.sin(rotationAngle) ) + ( translatedEndPoint_1.y * Math.cos(rotationAngle) )); // should be 0
 		
-		var v_1_rotated = new Vector(origin, new Point(x_1_rotated, y_1_rotated));
+		//var v_1_rotated = new Vector(origin, new Point(x_1_rotated, y_1_rotated));
 		
 		
 		// rotate the second vector (in time: after 1st)
 		var x_2_rotated =  ( translatedEndPoint_2.x * Math.cos(rotationAngle) ) - ( translatedEndPoint_2.y * Math.sin(rotationAngle) );
 		var y_2_rotated = Math.round(( translatedEndPoint_2.x * Math.sin(rotationAngle) ) + ( translatedEndPoint_2.y * Math.cos(rotationAngle) ));
 		
-		var v_2_rotated = new Vector(origin, new Point(x_2_rotated, y_2_rotated));
+		//var v_2_rotated = new Vector(origin, new Point(x_2_rotated, y_2_rotated));
 		
 		// calculate the angle between v_1 and v_2
 		
@@ -380,11 +382,12 @@ class PointerInput {
 	
 		this.DEBUG = false;
 		
-		var options = options || {};
+		options = options || {};
 		
 
 		this.pointerId = pointerdownEvent.pointerId;
-		this.vectorTimespan = options.hasOwnProperty("vectorTimespan") ? options.vectorTimespan : 100; // milliseconds
+		var hasVectorTimespan = Object.prototype.hasOwnProperty.call(options, "vectorTimespan");
+		this.vectorTimespan = hasVectorTimespan == true ? options.vectorTimespan : 100; // milliseconds
 
 		// events used for vector calculation
 		this.initialPointerEvent = pointerdownEvent;
@@ -639,7 +642,7 @@ class Vector {
 		}
 		else {
 			// up or down
-			if (this.startPoint.y > this.endPoint.y){
+			if (this.startPoint.y < this.endPoint.y){
 				this.direction = DIRECTION_UP;
 			}
 			else {
@@ -766,7 +769,7 @@ class Gesture {
 	
 	validateMinMax (minMaxParameters, parameterName, value){
 	
-		var minValue = minMaxParameters[parameterName][0];;
+		var minValue = minMaxParameters[parameterName][0];
 		var maxValue = minMaxParameters[parameterName][1];
 
 		
@@ -866,7 +869,7 @@ class Gesture {
 			isValid = this.validateBool(boolParameterName, boolValue);
 			if (isValid == false){
 				return false;
-				break;
+				//break;
 			}
 		}
 		
@@ -886,12 +889,13 @@ class Gesture {
 			isValid = this.validateMinMax(minMaxParameters, minMaxParameterName, value);
 			if (isValid == false){
 				return false;
-				break;
+				//break;
 			}
 		}
 		
 		// check direction
-		if (this.options.hasOwnProperty("supportedDirections") && this.options.supportedDirections.length > 0){
+		var hasSupportedDirections = Object.prototype.hasOwnProperty.call(this.options, "supportedDirections");
+		if (hasSupportedDirections == true && this.options.supportedDirections.length > 0){
 			if (this.options.supportedDirections.indexOf(primaryPointerInput.liveParameters.vector.direction) == -1){
 			
 				if (this.DEBUG == true){
@@ -944,7 +948,7 @@ class Gesture {
 	emit (contact, eventName) {
 	
 		// fire general event like "pan" , "pinch", "rotate"
-		var eventName = eventName || this.constructor.name.toLowerCase();
+		eventName = eventName || this.constructor.name.toLowerCase();
 		
 		if (this.DEBUG === true){
 			console.log("[Gestures] detected and firing event " + eventName);
@@ -959,7 +963,8 @@ class Gesture {
 		// fire direction specific events
 		var currentDirection = eventData.live.direction;
 
-		if (this.options.hasOwnProperty("supportedDirections")){
+		var hasSupportedDirections = Object.prototype.hasOwnProperty.call(this.options, "supportedDirections");
+		if (hasSupportedDirections == true){
 
 			for (let d=0; d<this.options.supportedDirections.length; d++){
 				let direction = this.options.supportedDirections[d];
@@ -1024,6 +1029,12 @@ class Gesture {
 	
 	}
 
+	// provide the ability to react (eg block) to touch events
+	onTouchStart () {}
+	onTouchMove () {}
+	onTouchEnd () {}
+	onTouchCancel (){}
+
 }
 
 
@@ -1031,7 +1042,7 @@ class SinglePointerGesture extends Gesture {
 
 	constructor (domElement, options) {
 	
-		var options = options || {};
+		options = options || {};
 	
 		super(domElement, options);
 	
@@ -1109,13 +1120,13 @@ class Pan extends SinglePointerGesture {
 	
 	constructor (domElement, options){
 	
-		var options = options || {};
+		options = options || {};
 	
 		super(domElement, options);
 		
 		this.initialMinMaxParameters["pointerCount"] = [1,1]; // 1: no pan recognized at the pointerup event. 0: pan recognized at pointerup
 		this.initialMinMaxParameters["duration"] = [0, null];
-		this.initialMinMaxParameters["distance"] = [10, null]; 
+		this.initialMinMaxParameters["distance"] = [20, null]; 
 		
 		this.activeStateMinMaxParameters["pointerCount"] = [1,1];
 		
@@ -1125,9 +1136,15 @@ class Pan extends SinglePointerGesture {
 		this.swipeFinalSpeed = 600;
 		
 		this.isSwipe = false;
+
+		this.initialSupportedDirections = DIRECTION_ALL;
 		
-		if (!options.hasOwnProperty("supportedDirections")){
+		var hasSupportedDirections = Object.prototype.hasOwnProperty.call(options, "supportedDirections");
+		if (!hasSupportedDirections){
 			this.options.supportedDirections = DIRECTION_ALL;
+		}
+		else {
+			this.initialSupportedDirections = options.supportedDirections;
 		}
 	}
 	
@@ -1162,7 +1179,21 @@ class Pan extends SinglePointerGesture {
 		}
 		
 		super.onEnd(contact);
+
+		this.options.supportedDirections = this.initialSupportedDirections;
 	
+	}
+
+	onTouchMove (event) {
+		if (this.isActive == true) {
+
+			if (this.DEBUG == true){
+				console.log("[Pan] preventing touchmove default");
+			}
+
+			event.preventDefault();
+			event.stopPropagation();
+		}
 	}
 }
 
@@ -1176,7 +1207,7 @@ class Tap extends SinglePointerGesture {
 
 	constructor (domElement, options) {
 	
-		var options = options || {};
+		options = options || {};
 	
 		super(domElement, options);
 		
@@ -1202,7 +1233,7 @@ class MultiPointerGesture extends Gesture {
 	
 	constructor (domElement, options) {
 	
-		var options = options || {};
+		options = options || {};
 	
 		super(domElement, options);
 		
@@ -1229,7 +1260,7 @@ class TwoPointerGesture extends MultiPointerGesture {
 
 	constructor (domElement, options) {
 	
-		var options = options || {};
+		options = options || {};
 	
 		super(domElement, options);
 		
@@ -1321,7 +1352,7 @@ class Pinch extends TwoPointerGesture {
 
 	constructor (domElement, options) {
 	
-		var options = options || {};
+		options = options || {};
 	
 		super(domElement, options);
 		
@@ -1344,7 +1375,7 @@ class Rotate extends TwoPointerGesture {
 
 	constructor (domElement, options) {
 	
-		var options = options || {};
+		options = options || {};
 	
 		super(domElement, options);
 		
@@ -1361,7 +1392,7 @@ class TwoFingerPan extends TwoPointerGesture {
 
 	constructor (domElement, options) {
 	
-		var options = options || {};
+		options = options || {};
 	
 		super(domElement, options);
 		
@@ -1395,25 +1426,46 @@ class PointerListener {
 	
 		var self = this;
 		
-		var options = options || {};
+		options = options || {};
 		
 		var supportedGestures = ALL_GESTURE_CLASSES;
 		
+		// default options
 		this.options = {
-			supportedGestures : []
+			supportedGestures : [], // default managed below, adding all gestures
+			handleTouchEvents : true
 		};
 		
-		if (options.hasOwnProperty("supportedGestures")){
+		// instantiate gesture classes on domElement and add them to this.options
+		var hasSupportedGestures = Object.prototype.hasOwnProperty.call(options, "supportedGestures");
+		if (hasSupportedGestures == true){
 			supportedGestures = options.supportedGestures;
 		}
 		
-			
 		for (let i=0; i<supportedGestures.length; i++){
+	
+			let gesture;
 			let GestureClass = supportedGestures[i];
-			let gesture = new GestureClass(domElement);
+
+			if (typeof GestureClass == "function"){
+				gesture = new GestureClass(domElement);
+			}
+			else if (typeof GestureClass == "object"){
+				gesture = GestureClass;
+			}
+			else {
+				throw new Error("unsupported gesture type: " + typeof GestureClass);
+			}
 			this.options.supportedGestures.push(gesture);
 		}
 		
+		for (let key in options){
+			if (key == "supportedGestures"){
+				continue;
+			}
+
+			this.options[key] = options[key];
+		}
 		
 		this.domElement = domElement;
 		
@@ -1441,8 +1493,9 @@ class PointerListener {
 				// use existing contact instance if a second pointer becomes present
 				self.contact.addPointer(event);
 			}
-					
-			if (self.options.hasOwnProperty("pointerdown")){
+			
+			var hasPointerDownHook = Object.prototype.hasOwnProperty.call(self.options, "pointerdown");
+			if (hasPointerDownHook == true){
 				self.options.pointerdown(event, self);
 			}
 			
@@ -1460,7 +1513,8 @@ class PointerListener {
 				self.contact.onPointerMove(event);
 				self.recognizeGestures();
 				
-				if (self.options.hasOwnProperty("pointermove")){
+				var hasPointerMoveHook = Object.prototype.hasOwnProperty.call(self.options, "pointermove");
+				if (hasPointerMoveHook == true){
 					self.options.pointermove(event, self);
 				}
 			}
@@ -1479,7 +1533,8 @@ class PointerListener {
 				self.contact.onPointerUp(event);
 				self.recognizeGestures();
 				
-				if (self.options.hasOwnProperty("pointerup")){
+				var hasPointerUpHook = Object.prototype.hasOwnProperty.call(self.options, "pointerup");
+				if (hasPointerUpHook == true){
 					self.options.pointerup(event, self);
 				}
 			}
@@ -1492,13 +1547,13 @@ class PointerListener {
 		* MDN: Pointer capture allows events for a particular pointer event (PointerEvent) to be re-targeted to a particular element instead of the normal (or hit test) target at a pointer's location. This can be used to ensure that an element continues to receive pointer events even if the pointer device's contact moves off the element (such as by scrolling or panning). 
 		*/
 		
-		/*domElement.addEventListener("pointerout", function(event){
+		domElement.addEventListener("pointerleave", function(event){
 			
 			if (self.contact != null && self.contact.isActive == true){
-				self.contact.onPointerOut(event);
+				self.contact.onPointerLeave(event);
 				self.recognizeGestures();
 			}		
-		});*/
+		});
 
 		
 		domElement.addEventListener("pointercancel", function(event){
@@ -1506,7 +1561,7 @@ class PointerListener {
 			domElement.releasePointerCapture(event.pointerId);
 		
 			if (this.DEBUG == true){
-				console.log("[TouchListener] pointercancel detected");
+				console.log("[PointerListener] pointercancel detected");
 			}
 		
 			//self.domElement.classList.remove("disable-scrolling");
@@ -1514,14 +1569,50 @@ class PointerListener {
 			self.contact.onPointerCancel(event);
 			self.recognizeGestures();
 			
-			if (self.options.hasOwnProperty("pointercancel")){
+			var hasPointerCancelHook = Object.prototype.hasOwnProperty.call(self.options, "pointercancel");
+			if (hasPointerCancelHook == true){
 				self.options.pointercancel(event, self);
 			}
 			
 			
 		}, { "passive": true });
 		
-	
+		
+		this.addTouchListeners();
+	}
+
+	// provide the ability to interact/prevent touch events
+	// scrolling (touchmove event) results in pointerCancel event, stopping horizontal panning if user scrolls vertically
+	// the better solution is using eg css: touch-action: pan-y;
+	addTouchListeners () {
+
+		var self = this;
+
+		if (self.options.handleTouchEvents == true){
+
+			/*this.domElement.addEventListener("touchstart", function(event){
+
+			});*/
+
+			this.domElement.addEventListener("touchmove", function(event){
+				
+				// fire onTouchMove for all gestures
+				for (let g=0; g<self.options.supportedGestures.length; g++){
+			
+					let gesture = self.options.supportedGestures[g];
+
+					gesture.onTouchMove(event);
+				}
+				
+			});
+
+			/*this.domElement.addEventListener("touchend", function(event){
+			});
+
+			this.domElement.addEventListener("touchcancel", function(event){
+			});*/
+		}
+
 	}
 	
 	// run all configured recognizers

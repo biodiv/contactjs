@@ -1,7 +1,5 @@
 "use strict";
 
-// contact.js - v1.1.0
-
 const DIRECTION_NONE = "0";
 const DIRECTION_LEFT = "left";
 const DIRECTION_RIGHT = "right";
@@ -1630,4 +1628,12 @@ class PointerListener {
 		
 	}
 	
+}
+
+export {
+    DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP, DIRECTION_DOWN, DIRECTION_VERTICAL, DIRECTION_HORIZONTAL, DIRECTION_CLOCKWISE, DIRECTION_COUNTER_CLOCKWISE,
+    GESTURE_STATE_BLOCKED, GESTURE_STATE_POSSIBLE,
+    deg2rad, rad2deg, calcAngleDegrees, calcAngleRad,
+    PointerListener,
+    Tap, Pan, Pinch, Rotate, TwoFingerPan
 }

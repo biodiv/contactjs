@@ -47,7 +47,7 @@ class Gesture {
 	
 	validateMinMax (minMaxParameters, parameterName, value){
 	
-		var minValue = minMaxParameters[parameterName][0];;
+		var minValue = minMaxParameters[parameterName][0];
 		var maxValue = minMaxParameters[parameterName][1];
 
 		
@@ -147,7 +147,7 @@ class Gesture {
 			isValid = this.validateBool(boolParameterName, boolValue);
 			if (isValid == false){
 				return false;
-				break;
+				//break;
 			}
 		}
 		
@@ -167,12 +167,13 @@ class Gesture {
 			isValid = this.validateMinMax(minMaxParameters, minMaxParameterName, value);
 			if (isValid == false){
 				return false;
-				break;
+				//break;
 			}
 		}
 		
 		// check direction
-		if (this.options.hasOwnProperty("supportedDirections") && this.options.supportedDirections.length > 0){
+		var hasSupportedDirections = Object.prototype.hasOwnProperty.call(this.options, "supportedDirections");
+		if (hasSupportedDirections == true && this.options.supportedDirections.length > 0){
 			if (this.options.supportedDirections.indexOf(primaryPointerInput.liveParameters.vector.direction) == -1){
 			
 				if (this.DEBUG == true){
@@ -225,7 +226,7 @@ class Gesture {
 	emit (contact, eventName) {
 	
 		// fire general event like "pan" , "pinch", "rotate"
-		var eventName = eventName || this.constructor.name.toLowerCase();
+		eventName = eventName || this.constructor.name.toLowerCase();
 		
 		if (this.DEBUG === true){
 			console.log("[Gestures] detected and firing event " + eventName);
@@ -240,7 +241,8 @@ class Gesture {
 		// fire direction specific events
 		var currentDirection = eventData.live.direction;
 
-		if (this.options.hasOwnProperty("supportedDirections")){
+		var hasSupportedDirections = Object.prototype.hasOwnProperty.call(this.options, "supportedDirections");
+		if (hasSupportedDirections == true){
 
 			for (let d=0; d<this.options.supportedDirections.length; d++){
 				let direction = this.options.supportedDirections[d];
@@ -305,6 +307,12 @@ class Gesture {
 	
 	}
 
+	// provide the ability to react (eg block) to touch events
+	onTouchStart () {}
+	onTouchMove () {}
+	onTouchEnd () {}
+	onTouchCancel (){}
+
 }
 
 
@@ -312,7 +320,7 @@ class SinglePointerGesture extends Gesture {
 
 	constructor (domElement, options) {
 	
-		var options = options || {};
+		options = options || {};
 	
 		super(domElement, options);
 	
@@ -390,13 +398,13 @@ class Pan extends SinglePointerGesture {
 	
 	constructor (domElement, options){
 	
-		var options = options || {};
+		options = options || {};
 	
 		super(domElement, options);
 		
 		this.initialMinMaxParameters["pointerCount"] = [1,1]; // 1: no pan recognized at the pointerup event. 0: pan recognized at pointerup
 		this.initialMinMaxParameters["duration"] = [0, null];
-		this.initialMinMaxParameters["distance"] = [10, null]; 
+		this.initialMinMaxParameters["distance"] = [20, null]; 
 		
 		this.activeStateMinMaxParameters["pointerCount"] = [1,1];
 		
@@ -406,9 +414,15 @@ class Pan extends SinglePointerGesture {
 		this.swipeFinalSpeed = 600;
 		
 		this.isSwipe = false;
+
+		this.initialSupportedDirections = DIRECTION_ALL;
 		
-		if (!options.hasOwnProperty("supportedDirections")){
+		var hasSupportedDirections = Object.prototype.hasOwnProperty.call(options, "supportedDirections");
+		if (!hasSupportedDirections){
 			this.options.supportedDirections = DIRECTION_ALL;
+		}
+		else {
+			this.initialSupportedDirections = options.supportedDirections;
 		}
 	}
 	
@@ -443,7 +457,21 @@ class Pan extends SinglePointerGesture {
 		}
 		
 		super.onEnd(contact);
+
+		this.options.supportedDirections = this.initialSupportedDirections;
 	
+	}
+
+	onTouchMove (event) {
+		if (this.isActive == true) {
+
+			if (this.DEBUG == true){
+				console.log("[Pan] preventing touchmove default");
+			}
+
+			event.preventDefault();
+			event.stopPropagation();
+		}
 	}
 }
 
@@ -457,7 +485,7 @@ class Tap extends SinglePointerGesture {
 
 	constructor (domElement, options) {
 	
-		var options = options || {};
+		options = options || {};
 	
 		super(domElement, options);
 		
@@ -483,7 +511,7 @@ class MultiPointerGesture extends Gesture {
 	
 	constructor (domElement, options) {
 	
-		var options = options || {};
+		options = options || {};
 	
 		super(domElement, options);
 		
@@ -510,7 +538,7 @@ class TwoPointerGesture extends MultiPointerGesture {
 
 	constructor (domElement, options) {
 	
-		var options = options || {};
+		options = options || {};
 	
 		super(domElement, options);
 		
@@ -602,7 +630,7 @@ class Pinch extends TwoPointerGesture {
 
 	constructor (domElement, options) {
 	
-		var options = options || {};
+		options = options || {};
 	
 		super(domElement, options);
 		
@@ -625,7 +653,7 @@ class Rotate extends TwoPointerGesture {
 
 	constructor (domElement, options) {
 	
-		var options = options || {};
+		options = options || {};
 	
 		super(domElement, options);
 		
@@ -642,7 +670,7 @@ class TwoFingerPan extends TwoPointerGesture {
 
 	constructor (domElement, options) {
 	
-		var options = options || {};
+		options = options || {};
 	
 		super(domElement, options);
 		
