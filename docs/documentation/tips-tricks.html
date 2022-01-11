@@ -1,0 +1,86 @@
+---
+title: CONTACT.JS
+layout: default
+permalink: /documentation/tips-tricks/
+bg-color: bg-white
+---
+
+<div class="container">
+	<div class="row mt-5">
+		<div class="col-12 col-md-4 col-lg-2">
+			{% include_relative nav.html %}
+		</div>
+		<div class="col-12 col-md-8 col-lg-10">
+			<div class="row">
+				<div class="col-12">
+					<h2>Tips&Tricks</h2>
+				</div>
+			</div>
+	
+			<div class="row mt-5">
+				<div class="col-12">
+					<h4>Horizontal Pan and vertical page scroll</h4>
+					<div class="mt-5 text-left">
+						<img src="{{ 'assets/img/contactjs-scrolling.png' | relative_url }}" class="img-fluid" />
+					</div>
+					
+					<div class="my-5">
+						<strong>Expected behaviour:</strong>
+						<ul>
+							<li>smooth, native vertical scrolling</li>
+							<li>vertical scrolling available on panElement</li>
+							<li>horizontal panning available on panElement</li>
+							<li>no vertical scrolling during horizontal panning</li>
+							<li>no horizontal panning during vertical scrolling</li>
+						</ul>
+					</div>
+					
+					<div>
+						<strong>CSS:</strong>
+						<div class="bg-light pt-3 pb-1 px-3 mt-3">	
+{% highlight css %}
+.panElement {
+	touch-action: pan-y;
+}
+{% endhighlight %}
+						</div>
+					</div>
+					
+					<div class="mt-5">
+					<strong>JS:</strong>
+						<div class="bg-light pt-3 pb-1 px-3 mt-3">
+{% highlight javascript %}
+var panRecognizer = new Pan(panElement, {
+	supportedDirections : DIRECTION_HORIZONTAL
+});
+
+var pointerListener = new PointerListener(panElement, {
+	supportedGestures : [panRecognizer]
+});
+
+function onPan(event){
+	// perform something
+}
+
+panElement.addEventListener("panleft", onPan);
+panElement.addEventListener("panright", onPan);
+{% endhighlight %}
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-5">
+				<div class="col-12">
+					<h5>Background</h5>
+					If page scrolling is detected, <kbd>pointercancelEvent</kbd> is fired by default, aborting all panning which was implemented using <kbd>PointerEvents</kbd>.
+					
+					<br><br>Page Scrolling uses the <kbd>TouchEvent</kbd> interface.
+					
+					<br><br>If the user performs horizontal panning, contactjs uses <kbd>event.preventDefault();</kbd> on the related <kbd>TouchMove</kbd> event preventing scrolling. If the user "pans" vertically to scroll the page, <kbd>panRecognizer</kbd> invalidates and does not block the <kbd>TouchMove</kbd> event. This enables native page scrolling and horizontal panning on the same element.
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>

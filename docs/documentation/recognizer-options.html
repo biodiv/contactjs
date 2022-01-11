@@ -1,0 +1,63 @@
+---
+title: CONTACT.JS
+layout: default
+permalink: /documentation/recognizer-options/
+bg-color: bg-white
+---
+
+<div class="container">
+	<div class="row mt-5">
+		<div class="col-12 col-md-4 col-lg-2">
+			{% include_relative nav.html %}
+		</div>
+		<div class="col-12 col-md-8 col-lg-10">
+			<div id="Pan" class="row mt-5">
+				<div class="col-12">
+					<h2>Pan</h2>
+					<div class="mt-3">
+						You can instantiate <kbd>Pan</kbd> with options and pass it to <kbd>PointerListener</kbd>.
+						<div class="bg-light pt-3 pb-1 px-3 mt-3">
+{% highlight javascript %}
+
+var panOptions = {
+	supportedDirections : DIRECTION_HORIZONTAL
+};
+
+var panRecognizer = new Pan(domElement, panOptions);
+
+var pointerListener = new PointerListener(domElement, {
+	supportedGestures : [panRecognizer]
+});
+{% endhighlight %}
+						</div>
+					</div>
+					<div class="mt-5">
+						<h4>Available options</h4>
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th scope="col">Option</th>
+									<th scope="col">Possible Values</th>
+									<th scope="col">Simplified description</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<th scope="row">supportedDirections</th>
+									<td>
+										DIRECTION_ALL, DIRECTION_HORIZONTAL, DIRECTION_VERTICAL <br><br>
+										or a list[] with one or more of the following: <br>
+										DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP, DIRECTION_DOWN
+									</td>
+									<td>
+										DIRECTION_HORIZONTAL <br> or <br>[DIRECTION_LEFT, DIRECTION_RIGHT]
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
