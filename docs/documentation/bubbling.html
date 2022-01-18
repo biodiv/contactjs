@@ -1,0 +1,111 @@
+---
+title: CONTACT.JS
+layout: default
+permalink: /documentation/bubbling/
+bg-color: bg-white
+---
+
+<div class="container">
+	<div class="row mt-5">
+		<div class="col-12 col-md-4 col-lg-2">
+			{% include_relative nav.html %}
+		</div>
+		<div class="col-12 col-md-8 col-lg-10">
+			<div class="row">
+				<div class="col-12">
+					<h2>Event Bubbling</h2>
+				</div>
+			</div>
+	
+			<div class="row mt-5">
+				<div class="col-12">
+					You can attach <kbd>PointerListener</kbd> to an element and catch events on its descendants. This way, you only have instantiate <kbd>PointerListener</kbd> once.
+					<div class="mt-5 text-left">
+						<img src="{{ 'assets/img/contactjs-scrolling.png' | relative_url }}" class="img-fluid" />
+					</div>
+					
+					
+					
+					<div>
+						<strong>HTML:</strong>
+						<div class="bg-light pt-3 pb-1 px-3 mt-3">	
+{% highlight html %}
+<div id="outer">
+	<div id="container">
+		<div id="button-1"></div>
+		<div id="button-2"></div>
+		<div id="button-3"></div>
+	</div>
+</div>
+{% endhighlight %}
+						</div>
+					</div>
+					
+					<div class="mt-5">
+					<strong>JS:</strong>
+						<div class="bg-light pt-3 pb-1 px-3 mt-3">
+{% highlight javascript %}
+var outerDiv = document.getElementById("outer");
+
+var pointerListener = new PointerListener(outerDiv, {
+	supportedGestures : [Tap]
+});
+
+function onTap (event) {
+	// do something
+}
+
+var button_1 = document.getElementById("button-1");
+button_1.addEventListener("tap", onTap);
+
+var button_2 = document.getElementById("button-2");
+button_2.addEventListener("tap", onTap);
+
+var button_3 = document.getElementById("button-3");
+button_3.addEventListener("tap", onTap);
+{% endhighlight %}
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-5">
+				<div class="col-12">
+					<h5>Turn off bubbling</h5>
+					You can turn off bubbling in the options of PointerListener.
+				</div>
+				<div class="col-12 mt-3">
+					<strong>JS:</strong>
+					<div class="bg-light pt-3 pb-1 px-3">
+{% highlight javascript %}
+
+
+var pointerListener = new PointerListener(domElement, {
+	bubbles : false
+});
+
+
+{% endhighlight %}
+					</div>
+				</div>
+				<div class="col-12 mt-3">
+					or in the options of a recognizer.
+					<div class="mt-3">
+						<strong>JS:</strong>
+					<div class="bg-light pt-3 pb-1 px-3">
+{% highlight javascript %}
+
+
+var tapRecognizer = new Tap(domElement, {
+	bubbles : false
+});
+
+
+{% endhighlight %}
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>

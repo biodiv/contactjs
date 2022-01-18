@@ -36,6 +36,7 @@ var pointerListener = new PointerListener(domElement, options);
 {% highlight javascript %}
 var options = {
 	supportedGestures : [Tap, Pan, Pinch, Rotate, TwoFingerPan],
+	bubbles : false, // defaults to true
 	pointerDown : function(event, pointerListener){},
 	pointerMove : function(event, pointerListener){},
 	pointerUp : function(event, pointerListener){},
