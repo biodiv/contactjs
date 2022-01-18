@@ -55,6 +55,31 @@ function loadContact (){
 		}, 200);
 	});
 	
+	// no bubbling
+	
+	var rectangle4 = document.getElementById("rectangle-4");
+	var pointerListenerNoBubble = new PointerListener(rectangle4, {
+		supportedGestures : [Tap],
+		bubbles : false,
+		pointerup: function (event, pointerListener){
+			if(pointerListener.contact.isActive == false && TAP_ACTIVE == false){
+				resetElementTransform();
+			};
+		}
+	});
+	
+	rectangle4.addEventListener("tap", function(event){
+	
+		TAP_ACTIVE = true;
+		onTap(event);
+	
+		output.textContent = "Tap on " + event.target.id + " detected";
+		
+		setTimeout(function(){
+			TAP_ACTIVE = false;
+		}, 200);
+	});
+	
 }
 
 

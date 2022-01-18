@@ -24,12 +24,13 @@ html, body {
 	justify-content: center;
 	align-items: center;
 	perspective: 500px;
+	flex-direction: column;
 	/*border: 10px solid black;
 	border-radius: .5em;
 	background: #FFFFFF;*/
 }
 
-#rectangle-1 {
+#rectangle-1, #rectangle-4 {
 	width: 300px;
 	height:  300px;
 	background: #FFDEFA;
@@ -42,7 +43,7 @@ html, body {
 	align-items: center;
 }
 
-#rectangle-2 {
+#rectangle-2, #rectangle-5 {
 	width: 200px;
 	height:  200px;
 	background: #FFb0b0b0;
@@ -55,7 +56,7 @@ html, body {
 	align-items: center;
 }
 
-#rectangle-3 {
+#rectangle-3, #rectangle-6 {
 	width: 100px;
 	height:  100px;
 	background: #FFd3d3;

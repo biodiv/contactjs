@@ -41,7 +41,17 @@ class Gesture {
 			distance : [null, null] // px
 		}
 		
+		let defaultOptions = {
+			"bubbles" : true
+		};
+
 		this.options = options || {};
+		
+		for (let key in defaultOptions){
+			if (!(key in this.options)){
+				this.options[key] = defaultOptions[key];
+			}
+		}
 	
 	}
 	
@@ -234,13 +244,22 @@ class Gesture {
 		
 		var eventData = this.getEventData(contact);
 		
-		var initialTarget = contact.initialPointerEvent.target
+		var eventOptions = {
+			detail: eventData,
+			bubbles : this.options.bubbles
+		};
 		
-		var event = new CustomEvent(eventName, { detail: eventData, bubbles : true });
-
-		initialTarget.dispatchEvent(event);
-		//this.domElement.dispatchEvent(event);
+		var event = new CustomEvent(eventName, eventOptions);
 		
+		var initialTarget = contact.initialPointerEvent.target;
+		
+		if (eventOptions.bubbles == true){
+			initialTarget.dispatchEvent(event);
+		}
+		else {
+			this.domElement.dispatchEvent(event);
+		}
+			
 		// fire direction specific events
 		var currentDirection = eventData.live.direction;
 
@@ -258,10 +277,14 @@ class Gesture {
 						console.log("[Gestures] detected and firing event " + directionEventName);
 					}
 					
-					let directionEvent = new CustomEvent(directionEventName, { detail: eventData, bubbles : true });
+					let directionEvent = new CustomEvent(directionEventName, eventOptions);
 		
-					initialTarget.dispatchEvent(directionEvent);
-					//this.domElement.dispatchEvent(directionEvent);
+					if (eventOptions.bubbles == true){
+						initialTarget.dispatchEvent(directionEvent);
+					}
+					else {
+						this.domElement.dispatchEvent(directionEvent);
+					}
 					
 				}
 			}

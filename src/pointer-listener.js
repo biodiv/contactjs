@@ -22,13 +22,22 @@ class PointerListener {
 		
 		options = options || {};
 		
-		var supportedGestures = ALL_GESTURE_CLASSES;
-		
-		// default options
 		this.options = {
-			supportedGestures : [], // default managed below, adding all gestures
-			handleTouchEvents : true
+			"bubbles" : true
 		};
+		
+		// add user-defined options to this.options
+		for (let key in options){
+			if (key == "supportedGestures"){
+				continue;
+			}
+
+			this.options[key] = options[key];
+		}
+
+		// add instantiatedGestures to options.supportedGestures
+		var supportedGestures = ALL_GESTURE_CLASSES;
+		var instantiatedGestures = [];
 		
 		// instantiate gesture classes on domElement and add them to this.options
 		var hasSupportedGestures = Object.prototype.hasOwnProperty.call(options, "supportedGestures");
@@ -40,9 +49,12 @@ class PointerListener {
 	
 			let gesture;
 			let GestureClass = supportedGestures[i];
+			let gestureOptions = {
+				bubbles : this.options.bubbles
+			};
 
 			if (typeof GestureClass == "function"){
-				gesture = new GestureClass(domElement);
+				gesture = new GestureClass(domElement, gestureOptions);
 			}
 			else if (typeof GestureClass == "object"){
 				gesture = GestureClass;
@@ -50,16 +62,10 @@ class PointerListener {
 			else {
 				throw new Error("unsupported gesture type: " + typeof GestureClass);
 			}
-			this.options.supportedGestures.push(gesture);
+			instantiatedGestures.push(gesture);
 		}
 		
-		for (let key in options){
-			if (key == "supportedGestures"){
-				continue;
-			}
-
-			this.options[key] = options[key];
-		}
+		this.options.supportedGestures = instantiatedGestures;
 		
 		this.domElement = domElement;
 		
