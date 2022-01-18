@@ -28,6 +28,8 @@ class Contact {
 		
 		this.primaryPointerId = pointerdownEvent.pointerId;
 		
+		// initialPointerEvent holds the correct event.target for bubbling if pointerListener is bound to a "ancestor element"
+		this.initialPointerEvent = pointerdownEvent;
 		this.currentPointerEvent = pointerdownEvent;
 		
 		this.addPointer(pointerdownEvent);
@@ -101,7 +103,7 @@ class Contact {
 	
 	// pointermove contains only one single pointer, not multiple like on touch events (touches, changedTouches,...)
 	onPointerMove (pointermoveEvent) {
-	
+
 		this.currentPointerEvent = pointermoveEvent;
 		this.currentTimestamp = pointermoveEvent.timeStamp;
 	
@@ -118,7 +120,7 @@ class Contact {
 	
 	// pointerup event: finger released, or mouse button released
 	onPointerUp (pointerupEvent) {
-	
+
 		var pointerId = pointerupEvent.pointerId;
 	
 		this.currentPointerEvent = pointerupEvent;

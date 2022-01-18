@@ -45,6 +45,8 @@ class Contact {
 		
 		this.primaryPointerId = pointerdownEvent.pointerId;
 		
+		// initialPointerEvent holds the correct event.target for bubbling if pointerListener is bound to a "ancestor element"
+		this.initialPointerEvent = pointerdownEvent;
 		this.currentPointerEvent = pointerdownEvent;
 		
 		this.addPointer(pointerdownEvent);
@@ -118,7 +120,7 @@ class Contact {
 	
 	// pointermove contains only one single pointer, not multiple like on touch events (touches, changedTouches,...)
 	onPointerMove (pointermoveEvent) {
-	
+
 		this.currentPointerEvent = pointermoveEvent;
 		this.currentTimestamp = pointermoveEvent.timeStamp;
 	
@@ -135,7 +137,7 @@ class Contact {
 	
 	// pointerup event: finger released, or mouse button released
 	onPointerUp (pointerupEvent) {
-	
+
 		var pointerId = pointerupEvent.pointerId;
 	
 		this.currentPointerEvent = pointerupEvent;
@@ -956,9 +958,12 @@ class Gesture {
 		
 		var eventData = this.getEventData(contact);
 		
-		var event = new CustomEvent(eventName, { detail: eventData });
+		var initialTarget = contact.initialPointerEvent.target
 		
-		this.domElement.dispatchEvent(event);
+		var event = new CustomEvent(eventName, { detail: eventData, bubbles : true });
+
+		initialTarget.dispatchEvent(event);
+		//this.domElement.dispatchEvent(event);
 		
 		// fire direction specific events
 		var currentDirection = eventData.live.direction;
@@ -977,9 +982,10 @@ class Gesture {
 						console.log("[Gestures] detected and firing event " + directionEventName);
 					}
 					
-					let directionEvent = new CustomEvent(directionEventName, { detail: eventData });
+					let directionEvent = new CustomEvent(directionEventName, { detail: eventData, bubbles : true });
 		
-					this.domElement.dispatchEvent(directionEvent);
+					initialTarget.dispatchEvent(directionEvent);
+					//this.domElement.dispatchEvent(directionEvent);
 					
 				}
 			}

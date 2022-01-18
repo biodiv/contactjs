@@ -234,9 +234,12 @@ class Gesture {
 		
 		var eventData = this.getEventData(contact);
 		
-		var event = new CustomEvent(eventName, { detail: eventData });
+		var initialTarget = contact.initialPointerEvent.target
 		
-		this.domElement.dispatchEvent(event);
+		var event = new CustomEvent(eventName, { detail: eventData, bubbles : true });
+
+		initialTarget.dispatchEvent(event);
+		//this.domElement.dispatchEvent(event);
 		
 		// fire direction specific events
 		var currentDirection = eventData.live.direction;
@@ -255,9 +258,10 @@ class Gesture {
 						console.log("[Gestures] detected and firing event " + directionEventName);
 					}
 					
-					let directionEvent = new CustomEvent(directionEventName, { detail: eventData });
+					let directionEvent = new CustomEvent(directionEventName, { detail: eventData, bubbles : true });
 		
-					this.domElement.dispatchEvent(directionEvent);
+					initialTarget.dispatchEvent(directionEvent);
+					//this.domElement.dispatchEvent(directionEvent);
 					
 				}
 			}
