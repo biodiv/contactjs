@@ -3,7 +3,7 @@ class Gesture {
 
 	constructor (domElement, options){
 	
-		this.DEBUG = false;
+		this.DEBUG = true;
 		
 		this.domElement = domElement;
 		
@@ -559,7 +559,20 @@ class Press extends SinglePointerGesture {
 		// only Press has this parameter
 		this.hasBeenEmitted = false;
 
-	}	
+	}
+	
+	// distance has to use the global vector
+	getMinMaxParameters (contact) {
+	
+		var minMaxParameters = super.getMinMaxParameters(contact);
+		
+		var primaryPointerInput = contact.getPrimaryPointerInput();
+		
+		minMaxParameters.distance = primaryPointerInput.globalParameters.vector.vectorLength;
+		
+		return minMaxParameters;
+		
+	}
 	
 	recognize (contact) {
 

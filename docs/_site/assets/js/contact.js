@@ -757,7 +757,7 @@ class Gesture {
 
 	constructor (domElement, options){
 	
-		this.DEBUG = true;
+		this.DEBUG = false;
 		
 		this.domElement = domElement;
 		
@@ -1313,20 +1313,7 @@ class Press extends SinglePointerGesture {
 		// only Press has this parameter
 		this.hasBeenEmitted = false;
 
-	}
-	
-	// distance has to use the global vector
-	getMinMaxParameters (contact) {
-	
-		var minMaxParameters = super.getMinMaxParameters(contact);
-		
-		var primaryPointerInput = contact.getPrimaryPointerInput();
-		
-		minMaxParameters.distance = primaryPointerInput.globalParameters.vector.vectorLength;
-		
-		return minMaxParameters;
-		
-	}
+	}	
 	
 	recognize (contact) {
 
@@ -1827,12 +1814,4 @@ class PointerListener {
 		
 	}
 	
-}
-
-export {
-    DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP, DIRECTION_DOWN, DIRECTION_VERTICAL, DIRECTION_HORIZONTAL, DIRECTION_CLOCKWISE, DIRECTION_COUNTER_CLOCKWISE,
-    GESTURE_STATE_BLOCKED, GESTURE_STATE_POSSIBLE,
-    deg2rad, rad2deg, calcAngleDegrees, calcAngleRad,
-    PointerListener,
-    Tap, Press, Pan, Pinch, Rotate, TwoFingerPan
 }
