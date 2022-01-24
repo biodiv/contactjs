@@ -757,7 +757,7 @@ class Gesture {
 
 	constructor (domElement, options){
 	
-		this.DEBUG = true;
+		this.DEBUG = false;
 		
 		this.domElement = domElement;
 		
