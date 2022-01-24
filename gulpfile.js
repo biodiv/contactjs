@@ -56,5 +56,15 @@ function bundleAsModule(cb) {
 	cb();
 }
 
+function bundleForNPM(cb) {
+	src(productionJSFilesForModule)
+		.pipe(concat('contact.module.js'))
+		.pipe(dest('lib/'));
+	
+	src('.eslintrc.json')
+		.pipe(dest('lib/'));
+		
+	cb();
+}
 
-exports.build = series(transpile, bundle, bundleAndMinify, bundleAsModule);
+exports.build = series(transpile, bundle, bundleAndMinify, bundleAsModule, bundleForNPM);

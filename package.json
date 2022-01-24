@@ -1,10 +1,10 @@
 {
   "name": "contactjs",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Pointer gestures for your webapp",
-  "main": "src/index.js",
+  "main": "lib/contact.module.js",
   "directories": {
-    "doc": "docs",
+    "lib": "lib",
     "test": "test"
   },
   "scripts": {
@@ -14,15 +14,28 @@
     "type": "git",
     "url": "git+https://github.com/biodiv/contactjs.git"
   },
+  "files": [
+    "lib"
+  ],
   "author": "",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/biodiv/contactjs/issues"
   },
-  "homepage": "https://github.com/biodiv/contactjs#readme",
+  "homepage": "https://biodiv.github.io/contactjs/",
   "devDependencies": {
+    "eslint": "^8.7.0",
     "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
-    "gulp-minify": "^3.1.0"
+    "gulp-minify": "^3.1.0",
+    "ansi-cyan": "^0.1.1",
+    "ansi-red": "^0.1.1",
+    "commander": "^2.20.3",
+    "plugin-error": "^0.1.2",
+    "source-map-support": "^0.5.20",
+    "terser": "^3.17.0"
+  },
+  "dependencies": {
+
   }
 }
