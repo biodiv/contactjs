@@ -19,9 +19,47 @@ bg-color: bg-white
 						contact.js is a open-source library that can recognize gestures made by touch, pen and mouse using PointerEvents.
 					</div>
 					<div class="py-3">
-						<a href="https://biodiv.github.io/contactjs/assets/js/contact.min.js" class="btn btn-primary" download>Download contact.js</a>
+						<h5>Installation</h5>
+						
+						<div>
+							<h6>Method 1: Javascript</h6>
+
+							<div class="py-3">
+								<a href="https://biodiv.github.io/contactjs/assets/js/contact.min.js" class="btn btn-primary" download>Download minified contact.min.js</a>
+							</div>
+							... and reference the downloaded file:
+							<div class="bg-light p-3 mt-3">
+{% highlight html %}
+<script src="/path/to/contact.min.js" type="text/javascript"></script>
+{% endhighlight %}
+							</div>
+						</div>
+						
+						<div class="mt-5">
+							<h6>Method 2: Javascript module</h6>
+
+							<div class="py-3">
+								<a href="https://biodiv.github.io/contactjs/assets/js/contact.module.js" class="btn btn-primary" download>Download contact.module.js</a>
+							</div>
+							... and reference the downloaded file:
+							<div class="bg-light p-3 mt-3">
+{% highlight html %}
+<script src="/path/to/contact.module.js" type="module"></script>
+{% endhighlight %}
+							</div>
+						</div>
+						
+						<div class="mt-5">
+							<h6>Method 3: Install it using npm</h6>
+
+							<div class="bg-light p-3 mt-3">
+{% highlight console %}
+npm install contactjs@latest
+{% endhighlight %}
+							</div>
+						</div>
 					</div>
-					<div>
+					<div class="mt-5">
 						<h5>Usage</h5>
 						First, initialize a <kbd>PointerListener</kbd> instance. This will active gesture detection on the <kbd>domElement</kbd> of your choice.
 						<div class="bg-light p-3 mt-3">
