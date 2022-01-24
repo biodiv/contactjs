@@ -8,6 +8,7 @@ var START_X;
 var START_Y;
 
 var TAP_ACTIVE = false;
+var PRESS_ACTIVE = false;
 
 var transform = {
 	translate: { x: 0, y: 0 },
@@ -36,7 +37,7 @@ function loadContact (){
 	
 	var pointerListener = new PointerListener(rectangle, {
 		pointerup: function (event, pointerListener){
-			if(pointerListener.contact.isActive == false && TAP_ACTIVE == false){
+			if(pointerListener.contact.isActive == false && TAP_ACTIVE == false && PRESS_ACTIVE == false){
 				resetElementTransform();
 			};
 		}
@@ -75,6 +76,19 @@ function loadContact (){
 		
 		setTimeout(function(){
 			TAP_ACTIVE = false;
+		}, 200);
+	});
+	
+	
+	rectangle.addEventListener("press", function(event){
+		console.log("press")
+		PRESS_ACTIVE = true;
+		onPress(event);
+	
+		output.textContent = "Press detected";
+		
+		setTimeout(function(){
+			PRESS_ACTIVE = false;
 		}, 200);
 	});
 	
@@ -254,6 +268,13 @@ function onTap (event) {
 
     
     requestElementUpdate();
+}
+
+
+function onPress (event) {
+
+	
+
 }
 
 function onPinch (event){

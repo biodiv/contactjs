@@ -36,6 +36,10 @@ html, body {
 	cursor: pointer;
 	touch-action: none;
 	user-select: none;
+	-webkit-tap-highlight-color: transparent;
+	-webkit-user-select: none; 
+    -moz-user-select: none; 
+    -ms-user-select: none;
 	transform-origin:center;
 }
 

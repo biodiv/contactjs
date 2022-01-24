@@ -10,7 +10,7 @@
 *	- domElement.addEventListener("pan", function(){});
 */
 
-var ALL_GESTURE_CLASSES = [Tap, Pan, Pinch, Rotate, TwoFingerPan];
+var ALL_GESTURE_CLASSES = [Tap, Press, Pan, Pinch, Rotate, TwoFingerPan];
 
 class PointerListener {
 
@@ -19,6 +19,9 @@ class PointerListener {
 		this.DEBUG = false;
 	
 		var self = this;
+		
+		this.lastRecognitionTimestamp = null;
+		this.idleRecognitionIntervalId = null;
 		
 		options = options || {};
 		
@@ -99,6 +102,15 @@ class PointerListener {
 				self.options.pointerdown(event, self);
 			}
 			
+			// before starting a new interval, make sure the old one is stopped if present
+			if (self.idleRecognitionIntervalId != null){
+				self.clearIdleRecognitionInterval();
+			}
+			
+			self.idleRecognitionIntervalId = setInterval(function(){
+				self.onIdle();
+			}, 100);
+			
 		}, { "passive": true });
 		
 		domElement.addEventListener("pointermove", function(event){
@@ -138,6 +150,9 @@ class PointerListener {
 					self.options.pointerup(event, self);
 				}
 			}
+			
+			self.clearIdleRecognitionInterval();
+			
 		});
 		
 		/*
@@ -152,7 +167,10 @@ class PointerListener {
 			if (self.contact != null && self.contact.isActive == true){
 				self.contact.onPointerLeave(event);
 				self.recognizeGestures();
-			}		
+			}
+			
+			self.clearIdleRecognitionInterval()
+			
 		});
 
 		
@@ -168,6 +186,8 @@ class PointerListener {
 		
 			self.contact.onPointerCancel(event);
 			self.recognizeGestures();
+			
+			self.clearIdleRecognitionInterval();
 			
 			var hasPointerCancelHook = Object.prototype.hasOwnProperty.call(self.options, "pointercancel");
 			if (hasPointerCancelHook == true){
@@ -215,8 +235,51 @@ class PointerListener {
 
 	}
 	
+	// to recognize Press, recognition has to be run if the user does nothing while having contact with the surfave (no pointermove, no pointerup, no pointercancel)
+	onIdle () {
+	
+		if (this.DEBUG == true){
+			console.log("[PointerListener] onIdle");
+		}
+		
+		if (this.contact == null || this.contact.isActive == false){
+			this.clearIdleRecognitionInterval();
+		}
+		else {
+		
+			let now = new Date().getTime();
+			let timedelta = null;
+			
+			if (this.lastRecognitionTimestamp != null){
+				timedelta = now - this.lastRecognitionTimestamp;
+			}
+			
+			if (timedelta == null || timedelta > 100){
+			
+				this.contact.onIdle();
+			
+				if (this.DEBUG == true){
+					console.log("[PointerListener] run idle recognition");
+				}
+			
+				this.recognizeGestures();
+			}
+		}
+		
+	}
+	
+	clearIdleRecognitionInterval () {
+	
+		if (this.idleRecognitionIntervalId != null){
+			clearInterval(this.idleRecognitionIntervalId);
+			this.idleRecognitionIntervalId = null;
+		}
+	}
+	
 	// run all configured recognizers
 	recognizeGestures (){
+	
+		this.lastRecognitionTimestamp = new Date().getTime();
 	
 		for (let g=0; g<this.options.supportedGestures.length; g++){
 		

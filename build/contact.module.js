@@ -174,6 +174,18 @@ class Contact {
 		}
 	}
 	
+	
+	// if the contact idles (no Momvement), the time still passes
+	// therefore, the pointerInput has to be updated
+	onIdle () {
+
+		for (let pointerInputId in this.activePointerInputs){
+		
+			let activePointer = this.activePointerInputs[pointerInputId];
+			activePointer.onIdle();
+		}
+	}
+	
 	// update this contact instance. invoked on pointermove, pointerup and pointercancel events
 	updateState () {
 	
@@ -386,6 +398,7 @@ class PointerInput {
 		
 		options = options || {};
 		
+		var now = new Date().getTime();
 
 		this.pointerId = pointerdownEvent.pointerId;
 		var hasVectorTimespan = Object.prototype.hasOwnProperty.call(options, "vectorTimespan");
@@ -400,9 +413,12 @@ class PointerInput {
 		this.canceled = false;
 		this.isActive = true;
 		
+		// start with the NullVector to support idle
+		var nullVector = this.getVector(pointerdownEvent, pointerdownEvent);
+		
 		// parameters within this.vectorTimespan
 		this.liveParameters = {
-			vector : null, // provides the traveled distance as length
+			vector : nullVector, // provides the traveled distance as length
 			speed : 0, // length of the vector
 			isMoving : false
 		};
@@ -411,10 +427,11 @@ class PointerInput {
 		this.globalParameters = {
 			startX : this.initialPointerEvent.clientX,
 			startY : this.initialPointerEvent.clientY,
-			vector : null,
+			vector : nullVector,
 			deltaX : 0,
 			deltaY : 0,
-			startTimestamp : this.initialPointerEvent.timeStamp,
+			startTimestampUTC : now,
+			startTimestamp : this.initialPointerEvent.timeStamp, // unfortunately, FF (linux) does not provide UTC, but elapsed time since the window Object was created
 			currentTimestamp : this.initialPointerEvent.timeStamp,
 			endTimestamp : null,
 			maximumSpeed : 0,
@@ -425,6 +442,19 @@ class PointerInput {
 			duration: 0
 		};
 	
+	}
+	
+	// do not update vector, only update time
+	onIdle () {
+	
+		var now = new Date().getTime();
+		
+		// currentTimestamp is not an UTC millisecond timestamp.
+		// this.globalParameters.currentTimestamp = now;
+		
+		let duration = now - this.globalParameters.startTimestampUTC;
+		this.globalParameters.duration = duration;
+
 	}
 	
 	onMove (pointermoveEvent) {
@@ -786,7 +816,7 @@ class Gesture {
 
 		
 		if (this.DEBUG == true){
-			console.log("[Gestures] checking " + parameterName + "[isActive: " + this.isActive.toString() + "]" +  " minValue: " + minValue + ", maxValue: " + maxValue + ", current value: " + value);
+			console.log("[Gestures] checking " + parameterName + "[gesture.isActive: " + this.isActive.toString() + "]" +  " minValue: " + minValue + ", maxValue: " + maxValue + ", current value: " + value);
 		}
 	
 		if (minValue != null && value != null && value < minValue){
@@ -813,7 +843,7 @@ class Gesture {
 	
 	validateBool (parameterName, value) {
 		
-		// requiresPointerMove = false -> it does not matter if the pointer has been moved
+		// requiresPointerMove = null -> it does not matter if the pointer has been moved
 		var requiredValue = this.boolParameters[parameterName];
 		
 		if (requiredValue != null && value != null && requiredValue === value){
@@ -1257,6 +1287,64 @@ class Tap extends SinglePointerGesture {
 
 }
 
+
+/*
+* press should only be fired once
+* if global duration is below Press.initialMinMaxParameters["duration"][0], set the Press to possible
+* if global duration is above Press.initialMinMaxParameters["duration"][0] AND press already has been emitted, set Press to impossible
+*
+*/
+class Press extends SinglePointerGesture {
+
+	constructor (domElement, options) {
+	
+		options = options || {};
+		
+		super(domElement, options);
+	
+		this.initialMinMaxParameters["pointerCount"] = [1, 1]; // count of fingers touching the surface. a press is fired during an active contact
+		this.initialMinMaxParameters["duration"] = [600, null]; // milliseconds. after a certain touch duration, it is not a TAP anymore
+		
+		this.initialMinMaxParameters["distance"] = [null, 30]; // if a certain distance is detected, Press becomes impossible
+		
+		this.boolParameters["requiresPointerMove"] = null;
+		this.boolParameters["requiresActivePointer"] = true;
+		
+		// only Press has this parameter
+		this.hasBeenEmitted = false;
+
+	}	
+	
+	recognize (contact) {
+
+		var isValid = this.validate(contact);
+		
+		if (isValid == true && this.hasBeenEmitted == false){
+			
+			this.initialPointerEvent = contact.currentPointerEvent;
+			
+			this.emit(contact);
+			
+			this.hasBeenEmitted = true;
+			
+		}
+		else {
+		
+			var primaryPointerInput = contact.getPrimaryPointerInput();
+			let duration = primaryPointerInput.globalParameters.duration;
+			
+			if (this.hasBeenEmitted == true && duration <= this.initialMinMaxParameters["duration"][0]){
+				this.hasBeenEmitted = false;
+			}
+		}
+		
+	}
+	
+	
+
+}
+
+
 class MultiPointerGesture extends Gesture {
 
 	
@@ -1445,7 +1533,7 @@ class TwoFingerPan extends TwoPointerGesture {
 *	- domElement.addEventListener("pan", function(){});
 */
 
-var ALL_GESTURE_CLASSES = [Tap, Pan, Pinch, Rotate, TwoFingerPan];
+var ALL_GESTURE_CLASSES = [Tap, Press, Pan, Pinch, Rotate, TwoFingerPan];
 
 class PointerListener {
 
@@ -1454,6 +1542,9 @@ class PointerListener {
 		this.DEBUG = false;
 	
 		var self = this;
+		
+		this.lastRecognitionTimestamp = null;
+		this.idleRecognitionIntervalId = null;
 		
 		options = options || {};
 		
@@ -1534,6 +1625,15 @@ class PointerListener {
 				self.options.pointerdown(event, self);
 			}
 			
+			// before starting a new interval, make sure the old one is stopped if present
+			if (self.idleRecognitionIntervalId != null){
+				self.clearIdleRecognitionInterval();
+			}
+			
+			self.idleRecognitionIntervalId = setInterval(function(){
+				self.onIdle();
+			}, 100);
+			
 		}, { "passive": true });
 		
 		domElement.addEventListener("pointermove", function(event){
@@ -1573,6 +1673,9 @@ class PointerListener {
 					self.options.pointerup(event, self);
 				}
 			}
+			
+			self.clearIdleRecognitionInterval();
+			
 		});
 		
 		/*
@@ -1587,7 +1690,10 @@ class PointerListener {
 			if (self.contact != null && self.contact.isActive == true){
 				self.contact.onPointerLeave(event);
 				self.recognizeGestures();
-			}		
+			}
+			
+			self.clearIdleRecognitionInterval()
+			
 		});
 
 		
@@ -1603,6 +1709,8 @@ class PointerListener {
 		
 			self.contact.onPointerCancel(event);
 			self.recognizeGestures();
+			
+			self.clearIdleRecognitionInterval();
 			
 			var hasPointerCancelHook = Object.prototype.hasOwnProperty.call(self.options, "pointercancel");
 			if (hasPointerCancelHook == true){
@@ -1650,8 +1758,51 @@ class PointerListener {
 
 	}
 	
+	// to recognize Press, recognition has to be run if the user does nothing while having contact with the surfave (no pointermove, no pointerup, no pointercancel)
+	onIdle () {
+	
+		if (this.DEBUG == true){
+			console.log("[PointerListener] onIdle");
+		}
+		
+		if (this.contact == null || this.contact.isActive == false){
+			this.clearIdleRecognitionInterval();
+		}
+		else {
+		
+			let now = new Date().getTime();
+			let timedelta = null;
+			
+			if (this.lastRecognitionTimestamp != null){
+				timedelta = now - this.lastRecognitionTimestamp;
+			}
+			
+			if (timedelta == null || timedelta > 100){
+			
+				this.contact.onIdle();
+			
+				if (this.DEBUG == true){
+					console.log("[PointerListener] run idle recognition");
+				}
+			
+				this.recognizeGestures();
+			}
+		}
+		
+	}
+	
+	clearIdleRecognitionInterval () {
+	
+		if (this.idleRecognitionIntervalId != null){
+			clearInterval(this.idleRecognitionIntervalId);
+			this.idleRecognitionIntervalId = null;
+		}
+	}
+	
 	// run all configured recognizers
 	recognizeGestures (){
+	
+		this.lastRecognitionTimestamp = new Date().getTime();
 	
 		for (let g=0; g<this.options.supportedGestures.length; g++){
 		
@@ -1670,5 +1821,5 @@ export {
     GESTURE_STATE_BLOCKED, GESTURE_STATE_POSSIBLE,
     deg2rad, rad2deg, calcAngleDegrees, calcAngleRad,
     PointerListener,
-    Tap, Pan, Pinch, Rotate, TwoFingerPan
+    Tap, Press, Pan, Pinch, Rotate, TwoFingerPan
 }

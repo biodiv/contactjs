@@ -157,6 +157,18 @@ class Contact {
 		}
 	}
 	
+	
+	// if the contact idles (no Momvement), the time still passes
+	// therefore, the pointerInput has to be updated
+	onIdle () {
+
+		for (let pointerInputId in this.activePointerInputs){
+		
+			let activePointer = this.activePointerInputs[pointerInputId];
+			activePointer.onIdle();
+		}
+	}
+	
 	// update this contact instance. invoked on pointermove, pointerup and pointercancel events
 	updateState () {
 	
@@ -369,6 +381,7 @@ class PointerInput {
 		
 		options = options || {};
 		
+		var now = new Date().getTime();
 
 		this.pointerId = pointerdownEvent.pointerId;
 		var hasVectorTimespan = Object.prototype.hasOwnProperty.call(options, "vectorTimespan");
@@ -383,9 +396,12 @@ class PointerInput {
 		this.canceled = false;
 		this.isActive = true;
 		
+		// start with the NullVector to support idle
+		var nullVector = this.getVector(pointerdownEvent, pointerdownEvent);
+		
 		// parameters within this.vectorTimespan
 		this.liveParameters = {
-			vector : null, // provides the traveled distance as length
+			vector : nullVector, // provides the traveled distance as length
 			speed : 0, // length of the vector
 			isMoving : false
 		};
@@ -394,10 +410,11 @@ class PointerInput {
 		this.globalParameters = {
 			startX : this.initialPointerEvent.clientX,
 			startY : this.initialPointerEvent.clientY,
-			vector : null,
+			vector : nullVector,
 			deltaX : 0,
 			deltaY : 0,
-			startTimestamp : this.initialPointerEvent.timeStamp,
+			startTimestampUTC : now,
+			startTimestamp : this.initialPointerEvent.timeStamp, // unfortunately, FF (linux) does not provide UTC, but elapsed time since the window Object was created
 			currentTimestamp : this.initialPointerEvent.timeStamp,
 			endTimestamp : null,
 			maximumSpeed : 0,
@@ -408,6 +425,19 @@ class PointerInput {
 			duration: 0
 		};
 	
+	}
+	
+	// do not update vector, only update time
+	onIdle () {
+	
+		var now = new Date().getTime();
+		
+		// currentTimestamp is not an UTC millisecond timestamp.
+		// this.globalParameters.currentTimestamp = now;
+		
+		let duration = now - this.globalParameters.startTimestampUTC;
+		this.globalParameters.duration = duration;
+
 	}
 	
 	onMove (pointermoveEvent) {

@@ -3,5 +3,5 @@ export {
     GESTURE_STATE_BLOCKED, GESTURE_STATE_POSSIBLE,
     deg2rad, rad2deg, calcAngleDegrees, calcAngleRad,
     PointerListener,
-    Tap, Pan, Pinch, Rotate, TwoFingerPan
+    Tap, Press, Pan, Pinch, Rotate, TwoFingerPan
 }

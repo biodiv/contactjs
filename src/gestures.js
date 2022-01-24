@@ -62,7 +62,7 @@ class Gesture {
 
 		
 		if (this.DEBUG == true){
-			console.log("[Gestures] checking " + parameterName + "[isActive: " + this.isActive.toString() + "]" +  " minValue: " + minValue + ", maxValue: " + maxValue + ", current value: " + value);
+			console.log("[Gestures] checking " + parameterName + "[gesture.isActive: " + this.isActive.toString() + "]" +  " minValue: " + minValue + ", maxValue: " + maxValue + ", current value: " + value);
 		}
 	
 		if (minValue != null && value != null && value < minValue){
@@ -89,7 +89,7 @@ class Gesture {
 	
 	validateBool (parameterName, value) {
 		
-		// requiresPointerMove = false -> it does not matter if the pointer has been moved
+		// requiresPointerMove = null -> it does not matter if the pointer has been moved
 		var requiredValue = this.boolParameters[parameterName];
 		
 		if (requiredValue != null && value != null && requiredValue === value){
@@ -532,6 +532,64 @@ class Tap extends SinglePointerGesture {
 	}
 
 }
+
+
+/*
+* press should only be fired once
+* if global duration is below Press.initialMinMaxParameters["duration"][0], set the Press to possible
+* if global duration is above Press.initialMinMaxParameters["duration"][0] AND press already has been emitted, set Press to impossible
+*
+*/
+class Press extends SinglePointerGesture {
+
+	constructor (domElement, options) {
+	
+		options = options || {};
+		
+		super(domElement, options);
+	
+		this.initialMinMaxParameters["pointerCount"] = [1, 1]; // count of fingers touching the surface. a press is fired during an active contact
+		this.initialMinMaxParameters["duration"] = [600, null]; // milliseconds. after a certain touch duration, it is not a TAP anymore
+		
+		this.initialMinMaxParameters["distance"] = [null, 30]; // if a certain distance is detected, Press becomes impossible
+		
+		this.boolParameters["requiresPointerMove"] = null;
+		this.boolParameters["requiresActivePointer"] = true;
+		
+		// only Press has this parameter
+		this.hasBeenEmitted = false;
+
+	}	
+	
+	recognize (contact) {
+
+		var isValid = this.validate(contact);
+		
+		if (isValid == true && this.hasBeenEmitted == false){
+			
+			this.initialPointerEvent = contact.currentPointerEvent;
+			
+			this.emit(contact);
+			
+			this.hasBeenEmitted = true;
+			
+		}
+		else {
+		
+			var primaryPointerInput = contact.getPrimaryPointerInput();
+			let duration = primaryPointerInput.globalParameters.duration;
+			
+			if (this.hasBeenEmitted == true && duration <= this.initialMinMaxParameters["duration"][0]){
+				this.hasBeenEmitted = false;
+			}
+		}
+		
+	}
+	
+	
+
+}
+
 
 class MultiPointerGesture extends Gesture {
 
