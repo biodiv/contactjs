@@ -13,11 +13,11 @@ bg-color: bg-white
 		<div class="col-12 col-md-8 col-lg-10">
 			<div class="row">
 				<div class="col-12">
-					<h2>Tips&Tricks</h2>
+					<h2>Advanced</h2>
 				</div>
 			</div>
 	
-			<div class="row mt-5">
+			<div id="pan-and-scroll" class="row mt-5">
 				<div class="col-12">
 					<h4>Horizontal Pan and vertical page scroll</h4>
 					<div class="mt-5 text-left">
@@ -78,6 +78,101 @@ panElement.addEventListener("panright", onPan);
 					<br><br>Page Scrolling uses the <kbd>TouchEvent</kbd> interface.
 					
 					<br><br>If the user performs horizontal panning, contactjs uses <kbd>event.preventDefault();</kbd> on the related <kbd>TouchMove</kbd> event preventing scrolling. If the user "pans" vertically to scroll the page, <kbd>panRecognizer</kbd> invalidates and does not block the <kbd>TouchMove</kbd> event. This enables native page scrolling and horizontal panning on the same element.
+				</div>
+			</div>
+			
+			
+			<div id="prevent-native-events" class="row mt-5">
+				<div class="col-12">
+				
+					<h4>Prevent native events</h4>
+					<h5 class="mt-3">Prevent press from opening a context menu on mobile devices</h5>
+					
+					Mobile Safari and Chrome open a context menu if the user presses (long touch) a link or graphic. If using a mouse, this is done by pressing the secondary mouse button and therefore does not cause any problems. On mobile, context menus can be prevented by adding <kbd>touch-action:none;</kbd>
+					
+					<div class="my-3">
+						<strong>HTML:</strong>
+						<div class="bg-light pt-3 pb-1 px-3 mt-3">
+{% highlight html %}
+<a href="/somewhere/" class="nocontext">Somewhere</a>
+{% endhighlight %}
+						</div>
+					</div>
+					
+					<div class="my-3">
+						<strong>CSS:</strong>
+						<div class="bg-light pt-3 pb-1 px-3 mt-3">
+{% highlight css %}
+.nocontext {
+	touch-action: none;
+}
+{% endhighlight %}
+						</div>
+					</div>
+
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-12">
+				
+					<h5 class="mt-3">Prevent press from opening a text selection bubble</h5>
+					
+					Mobile Safari opens a text selection if a press (long touch) is performed on a text section. This can be prevented using <kbd>user-select: none</kbd> in css.
+					
+					<div class="my-3">
+						<strong>HTML:</strong>
+						<div class="bg-light pt-3 pb-1 px-3 mt-3">
+{% highlight html %}
+<div class="noselect">Some text here</div>
+{% endhighlight %}
+						</div>
+					</div>
+					
+					<div class="my-3">
+						<strong>CSS:</strong>
+						<div class="bg-light pt-3 pb-1 px-3 mt-3">
+{% highlight css %}
+.noselect {
+	-webkit-user-select: none; /* Safari */
+	-ms-user-select: none; /* IE 10 and IE 11 */
+	-moz-user-select: none; /* Firefox */
+	user-select: none; /* Standard syntax */
+}
+{% endhighlight %}
+						</div>
+					</div>
+				
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-12">
+				
+					<h5 class="mt-3">Prevent Android from highlighting the touched area</h5>
+					
+					Some Android versions highlight touched area by default. This can be made invisible using <kbd>-webkit-tap-highlight-color: transparent</kbd> in css.
+					
+					<div class="my-3">
+						<strong>HTML:</strong>
+						<div class="bg-light pt-3 pb-1 px-3 mt-3">
+{% highlight html %}
+<div class="nohighlight">Some text here</div>
+{% endhighlight %}
+						</div>
+					</div>
+					
+					<div class="my-3">
+						<strong>CSS:</strong>
+						<div class="bg-light pt-3 pb-1 px-3 mt-3">
+{% highlight css %}
+.nohighlight {
+	-webkit-tap-highlight-color: transparent;
+}
+{% endhighlight %}
+						</div>
+					</div>
+				
 				</div>
 			</div>
 
