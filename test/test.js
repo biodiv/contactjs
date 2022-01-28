@@ -10,6 +10,10 @@ var START_Y;
 var TAP_ACTIVE = false;
 var PRESS_ACTIVE = false;
 
+var PINCHACTIVE = false;
+var ROTATIONACTIVE = false;
+var TWOFINGERPANACTIVE = false;
+
 var transform = {
 	translate: { x: 0, y: 0 },
 	scale: {
@@ -36,10 +40,11 @@ function loadContact (){
 	var output = document.getElementById("recognition-output");
 	
 	var pointerListener = new PointerListener(rectangle, {
+		supportedGestures : [TwoFingerPan, Pinch],
 		pointerup: function (event, pointerListener){
 			if(pointerListener.contact.isActive == false && TAP_ACTIVE == false && PRESS_ACTIVE == false){
 				resetElementTransform();
-			};
+			}
 		}
 	});
 	
@@ -92,6 +97,11 @@ function loadContact (){
 		}, 200);
 	});
 	
+	
+	rectangle.addEventListener("pinchstart", function(event){
+		PINCHACTIVE = true;
+	});
+	
 	rectangle.addEventListener("pinch", function(event){
 	
 		onPinch(event);
@@ -101,11 +111,17 @@ function loadContact (){
 	
 	rectangle.addEventListener("pinchend", function(event){
 	
+		PINCHACTIVE = false;
+	
 		onEnd(event);
 	
 		output.textContent = "Pinch end detected";
 	});
 	
+	// ROTATION
+	rectangle.addEventListener("rotatestart", function(event){
+		ROTATIONACTIVE = true;
+	});
 	
 	rectangle.addEventListener("rotate", function(event){
 	
@@ -116,9 +132,17 @@ function loadContact (){
 	
 	rectangle.addEventListener("rotateend", function(event){
 	
+		ROTATIONACTIVE = false;
+	
 		onEnd(event);
 	
 		output.textContent = "Rotation end detected";
+	});
+	
+	
+	// TWOFINGERPAN
+	rectangle.addEventListener("twofingerpanstart", function(event){
+		TWOFINGERPANACTIVE = true;
 	});
 	
 	
@@ -131,6 +155,8 @@ function loadContact (){
 	
 	rectangle.addEventListener("twofingerpanend", function(event){
 	
+		TWOFINGERPANACTIVE = true;
+	
 		onEnd(event);
 		
 		output.textContent = "Two finger pan end detected";
@@ -141,9 +167,9 @@ function loadContact (){
 
 function onEnd (event){
 
-	//if (event.detail.contact.isActive == false){
+	/*if (event.detail.contact.isActive == false){
 		resetElementTransform();
-	//}
+	}*/
 }
 
 function resetElementTransform (){

@@ -647,11 +647,13 @@ class TwoPointerGesture extends MultiPointerGesture {
 		this.initialMinMaxParameters["centerMovement"] = [null,null]; //px
 		this.initialMinMaxParameters["distanceChange"] = [null, null]; //px - distance between 2 fingers
 		this.initialMinMaxParameters["rotationAngle"] = [null, null]; // degrees: positive = clockwise, negative = counter-clockwise (js convention, not mathematical convention)
+		this.initialMinMaxParameters["vectorAngle"] = [null, null];
 		
 		this.activeStateMinMaxParameters["pointerCount"] = [2, 2]; 
 		this.activeStateMinMaxParameters["centerMovement"] = [null,null];
 		this.activeStateMinMaxParameters["distanceChange"] = [null, null];
 		this.activeStateMinMaxParameters["rotationAngle"] = [null, null];
+		this.activeStateMinMaxParameters["vectorAngle"] = [null, null];
 	
 	}
 	
@@ -664,6 +666,8 @@ class TwoPointerGesture extends MultiPointerGesture {
 		minMaxParameters.distanceChange = Math.abs(contact.multipointer.liveParameters.distanceChange);
 		
 		minMaxParameters.rotationAngle = Math.abs(contact.multipointer.liveParameters.rotationAngle);
+		
+		minMaxParameters.vectorAngle = contact.multipointer.liveParameters.vectorAngle;
 		
 		return minMaxParameters;
 		
@@ -735,6 +739,9 @@ class Pinch extends TwoPointerGesture {
 		this.initialMinMaxParameters["centerMovement"] = [0, 50]; //px
 		this.initialMinMaxParameters["distanceChange"] = [5, null]; // distance between 2 fingers
 		this.initialMinMaxParameters["rotationAngle"] = [null, 20]; // distance between 2 fingers
+		this.initialMinMaxParameters["vectorAngle"] = [10, null];
+		
+		this.activeStateMinMaxParameters["vectorAngle"] = [20, null];
 		
 	}
 
@@ -764,6 +771,9 @@ class Rotate extends TwoPointerGesture {
 }
 
 
+/*
+* 2 fingers are moved across the surface, in the same direction
+*/
 class TwoFingerPan extends TwoPointerGesture {
 
 	constructor (domElement, options) {
@@ -772,9 +782,13 @@ class TwoFingerPan extends TwoPointerGesture {
 	
 		super(domElement, options);
 		
-		this.initialMinMaxParameters["centerMovement"] = [5, null];
-		this.initialMinMaxParameters["distanceChange"] = [null, 500];
+		this.initialMinMaxParameters["centerMovement"] = [2, null];
+		this.initialMinMaxParameters["distanceChange"] = [null, 50];
 		this.initialMinMaxParameters["rotationAngle"] = [null, null];
+		this.initialMinMaxParameters["vectorAngle"] = [null, 150];
+		
+		this.activeStateMinMaxParameters["vectorAngle"] = [null, 150]; // a difference in direction translates into the angle between those vectors
+		this.activeStateMinMaxParameters["distanceChange"] = [null, 5];
 
 	}
 

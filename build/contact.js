@@ -65,14 +65,16 @@ class Contact {
 				centerMovementVector : null,
 				distanceChange : null, // px
 				relativeDistanceChange : null, // %
-				rotationAngle : null //deg ccw[0,360], cw[0,-360] 
+				rotationAngle : null, //deg ccw[0,360], cw[0,-360] 
+				vectorAngle : null // angle between the 2 vectors performed by the pointer. This differs from rotationAngle
 			},
 			globalParameters : {
 				centerMovement : null,
 				centerMovementVector : null,
 				distanceChange : null,
 				relativeDistanceChange: null,
-				rotationAngle : null
+				rotationAngle : null,
+				vectorAngle : null
 			}
 		};
 	
@@ -117,6 +119,21 @@ class Contact {
 		return this.pointerInputs[this.primaryPointerId];
 	}
 	
+	// currently, on 2 Inputs are supported
+	getMultiPointerInputs () {
+	
+		var pointerId_1 = Object.keys(this.activePointerInputs)[0];
+		var pointerInput_1 = this.activePointerInputs[pointerId_1];
+		
+		
+		var pointerId_2 = Object.keys(this.activePointerInputs)[1];
+		var pointerInput_2 = this.activePointerInputs[pointerId_2];
+		
+		var multiPointerInputs = [pointerInput_1, pointerInput_2];
+		
+		return multiPointerInputs;
+	
+	}
 	
 	// pointermove contains only one single pointer, not multiple like on touch events (touches, changedTouches,...)
 	onPointerMove (pointermoveEvent) {
@@ -209,12 +226,10 @@ class Contact {
 	// functions for multi pointer gestures, currently only 2 pointers are supported
 	updateMultipointerParameters () {
 	
-		var pointerId_1 = Object.keys(this.activePointerInputs)[0];
-		var pointerInput_1 = this.activePointerInputs[pointerId_1];
-		
-		
-		var pointerId_2 = Object.keys(this.activePointerInputs)[1];
-		var pointerInput_2 = this.activePointerInputs[pointerId_2];
+		var multiPointerInputs = this.getMultiPointerInputs()
+
+		var pointerInput_1 = multiPointerInputs[0];
+		var pointerInput_2 = multiPointerInputs[1];
 		
 		var vector_1 = pointerInput_1.liveParameters.vector;
 		var vector_2 = pointerInput_2.liveParameters.vector;
@@ -234,8 +249,13 @@ class Contact {
 			
 			
 			// calculate rotation angle. imagine the user turning a wheel with 2 fingers
-			var liveAngle = this.calculateAngle(vector_1, vector_2);
-			this.multipointer.liveParameters.rotationAngle = liveAngle;
+			var liveRotationAngle = this.calculateRotationAngle(vector_1, vector_2);
+			this.multipointer.liveParameters.rotationAngle = liveRotationAngle;
+			
+			// calculate the simple vectorAngle for determining if the fingers moved into the same direction
+			var liveVectorAngle = this.calculateVectorAngle(vector_1, vector_2)
+			this.multipointer.liveParameters.vectorAngle = liveVectorAngle;
+			
 			
 		}		
 		
@@ -257,8 +277,11 @@ class Contact {
 			this.multipointer.globalParameters.relativeDistanceChange = globalDistanceChange.relative;
 			
 			
-			var globalAngle = this.calculateAngle(globalVector_1, globalVector_2);
-			this.multipointer.globalParameters.rotationAngle = globalAngle;
+			var globalRotationAngle = this.calculateRotationAngle(globalVector_1, globalVector_2);
+			this.multipointer.globalParameters.rotationAngle = globalRotationAngle;
+			
+			var globalVectorAngle = this.calculateVectorAngle(globalVector_1, globalVector_2)
+			this.multipointer.liveParameters.vectorAngle = globalVectorAngle;
 			
 		}
 		
@@ -313,7 +336,7 @@ class Contact {
 	* - if the wheel has been turned cw, its state has a positive angle
 	* - possible values for the angle: [-360,360]
 	*/
-	calculateAngle (vector_1, vector_2) {
+	calculateRotationAngle (vector_1, vector_2) {
 	
 		// vector_ are vectors between 2 points in time, same finger
 		// angleAector_ are vectors between 2 fingers
@@ -372,6 +395,22 @@ class Contact {
 		
 		return angleDeg;
 	
+	}
+	
+	calculateVectorAngle (vector_1, vector_2) {
+	
+		var angleDeg = null;
+	
+		if (vector_1.vectorLength > 0 && vector_2.vectorLength > 0){
+		
+			var cos = ( (vector_1.x * vector_2.x) + (vector_1.y * vector_2.y) ) / (vector_1.vectorLength * vector_2.vectorLength);
+
+			var angleRad = Math.acos(cos);
+			angleDeg = rad2deg(angleRad);
+		
+		}
+		
+		return angleDeg;
 	}
 
 }
@@ -660,7 +699,7 @@ class Vector {
 		this.y = this.deltaY;
 
 		// determine length
-		this.vectorLength = Math.sqrt( Math.pow(this.deltaX,2) + Math.pow(this.deltaY, 2) );
+		this.vectorLength = Math.sqrt( Math.pow(this.deltaX, 2) + Math.pow(this.deltaY, 2) );
 		
 		// determine direction
 		if (Math.abs(this.deltaX) > Math.abs(this.deltaY)){
@@ -757,7 +796,7 @@ class Gesture {
 
 	constructor (domElement, options){
 	
-		this.DEBUG = false;
+		this.DEBUG = true;
 		
 		this.domElement = domElement;
 		
@@ -1401,11 +1440,13 @@ class TwoPointerGesture extends MultiPointerGesture {
 		this.initialMinMaxParameters["centerMovement"] = [null,null]; //px
 		this.initialMinMaxParameters["distanceChange"] = [null, null]; //px - distance between 2 fingers
 		this.initialMinMaxParameters["rotationAngle"] = [null, null]; // degrees: positive = clockwise, negative = counter-clockwise (js convention, not mathematical convention)
+		this.initialMinMaxParameters["vectorAngle"] = [null, null];
 		
 		this.activeStateMinMaxParameters["pointerCount"] = [2, 2]; 
 		this.activeStateMinMaxParameters["centerMovement"] = [null,null];
 		this.activeStateMinMaxParameters["distanceChange"] = [null, null];
 		this.activeStateMinMaxParameters["rotationAngle"] = [null, null];
+		this.activeStateMinMaxParameters["vectorAngle"] = [null, null];
 	
 	}
 	
@@ -1418,6 +1459,8 @@ class TwoPointerGesture extends MultiPointerGesture {
 		minMaxParameters.distanceChange = Math.abs(contact.multipointer.liveParameters.distanceChange);
 		
 		minMaxParameters.rotationAngle = Math.abs(contact.multipointer.liveParameters.rotationAngle);
+		
+		minMaxParameters.vectorAngle = contact.multipointer.liveParameters.vectorAngle;
 		
 		return minMaxParameters;
 		
@@ -1489,6 +1532,9 @@ class Pinch extends TwoPointerGesture {
 		this.initialMinMaxParameters["centerMovement"] = [0, 50]; //px
 		this.initialMinMaxParameters["distanceChange"] = [5, null]; // distance between 2 fingers
 		this.initialMinMaxParameters["rotationAngle"] = [null, 20]; // distance between 2 fingers
+		this.initialMinMaxParameters["vectorAngle"] = [10, null];
+		
+		this.activeStateMinMaxParameters["vectorAngle"] = [20, null];
 		
 	}
 
@@ -1518,6 +1564,9 @@ class Rotate extends TwoPointerGesture {
 }
 
 
+/*
+* 2 fingers are moved across the surface, in the same direction
+*/
 class TwoFingerPan extends TwoPointerGesture {
 
 	constructor (domElement, options) {
@@ -1526,9 +1575,13 @@ class TwoFingerPan extends TwoPointerGesture {
 	
 		super(domElement, options);
 		
-		this.initialMinMaxParameters["centerMovement"] = [5, null];
-		this.initialMinMaxParameters["distanceChange"] = [null, 500];
+		this.initialMinMaxParameters["centerMovement"] = [2, null];
+		this.initialMinMaxParameters["distanceChange"] = [null, 50];
 		this.initialMinMaxParameters["rotationAngle"] = [null, null];
+		this.initialMinMaxParameters["vectorAngle"] = [null, 150];
+		
+		this.activeStateMinMaxParameters["vectorAngle"] = [null, 150]; // a difference in direction translates into the angle between those vectors
+		this.activeStateMinMaxParameters["distanceChange"] = [null, 5];
 
 	}
 
@@ -1548,6 +1601,7 @@ class TwoFingerPan extends TwoPointerGesture {
 
 var ALL_GESTURE_CLASSES = [Tap, Press, Pan, Pinch, Rotate, TwoFingerPan];
 
+
 class PointerListener {
 
 	constructor (domElement, options){
@@ -1556,8 +1610,13 @@ class PointerListener {
 	
 		var self = this;
 		
+		this.eventHandlers = {}; // registry for events removed on this.destroy();
+		
 		this.lastRecognitionTimestamp = null;
 		this.idleRecognitionIntervalId = null;
+		
+		this.pointerEventHandlers = {};
+		this.touchEventHandlers = {};
 		
 		options = options || {};
 		
@@ -1617,10 +1676,23 @@ class PointerListener {
 			return false;
 		});*/
 		
-		// javascript fires the events "pointerdown", "pointermove", "pointerup" and "pointercancel"
-		// on each of these events, the contact instance is updated and GestureRecognizers of this.supported_events are run		
-		domElement.addEventListener("pointerdown", function(event){
+		this.addPointerListeners();
 		
+		
+		this.addTouchListeners();
+	}
+	
+	
+	addPointerListeners () {
+	
+		var self = this;
+		
+		var domElement = this.domElement;
+		
+		// javascript fires the events "pointerdown", "pointermove", "pointerup" and "pointercancel"
+		// on each of these events, the contact instance is updated and GestureRecognizers of this.supported_events are run	
+		var onPointerDown = function (event) {
+			
 			// re-target all pointerevents to the current element
 			// see https://developer.mozilla.org/en-US/docs/Web/API/Element/setPointerCapture
 			domElement.setPointerCapture(event.pointerId);
@@ -1647,9 +1719,9 @@ class PointerListener {
 				self.onIdle();
 			}, 100);
 			
-		}, { "passive": true });
+		}
 		
-		domElement.addEventListener("pointermove", function(event){
+		var onPointerMove = function (event) {
 		
 			// pointermove is also firing if the mouse button is not pressed
 		
@@ -1666,10 +1738,10 @@ class PointerListener {
 					self.options.pointermove(event, self);
 				}
 			}
-			
-		}, { "passive": true });
 		
-		domElement.addEventListener("pointerup", function(event){
+		}
+		
+		var onPointerUp = function (event) {
 		
 			domElement.releasePointerCapture(event.pointerId);
 		
@@ -1688,8 +1760,8 @@ class PointerListener {
 			}
 			
 			self.clearIdleRecognitionInterval();
-			
-		});
+		
+		}
 		
 		/*
 		* case: user presses mouse button and moves element. while moving, the cursor leaves the element (fires pointerout)
@@ -1697,20 +1769,17 @@ class PointerListener {
 		*		during pan, pan should not end if the pointer leaves the element.
 		* MDN: Pointer capture allows events for a particular pointer event (PointerEvent) to be re-targeted to a particular element instead of the normal (or hit test) target at a pointer's location. This can be used to ensure that an element continues to receive pointer events even if the pointer device's contact moves off the element (such as by scrolling or panning). 
 		*/
+		var onPointerLeave = function (event) {
 		
-		domElement.addEventListener("pointerleave", function(event){
-			
 			if (self.contact != null && self.contact.isActive == true){
 				self.contact.onPointerLeave(event);
 				self.recognizeGestures();
 			}
 			
 			self.clearIdleRecognitionInterval()
-			
-		});
-
+		}
 		
-		domElement.addEventListener("pointercancel", function(event){
+		var onPointerCancel = function (event) {
 		
 			domElement.releasePointerCapture(event.pointerId);
 		
@@ -1729,12 +1798,32 @@ class PointerListener {
 			if (hasPointerCancelHook == true){
 				self.options.pointercancel(event, self);
 			}
-			
-			
-		}, { "passive": true });
 		
+		}
 		
-		this.addTouchListeners();
+		domElement.addEventListener("pointerdown", onPointerDown, { "passive": true });
+		domElement.addEventListener("pointermove", onPointerMove, { "passive": true });
+		domElement.addEventListener("pointerup", onPointerUp, { "passive": true });
+		domElement.addEventListener("pointerleave", onPointerLeave, {"passive": true});
+		domElement.addEventListener("pointercancel", onPointerCancel, { "passive": true });
+		
+		this.pointerEventHandlers = {
+			"pointerdown" : onPointerDown,
+			"pointermove" : onPointerMove,
+			"pointerup" : onPointerUp,
+			"pointerleave" : onPointerLeave,
+			"pointercancel" : onPointerCancel
+		};
+	
+	}
+	
+	removePointerListeners () {
+	
+		for (let event in this.pointerEventHandlers){
+			let handler = this.pointerEventHandlers[event];
+			this.domElement.removeEventListener(event, handler);
+		}
+	
 	}
 
 	// provide the ability to interact/prevent touch events
@@ -1746,12 +1835,8 @@ class PointerListener {
 
 		if (self.options.handleTouchEvents == true){
 
-			/*this.domElement.addEventListener("touchstart", function(event){
-
-			});*/
-
-			this.domElement.addEventListener("touchmove", function(event){
-				
+			
+			var onTouchMove = function (event) {
 				// fire onTouchMove for all gestures
 				for (let g=0; g<self.options.supportedGestures.length; g++){
 			
@@ -1759,8 +1844,17 @@ class PointerListener {
 
 					gesture.onTouchMove(event);
 				}
-				
-			});
+			}
+
+			this.domElement.addEventListener("touchmove", onTouchMove);
+			
+			this.touchEventHandlers = {
+				"touchmove" : onTouchmove
+			};
+			
+			/*this.domElement.addEventListener("touchstart", function(event){
+
+			});*/
 
 			/*this.domElement.addEventListener("touchend", function(event){
 			});
@@ -1769,6 +1863,15 @@ class PointerListener {
 			});*/
 		}
 
+	}
+	
+	removeTouchListeners () {
+	
+		for (let event in this.touchEventHandlers){
+			let handler = this.touchEventHandlers[event];
+			this.domElement.removeEventListener(event, handler);
+		}
+	
 	}
 	
 	// to recognize Press, recognition has to be run if the user does nothing while having contact with the surfave (no pointermove, no pointerup, no pointercancel)
@@ -1824,6 +1927,76 @@ class PointerListener {
 			gesture.recognize(this.contact);
 			
 		}
+		
+	}
+
+	
+	/*
+	*	handler management
+	*	eventsString: one or more events: "tap" or "pan twofingerpan pinchend"
+	*	currently, it is not supported to add the same handlerReference twice (once with useCapture = true, and once with useCapture = false)
+	*	useCapture defaults to false
+	*/
+	parseEventsString(eventsString) {
+		return eventsString.trim().split(/\s+/g);
+	}
+	
+	on (eventsString, handlerReference, useCapture) {
+		
+		let events = this.parseEventsString(evensString);
+		
+		for (let e=0; e<events.length; e++){
+			let event = events[e];
+			
+			if (!event in self.eventHandlers){
+				this.eventHandlers[event] = [];
+			}
+			
+			if (this.eventHandlers[event].indexOf(handlerReference) == -1){
+				this.eventHandlers[event].push(handlerReference);
+			}
+			
+			this.domElement.addEventListener(eventType, handlerReference, false);
+		}
+		
+		
+	}
+	
+	off (eventsString, handlerReference) {
+		
+		let events = this.parseEventsString(evensString);
+		
+		for (let e=0; e<events.length; e++){
+		
+			let event = events[e];
+			
+			if (event in this.eventHandlers){
+				let index = this.eventHandlers[event].indexOf(handlerReference);
+				if (index >=0){
+					this.eventHandlers[event].splice(index, 1); 
+				}
+			}
+			
+			this.domElement.removeEventListener(eventType, handlerReference, false);
+			
+		}
+	}
+	
+	destroy () {
+		
+		// remove all EventListeners from self.domElement
+		for (let event in this.eventHandlers){
+			let handlerList = this.eventHandlers[event];
+			for (let h=0; h<handlerList.length; h++){
+				let handler = handlerList[h];
+				this.domElement.removeEventListener(event, handler);
+			}
+			
+			delete this.eventHandlers[event];
+		}
+		
+		this.removePointerListeners();
+		this.removeTouchListeners();
 		
 	}
 	

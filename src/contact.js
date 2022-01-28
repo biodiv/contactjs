@@ -48,14 +48,16 @@ class Contact {
 				centerMovementVector : null,
 				distanceChange : null, // px
 				relativeDistanceChange : null, // %
-				rotationAngle : null //deg ccw[0,360], cw[0,-360] 
+				rotationAngle : null, //deg ccw[0,360], cw[0,-360] 
+				vectorAngle : null // angle between the 2 vectors performed by the pointer. This differs from rotationAngle
 			},
 			globalParameters : {
 				centerMovement : null,
 				centerMovementVector : null,
 				distanceChange : null,
 				relativeDistanceChange: null,
-				rotationAngle : null
+				rotationAngle : null,
+				vectorAngle : null
 			}
 		};
 	
@@ -100,6 +102,21 @@ class Contact {
 		return this.pointerInputs[this.primaryPointerId];
 	}
 	
+	// currently, on 2 Inputs are supported
+	getMultiPointerInputs () {
+	
+		var pointerId_1 = Object.keys(this.activePointerInputs)[0];
+		var pointerInput_1 = this.activePointerInputs[pointerId_1];
+		
+		
+		var pointerId_2 = Object.keys(this.activePointerInputs)[1];
+		var pointerInput_2 = this.activePointerInputs[pointerId_2];
+		
+		var multiPointerInputs = [pointerInput_1, pointerInput_2];
+		
+		return multiPointerInputs;
+	
+	}
 	
 	// pointermove contains only one single pointer, not multiple like on touch events (touches, changedTouches,...)
 	onPointerMove (pointermoveEvent) {
@@ -192,12 +209,10 @@ class Contact {
 	// functions for multi pointer gestures, currently only 2 pointers are supported
 	updateMultipointerParameters () {
 	
-		var pointerId_1 = Object.keys(this.activePointerInputs)[0];
-		var pointerInput_1 = this.activePointerInputs[pointerId_1];
-		
-		
-		var pointerId_2 = Object.keys(this.activePointerInputs)[1];
-		var pointerInput_2 = this.activePointerInputs[pointerId_2];
+		var multiPointerInputs = this.getMultiPointerInputs()
+
+		var pointerInput_1 = multiPointerInputs[0];
+		var pointerInput_2 = multiPointerInputs[1];
 		
 		var vector_1 = pointerInput_1.liveParameters.vector;
 		var vector_2 = pointerInput_2.liveParameters.vector;
@@ -217,8 +232,13 @@ class Contact {
 			
 			
 			// calculate rotation angle. imagine the user turning a wheel with 2 fingers
-			var liveAngle = this.calculateAngle(vector_1, vector_2);
-			this.multipointer.liveParameters.rotationAngle = liveAngle;
+			var liveRotationAngle = this.calculateRotationAngle(vector_1, vector_2);
+			this.multipointer.liveParameters.rotationAngle = liveRotationAngle;
+			
+			// calculate the simple vectorAngle for determining if the fingers moved into the same direction
+			var liveVectorAngle = this.calculateVectorAngle(vector_1, vector_2)
+			this.multipointer.liveParameters.vectorAngle = liveVectorAngle;
+			
 			
 		}		
 		
@@ -240,8 +260,11 @@ class Contact {
 			this.multipointer.globalParameters.relativeDistanceChange = globalDistanceChange.relative;
 			
 			
-			var globalAngle = this.calculateAngle(globalVector_1, globalVector_2);
-			this.multipointer.globalParameters.rotationAngle = globalAngle;
+			var globalRotationAngle = this.calculateRotationAngle(globalVector_1, globalVector_2);
+			this.multipointer.globalParameters.rotationAngle = globalRotationAngle;
+			
+			var globalVectorAngle = this.calculateVectorAngle(globalVector_1, globalVector_2)
+			this.multipointer.liveParameters.vectorAngle = globalVectorAngle;
 			
 		}
 		
@@ -296,7 +319,7 @@ class Contact {
 	* - if the wheel has been turned cw, its state has a positive angle
 	* - possible values for the angle: [-360,360]
 	*/
-	calculateAngle (vector_1, vector_2) {
+	calculateRotationAngle (vector_1, vector_2) {
 	
 		// vector_ are vectors between 2 points in time, same finger
 		// angleAector_ are vectors between 2 fingers
@@ -355,6 +378,22 @@ class Contact {
 		
 		return angleDeg;
 	
+	}
+	
+	calculateVectorAngle (vector_1, vector_2) {
+	
+		var angleDeg = null;
+	
+		if (vector_1.vectorLength > 0 && vector_2.vectorLength > 0){
+		
+			var cos = ( (vector_1.x * vector_2.x) + (vector_1.y * vector_2.y) ) / (vector_1.vectorLength * vector_2.vectorLength);
+
+			var angleRad = Math.acos(cos);
+			angleDeg = rad2deg(angleRad);
+		
+		}
+		
+		return angleDeg;
 	}
 
 }
@@ -643,7 +682,7 @@ class Vector {
 		this.y = this.deltaY;
 
 		// determine length
-		this.vectorLength = Math.sqrt( Math.pow(this.deltaX,2) + Math.pow(this.deltaY, 2) );
+		this.vectorLength = Math.sqrt( Math.pow(this.deltaX, 2) + Math.pow(this.deltaY, 2) );
 		
 		// determine direction
 		if (Math.abs(this.deltaX) > Math.abs(this.deltaY)){
