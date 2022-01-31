@@ -10,6 +10,7 @@ bg-color: bg-white
 		<div class="col-12 col-md-4 col-lg-2">
 			{% include_relative nav.html %}
 		</div>
+		
 		<div class="col-12 col-md-8 col-lg-10">
 			<div id="Pan" class="row mt-5">
 				<div class="col-12">
@@ -67,7 +68,39 @@ var pointerListener = new PointerListener(domElement, {
 						</table>
 					</div>
 				</div>
+				
+				
+
+				<div id="block" class="row mt-5">
+					<div class="col-12">
+						<h2>Block</h2>
+						<div class="mt-3">
+							By default, contactjs recognizes several gestures simultaneously. You can prevent this using <kbd>.block</kbd>.
+							
+							<div class="bg-light pt-3 pb-1 px-3 my-3">
+{% highlight javascript %}
+
+
+var twoFingerPan = new TwoFingerPan(domElement);
+var pinch = new Pinch(domElement);
+
+twoFingerPan.block(pinch);
+pinch.block(twoFingerPan);
+
+var pointerListener = new PointerListener(domElement, {
+	supportedGestures : [twoFingerPan, pinch]
+});
+{% endhighlight %}
+							</div>
+							
+							Now, <kbd>pinch</kbd> will not be recognized during a <kbd>twoFingerPan</kbd> and vice versa.
+							
+						</div>
+					</div>
+				</div>
+
 			</div>
 		</div>
+		
 	</div>
 </div>

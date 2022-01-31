@@ -185,6 +185,77 @@ domElement.addEventListener(EVENTNAME, function(event){
 					</div>
 				</div>
 			</div>
+			
+			<div id="Methods" class="row mt-5">
+				<div class="col-12">
+					<h4>Methods</h4>
+					<div class="my-3">
+						<kbd>PointerListener</kbd> offers an internal event management which takes car eof adding and removing event listeners from dom elements.
+					</div>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th scope="col">Name</th>
+								<th scope="col">Usage Example</th>
+								<th scope="col">Description</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<strong>.on( eventType, handlerReference)</strong>
+								</td>
+								<td>
+									<div class="bg-light pt-3 pb-1 px-3">
+{% highlight javascript %}
+var onPan = function(event) {
+	// do something
+}
+
+pointerListener.on("pan", onPan);
+{% endhighlight %}
+									</div>
+								</td>
+								<td>
+									attaches an event listener to pointerListener.domElement
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<strong>.off( eventType, handlerReference)</strong>
+								</td>
+								<td>
+									<div class="bg-light pt-3 pb-1 px-3">
+{% highlight javascript %}
+pointerListener.off("pan", onPan);
+{% endhighlight %}
+									</div>
+								</td>
+								<td>
+									removes a previously attached handlerReference
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<strong>.destroy()</strong>
+								</td>
+								<td>
+									<div class="bg-light pt-3 pb-1 px-3">
+{% highlight javascript %}
+pointerListener.destroy();
+{% endhighlight %}
+									</div>
+								</td>
+								<td>
+									Unbinds all events and input events and makes PointerListener unusable.
+								</td>
+							</tr>
+							
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
 			<div id="Constants" class="row mt-5">
 				<div class="col-12">
 					<h4>Constants</h4>
