@@ -38,6 +38,8 @@ class Contact {
 	constructor (pointerdownEvent) {
 	
 		this.DEBUG = false;
+		
+		this.id = new Date().getTime();
 	
 		// a map of all active PointerInput instances
 		this.pointerInputs = {};
@@ -286,8 +288,8 @@ class Contact {
 		}
 		
 		if (this.DEBUG === true){
-			console.log("[Contact] 2 fingers: centerMovement between pointer #" + pointerId_1 + " and pointer #" + pointerId_2 + " : " + this.multipointer.liveParameters.centerMovement + "px");
-			console.log("[Contact] 2 fingers: distanceChange: between pointer #" + pointerId_1 + " and pointer #" + pointerId_2 + " : "  + this.multipointer.liveParameters.distanceChange + "px");
+			console.log("[Contact] 2 fingers: centerMovement between pointer #" + pointerInput_1.pointerId + " and pointer #" + pointerInput_2.pointerId + " : " + this.multipointer.liveParameters.centerMovement + "px");
+			console.log("[Contact] 2 fingers: distanceChange: between pointer #" + pointerInput_1.pointerId + " and pointer #" + pointerInput_2.pointerId + " : "  + this.multipointer.liveParameters.distanceChange + "px");
 			console.log("[Contact] 2 fingers live angle: " + this.multipointer.liveParameters.rotationAngle + "deg");
 			console.log("[Contact] 2 fingers global angle: " + this.multipointer.globalParameters.rotationAngle + "deg");
 		}
@@ -795,8 +797,6 @@ function calcAngleRad (point) {
 class Gesture {
 
 	constructor (domElement, options){
-	
-		this.DEBUG = true;
 		
 		this.domElement = domElement;
 		
@@ -835,7 +835,9 @@ class Gesture {
 		}
 		
 		let defaultOptions = {
-			"bubbles" : true
+			"bubbles" : true,
+			"blocks" : [],
+			"DEBUG" : false
 		};
 
 		this.options = options || {};
@@ -845,6 +847,8 @@ class Gesture {
 				this.options[key] = defaultOptions[key];
 			}
 		}
+		
+		this.DEBUG = this.options.DEBUG;
 	
 	}
 	
@@ -935,6 +939,10 @@ class Gesture {
 	validate (contact){
 	
 		var isValid = false;
+
+		if (this.state == GESTURE_STATE_BLOCKED) {
+			return false;
+		}
 		
 		var primaryPointerInput = contact.getPrimaryPointerInput();
 	
@@ -996,18 +1004,50 @@ class Gesture {
 	
 		var isValid = this.validate(contact);
 		
-		if (isValid == true && this.isActive == false){
+		if (isValid == true && this.isActive == false && this.state == GESTURE_STATE_POSSIBLE){
 			this.onStart(contact);
 		}
 		
-		if (isValid == true && this.state == GESTURE_STATE_POSSIBLE){
+		if (isValid == true && this.isActive == true && this.state == GESTURE_STATE_POSSIBLE){
 			this.emit(contact);
 		}
 		else if (this.isActive == true && isValid == false){
 		
 			this.onEnd(contact);
+		
 		}
 		
+	}
+
+	block (gesture) {
+		if (this.options.blocks.indexOf(gesture) == -1){
+			this.options.blocks.push(gesture);
+		}
+	}
+
+	unblock (gesture) {
+		if (this.options.blocks.indexOf(gesture) != -1){
+			this.options.blocks.splice(this.options.blocks.indexOf(gesture), 1);
+		}
+	}
+	
+	blockGestures () {
+		for (let g=0; g<this.options.blocks.length; g++){
+			let gesture = this.options.blocks[g];
+			if (gesture.isActive == false) {
+				if (this.DEBUG == false){
+					console.log("[Gesture] blocking " + gesture.constructor.name);
+				}
+				gesture.state = GESTURE_STATE_BLOCKED;
+			}
+		}
+	}
+	
+	unblockGestures () {
+		for (let g=0; g<this.options.blocks.length; g++){
+			let gesture = this.options.blocks[g];
+			gesture.state = GESTURE_STATE_POSSIBLE;
+		}
 	}
 	
 	getEventData (contact) {
@@ -1087,6 +1127,8 @@ class Gesture {
 	}
 	
 	onStart (contact) {
+
+		this.blockGestures();
 	
 		this.isActive = true;
 		
@@ -1109,6 +1151,8 @@ class Gesture {
 
 	
 	onEnd (contact) {
+
+		this.unblockGestures();
 	
 		this.isActive = false;
 	
@@ -1224,7 +1268,7 @@ class Pan extends SinglePointerGesture {
 		
 		this.initialMinMaxParameters["pointerCount"] = [1,1]; // 1: no pan recognized at the pointerup event. 0: pan recognized at pointerup
 		this.initialMinMaxParameters["duration"] = [0, null];
-		this.initialMinMaxParameters["distance"] = [20, null]; 
+		this.initialMinMaxParameters["distance"] = [10, null]; 
 		
 		this.activeStateMinMaxParameters["pointerCount"] = [1,1];
 		
@@ -1319,9 +1363,15 @@ class Tap extends SinglePointerGesture {
 
 	}
 	
-	onStart (contact) {
-		// no onStart event for tap
-		this.initialPointerEvent = contact.currentPointerEvent;
+	recognize (contact) {
+	
+		var isValid = this.validate(contact);
+		
+		if (isValid == true && this.state == GESTURE_STATE_POSSIBLE){
+			this.initialPointerEvent = contact.currentPointerEvent;
+			this.emit(contact);
+		}
+		
 	}
 
 }
@@ -1344,13 +1394,15 @@ class Press extends SinglePointerGesture {
 		this.initialMinMaxParameters["pointerCount"] = [1, 1]; // count of fingers touching the surface. a press is fired during an active contact
 		this.initialMinMaxParameters["duration"] = [600, null]; // milliseconds. after a certain touch duration, it is not a TAP anymore
 		
-		this.initialMinMaxParameters["distance"] = [null, 30]; // if a certain distance is detected, Press becomes impossible
+		this.initialMinMaxParameters["distance"] = [null, 10]; // if a certain distance is detected, Press becomes impossible
 		
 		this.boolParameters["requiresPointerMove"] = null;
 		this.boolParameters["requiresActivePointer"] = true;
 		
 		// only Press has this parameter
 		this.hasBeenEmitted = false;
+		// as the global vector length is used, press should not trigger if the user moves away from the startpoint, then back, then stays
+		this.hasBeenInvalidatedForContactId = null;
 
 	}
 	
@@ -1370,8 +1422,21 @@ class Press extends SinglePointerGesture {
 	recognize (contact) {
 
 		var isValid = this.validate(contact);
+
+		var primaryPointerInput = contact.getPrimaryPointerInput();
 		
-		if (isValid == true && this.hasBeenEmitted == false){
+		if (this.hasBeenInvalidatedForContactId != null && this.hasBeenInvalidatedForContactId != contact.id) {
+			this.hasBeenInvalidatedForContactId = null;
+		}
+		
+		if (isValid == false) {
+			
+			if (primaryPointerInput.globalParameters.vector.vectorLength > this.initialMinMaxParameters["distance"][1]){
+				this.hasBeenInvalidatedForContactId = contact.id;
+			}
+		}
+		
+		if (isValid == true && this.hasBeenEmitted == false && this.hasBeenInvalidatedForContactId == null){
 			
 			this.initialPointerEvent = contact.currentPointerEvent;
 			
@@ -1382,7 +1447,6 @@ class Press extends SinglePointerGesture {
 		}
 		else {
 		
-			var primaryPointerInput = contact.getPrimaryPointerInput();
 			let duration = primaryPointerInput.globalParameters.duration;
 			
 			if (this.hasBeenEmitted == true && duration <= this.initialMinMaxParameters["duration"][0]){
@@ -1534,7 +1598,6 @@ class Pinch extends TwoPointerGesture {
 		this.initialMinMaxParameters["rotationAngle"] = [null, 20]; // distance between 2 fingers
 		this.initialMinMaxParameters["vectorAngle"] = [10, null];
 		
-		this.activeStateMinMaxParameters["vectorAngle"] = [20, null];
 		
 	}
 
@@ -1575,13 +1638,10 @@ class TwoFingerPan extends TwoPointerGesture {
 	
 		super(domElement, options);
 		
-		this.initialMinMaxParameters["centerMovement"] = [2, null];
+		this.initialMinMaxParameters["centerMovement"] = [3, null];
 		this.initialMinMaxParameters["distanceChange"] = [null, 50];
 		this.initialMinMaxParameters["rotationAngle"] = [null, null];
 		this.initialMinMaxParameters["vectorAngle"] = [null, 150];
-		
-		this.activeStateMinMaxParameters["vectorAngle"] = [null, 150]; // a difference in direction translates into the angle between those vectors
-		this.activeStateMinMaxParameters["distanceChange"] = [null, 5];
 
 	}
 
@@ -1607,10 +1667,9 @@ class PointerListener {
 	constructor (domElement, options){
 	
 		this.DEBUG = false;
-	
-		var self = this;
 		
-		this.eventHandlers = {}; // registry for events removed on this.destroy();
+		// registry for events like "pan", "rotate", which have to be removed on this.destroy();
+		this.eventHandlers = {}; 
 		
 		this.lastRecognitionTimestamp = null;
 		this.idleRecognitionIntervalId = null;
@@ -1621,7 +1680,8 @@ class PointerListener {
 		options = options || {};
 		
 		this.options = {
-			"bubbles" : true
+			"bubbles" : true,
+			"handleTouchEvents" : false
 		};
 		
 		// add user-defined options to this.options
@@ -1677,7 +1737,6 @@ class PointerListener {
 		});*/
 		
 		this.addPointerListeners();
-		
 		
 		this.addTouchListeners();
 	}
@@ -1849,7 +1908,7 @@ class PointerListener {
 			this.domElement.addEventListener("touchmove", onTouchMove);
 			
 			this.touchEventHandlers = {
-				"touchmove" : onTouchmove
+				"touchmove" : onTouchMove
 			};
 			
 			/*this.domElement.addEventListener("touchstart", function(event){
@@ -1941,19 +2000,19 @@ class PointerListener {
 		return eventsString.trim().split(/\s+/g);
 	}
 	
-	on (eventsString, handlerReference, useCapture) {
+	on (eventsString, handlerReference) {
 		
-		let events = this.parseEventsString(evensString);
+		let eventTypes = this.parseEventsString(eventsString);
 		
-		for (let e=0; e<events.length; e++){
-			let event = events[e];
+		for (let e=0; e<eventTypes.length; e++){
+			let eventType = eventTypes[e];
 			
-			if (!event in self.eventHandlers){
-				this.eventHandlers[event] = [];
+			if (!(eventType in this.eventHandlers)){
+				this.eventHandlers[eventType] = [];
 			}
 			
-			if (this.eventHandlers[event].indexOf(handlerReference) == -1){
-				this.eventHandlers[event].push(handlerReference);
+			if (this.eventHandlers[eventType].indexOf(handlerReference) == -1){
+				this.eventHandlers[eventType].push(handlerReference);
 			}
 			
 			this.domElement.addEventListener(eventType, handlerReference, false);
@@ -1964,20 +2023,27 @@ class PointerListener {
 	
 	off (eventsString, handlerReference) {
 		
-		let events = this.parseEventsString(evensString);
+		let eventTypes = this.parseEventsString(eventsString);
 		
-		for (let e=0; e<events.length; e++){
+		for (let e=0; e<eventTypes.length; e++){
 		
-			let event = events[e];
+			let eventType = eventTypes[e];
 			
-			if (event in this.eventHandlers){
-				let index = this.eventHandlers[event].indexOf(handlerReference);
-				if (index >=0){
-					this.eventHandlers[event].splice(index, 1); 
+			if (eventType in this.eventHandlers){
+
+				let handlerReferences = this.eventHandlers[eventType];
+
+				let index = handlerReferences.indexOf(handlerReference);
+
+				if (index >= 0) {
+					handlerReferences.splice(index, 1);
+					
+					this.eventHandlers[eventType] = handlerReferences;
 				}
+
+				this.domElement.removeEventListener(eventType, handlerReference, false);
+				
 			}
-			
-			this.domElement.removeEventListener(eventType, handlerReference, false);
 			
 		}
 	}

@@ -2,8 +2,6 @@
 class Gesture {
 
 	constructor (domElement, options){
-	
-		this.DEBUG = false;
 		
 		this.domElement = domElement;
 		
@@ -42,7 +40,9 @@ class Gesture {
 		}
 		
 		let defaultOptions = {
-			"bubbles" : true
+			"bubbles" : true,
+			"blocks" : [],
+			"DEBUG" : false
 		};
 
 		this.options = options || {};
@@ -52,6 +52,8 @@ class Gesture {
 				this.options[key] = defaultOptions[key];
 			}
 		}
+		
+		this.DEBUG = this.options.DEBUG;
 	
 	}
 	
@@ -142,6 +144,10 @@ class Gesture {
 	validate (contact){
 	
 		var isValid = false;
+
+		if (this.state == GESTURE_STATE_BLOCKED) {
+			return false;
+		}
 		
 		var primaryPointerInput = contact.getPrimaryPointerInput();
 	
@@ -203,18 +209,50 @@ class Gesture {
 	
 		var isValid = this.validate(contact);
 		
-		if (isValid == true && this.isActive == false){
+		if (isValid == true && this.isActive == false && this.state == GESTURE_STATE_POSSIBLE){
 			this.onStart(contact);
 		}
 		
-		if (isValid == true && this.state == GESTURE_STATE_POSSIBLE){
+		if (isValid == true && this.isActive == true && this.state == GESTURE_STATE_POSSIBLE){
 			this.emit(contact);
 		}
 		else if (this.isActive == true && isValid == false){
 		
 			this.onEnd(contact);
+		
 		}
 		
+	}
+
+	block (gesture) {
+		if (this.options.blocks.indexOf(gesture) == -1){
+			this.options.blocks.push(gesture);
+		}
+	}
+
+	unblock (gesture) {
+		if (this.options.blocks.indexOf(gesture) != -1){
+			this.options.blocks.splice(this.options.blocks.indexOf(gesture), 1);
+		}
+	}
+	
+	blockGestures () {
+		for (let g=0; g<this.options.blocks.length; g++){
+			let gesture = this.options.blocks[g];
+			if (gesture.isActive == false) {
+				if (this.DEBUG == false){
+					console.log("[Gesture] blocking " + gesture.constructor.name);
+				}
+				gesture.state = GESTURE_STATE_BLOCKED;
+			}
+		}
+	}
+	
+	unblockGestures () {
+		for (let g=0; g<this.options.blocks.length; g++){
+			let gesture = this.options.blocks[g];
+			gesture.state = GESTURE_STATE_POSSIBLE;
+		}
 	}
 	
 	getEventData (contact) {
@@ -294,6 +332,8 @@ class Gesture {
 	}
 	
 	onStart (contact) {
+
+		this.blockGestures();
 	
 		this.isActive = true;
 		
@@ -316,6 +356,8 @@ class Gesture {
 
 	
 	onEnd (contact) {
+
+		this.unblockGestures();
 	
 		this.isActive = false;
 	
@@ -431,7 +473,7 @@ class Pan extends SinglePointerGesture {
 		
 		this.initialMinMaxParameters["pointerCount"] = [1,1]; // 1: no pan recognized at the pointerup event. 0: pan recognized at pointerup
 		this.initialMinMaxParameters["duration"] = [0, null];
-		this.initialMinMaxParameters["distance"] = [20, null]; 
+		this.initialMinMaxParameters["distance"] = [10, null]; 
 		
 		this.activeStateMinMaxParameters["pointerCount"] = [1,1];
 		
@@ -526,9 +568,15 @@ class Tap extends SinglePointerGesture {
 
 	}
 	
-	onStart (contact) {
-		// no onStart event for tap
-		this.initialPointerEvent = contact.currentPointerEvent;
+	recognize (contact) {
+	
+		var isValid = this.validate(contact);
+		
+		if (isValid == true && this.state == GESTURE_STATE_POSSIBLE){
+			this.initialPointerEvent = contact.currentPointerEvent;
+			this.emit(contact);
+		}
+		
 	}
 
 }
@@ -551,13 +599,15 @@ class Press extends SinglePointerGesture {
 		this.initialMinMaxParameters["pointerCount"] = [1, 1]; // count of fingers touching the surface. a press is fired during an active contact
 		this.initialMinMaxParameters["duration"] = [600, null]; // milliseconds. after a certain touch duration, it is not a TAP anymore
 		
-		this.initialMinMaxParameters["distance"] = [null, 30]; // if a certain distance is detected, Press becomes impossible
+		this.initialMinMaxParameters["distance"] = [null, 10]; // if a certain distance is detected, Press becomes impossible
 		
 		this.boolParameters["requiresPointerMove"] = null;
 		this.boolParameters["requiresActivePointer"] = true;
 		
 		// only Press has this parameter
 		this.hasBeenEmitted = false;
+		// as the global vector length is used, press should not trigger if the user moves away from the startpoint, then back, then stays
+		this.hasBeenInvalidatedForContactId = null;
 
 	}
 	
@@ -577,8 +627,21 @@ class Press extends SinglePointerGesture {
 	recognize (contact) {
 
 		var isValid = this.validate(contact);
+
+		var primaryPointerInput = contact.getPrimaryPointerInput();
 		
-		if (isValid == true && this.hasBeenEmitted == false){
+		if (this.hasBeenInvalidatedForContactId != null && this.hasBeenInvalidatedForContactId != contact.id) {
+			this.hasBeenInvalidatedForContactId = null;
+		}
+		
+		if (isValid == false) {
+			
+			if (primaryPointerInput.globalParameters.vector.vectorLength > this.initialMinMaxParameters["distance"][1]){
+				this.hasBeenInvalidatedForContactId = contact.id;
+			}
+		}
+		
+		if (isValid == true && this.hasBeenEmitted == false && this.hasBeenInvalidatedForContactId == null){
 			
 			this.initialPointerEvent = contact.currentPointerEvent;
 			
@@ -589,7 +652,6 @@ class Press extends SinglePointerGesture {
 		}
 		else {
 		
-			var primaryPointerInput = contact.getPrimaryPointerInput();
 			let duration = primaryPointerInput.globalParameters.duration;
 			
 			if (this.hasBeenEmitted == true && duration <= this.initialMinMaxParameters["duration"][0]){
@@ -741,7 +803,6 @@ class Pinch extends TwoPointerGesture {
 		this.initialMinMaxParameters["rotationAngle"] = [null, 20]; // distance between 2 fingers
 		this.initialMinMaxParameters["vectorAngle"] = [10, null];
 		
-		this.activeStateMinMaxParameters["vectorAngle"] = [20, null];
 		
 	}
 
@@ -782,13 +843,10 @@ class TwoFingerPan extends TwoPointerGesture {
 	
 		super(domElement, options);
 		
-		this.initialMinMaxParameters["centerMovement"] = [2, null];
+		this.initialMinMaxParameters["centerMovement"] = [3, null];
 		this.initialMinMaxParameters["distanceChange"] = [null, 50];
 		this.initialMinMaxParameters["rotationAngle"] = [null, null];
 		this.initialMinMaxParameters["vectorAngle"] = [null, 150];
-		
-		this.activeStateMinMaxParameters["vectorAngle"] = [null, 150]; // a difference in direction translates into the angle between those vectors
-		this.activeStateMinMaxParameters["distanceChange"] = [null, 5];
 
 	}
 

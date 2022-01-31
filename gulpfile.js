@@ -37,6 +37,7 @@ function bundleAndMinify(cb) {
 		.pipe(concat('contact.js'))
 		.pipe(minify({
 			noSource : true,
+			mangle : false,
 			ext : {
 				src :'-debug.js',
 				min :'.min.js'

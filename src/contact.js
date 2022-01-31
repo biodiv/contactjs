@@ -21,6 +21,8 @@ class Contact {
 	constructor (pointerdownEvent) {
 	
 		this.DEBUG = false;
+		
+		this.id = new Date().getTime();
 	
 		// a map of all active PointerInput instances
 		this.pointerInputs = {};
@@ -269,8 +271,8 @@ class Contact {
 		}
 		
 		if (this.DEBUG === true){
-			console.log("[Contact] 2 fingers: centerMovement between pointer #" + pointerId_1 + " and pointer #" + pointerId_2 + " : " + this.multipointer.liveParameters.centerMovement + "px");
-			console.log("[Contact] 2 fingers: distanceChange: between pointer #" + pointerId_1 + " and pointer #" + pointerId_2 + " : "  + this.multipointer.liveParameters.distanceChange + "px");
+			console.log("[Contact] 2 fingers: centerMovement between pointer #" + pointerInput_1.pointerId + " and pointer #" + pointerInput_2.pointerId + " : " + this.multipointer.liveParameters.centerMovement + "px");
+			console.log("[Contact] 2 fingers: distanceChange: between pointer #" + pointerInput_1.pointerId + " and pointer #" + pointerInput_2.pointerId + " : "  + this.multipointer.liveParameters.distanceChange + "px");
 			console.log("[Contact] 2 fingers live angle: " + this.multipointer.liveParameters.rotationAngle + "deg");
 			console.log("[Contact] 2 fingers global angle: " + this.multipointer.globalParameters.rotationAngle + "deg");
 		}

@@ -18,10 +18,9 @@ class PointerListener {
 	constructor (domElement, options){
 	
 		this.DEBUG = false;
-	
-		var self = this;
 		
-		this.eventHandlers = {}; // registry for events removed on this.destroy();
+		// registry for events like "pan", "rotate", which have to be removed on this.destroy();
+		this.eventHandlers = {}; 
 		
 		this.lastRecognitionTimestamp = null;
 		this.idleRecognitionIntervalId = null;
@@ -32,7 +31,8 @@ class PointerListener {
 		options = options || {};
 		
 		this.options = {
-			"bubbles" : true
+			"bubbles" : true,
+			"handleTouchEvents" : false
 		};
 		
 		// add user-defined options to this.options
@@ -88,7 +88,6 @@ class PointerListener {
 		});*/
 		
 		this.addPointerListeners();
-		
 		
 		this.addTouchListeners();
 	}
@@ -260,7 +259,7 @@ class PointerListener {
 			this.domElement.addEventListener("touchmove", onTouchMove);
 			
 			this.touchEventHandlers = {
-				"touchmove" : onTouchmove
+				"touchmove" : onTouchMove
 			};
 			
 			/*this.domElement.addEventListener("touchstart", function(event){
@@ -352,19 +351,19 @@ class PointerListener {
 		return eventsString.trim().split(/\s+/g);
 	}
 	
-	on (eventsString, handlerReference, useCapture) {
+	on (eventsString, handlerReference) {
 		
-		let events = this.parseEventsString(evensString);
+		let eventTypes = this.parseEventsString(eventsString);
 		
-		for (let e=0; e<events.length; e++){
-			let event = events[e];
+		for (let e=0; e<eventTypes.length; e++){
+			let eventType = eventTypes[e];
 			
-			if (!event in self.eventHandlers){
-				this.eventHandlers[event] = [];
+			if (!(eventType in this.eventHandlers)){
+				this.eventHandlers[eventType] = [];
 			}
 			
-			if (this.eventHandlers[event].indexOf(handlerReference) == -1){
-				this.eventHandlers[event].push(handlerReference);
+			if (this.eventHandlers[eventType].indexOf(handlerReference) == -1){
+				this.eventHandlers[eventType].push(handlerReference);
 			}
 			
 			this.domElement.addEventListener(eventType, handlerReference, false);
@@ -375,20 +374,27 @@ class PointerListener {
 	
 	off (eventsString, handlerReference) {
 		
-		let events = this.parseEventsString(evensString);
+		let eventTypes = this.parseEventsString(eventsString);
 		
-		for (let e=0; e<events.length; e++){
+		for (let e=0; e<eventTypes.length; e++){
 		
-			let event = events[e];
+			let eventType = eventTypes[e];
 			
-			if (event in this.eventHandlers){
-				let index = this.eventHandlers[event].indexOf(handlerReference);
-				if (index >=0){
-					this.eventHandlers[event].splice(index, 1); 
+			if (eventType in this.eventHandlers){
+
+				let handlerReferences = this.eventHandlers[eventType];
+
+				let index = handlerReferences.indexOf(handlerReference);
+
+				if (index >= 0) {
+					handlerReferences.splice(index, 1);
+					
+					this.eventHandlers[eventType] = handlerReferences;
 				}
+
+				this.domElement.removeEventListener(eventType, handlerReference, false);
+				
 			}
-			
-			this.domElement.removeEventListener(eventType, handlerReference, false);
 			
 		}
 	}

@@ -3,6 +3,8 @@ var animationFrameId = null;
 
 var rectangle;
 var ticking = false;
+
+var pointerListener = null;
 	
 var START_X;
 var START_Y;
@@ -37,14 +39,7 @@ function loadContact (){
 	START_X = rectangle.getBoundingClientRect().left;
 	START_Y = rectangle.getBoundingClientRect().top;
 
-	/*var pinch = new Pinch(rectangle);
-	var twoFingerPan = new TwoFingerPan(rectangle);
-	pinch.block(twoFingerPan);
-	twoFingerPan.block(pinch);*/
-	
-	var pointerListener = new PointerListener(rectangle, {
-		//supportedGestures : [pinch, twoFingerPan],
-		//supportedGestures : [TwoFingerPan, Pinch],
+	pointerListener = new PointerListener(rectangle, {
 		pointerup: function (event, pointerListener){
 			if(pointerListener.contact.isActive == false && TAP_ACTIVE == false && PRESS_ACTIVE == false){
 				resetElementTransform();
@@ -52,149 +47,30 @@ function loadContact (){
 		}
 	});
 	
-	rectangle.addEventListener("pan", function(event){
-		onPan(event);
-		showOutput (event)
-	});
+	pointerListener.on("pan", onPan);
+	pointerListener.on("panend", onPanEnd);
 	
-	rectangle.addEventListener("panend", function(event){
+	pointerListener.on("swipe", onPan);
 	
-		let recognizer = event.detail.recognizer;
+	pointerListener.on("tap", onTap);
+	
+	pointerListener.on("press", onPress);
+	
+	pointerListener.on("pinchstart", onPinchStart);	
+	pointerListener.on("pinch", onPinch);
+	pointerListener.on("pinchend", onPinchEnd);
+	
 
-		if (recognizer.isSwipe == true){
-			//output.textContent = "Pan end with SWIPE detected";
-		}
-		else {
-			showOutput (event)
-		}
-		
-		setTimeout(function(){
-			clearOutput(event);
-		}, 1000);
-		
-		onEnd(event);
-	});
-	
-	rectangle.addEventListener("swipe", function(event){
-		onPan(event);
-		showOutput (event);
-	});
-	
-	rectangle.addEventListener("tap", function(event){
-	
-		TAP_ACTIVE = true;
-		onTap(event);
-	
-		showOutput(event);
-		
-		setTimeout(function(){
-			TAP_ACTIVE = false;
-		}, 200);
-		
-		setTimeout(function(){
-			clearOutput(event);
-		}, 1000);
-		
-		
-	});
-	
-	
-	rectangle.addEventListener("press", function(event){
-		
-		PRESS_ACTIVE = true;
-		onPress(event);
-	
-		showOutput(event);
-		
-		setTimeout(function(){
-			PRESS_ACTIVE = false;
-		}, 200);
-		
-		setTimeout(function(){
-			clearOutput(event);
-		}, 1000);
-		
-	});
-	
-	
-	rectangle.addEventListener("pinchstart", function(event){
-		PINCHACTIVE = true;
-	});
-	
-	rectangle.addEventListener("pinch", function(event){
-	
-		onPinch(event);
-	
-		showOutput(event);
-	});
-	
-	rectangle.addEventListener("pinchend", function(event){
-	
-		PINCHACTIVE = false;
-	
-		onEnd(event);
-	
-		showOutput(event);
-		
-		setTimeout(function(){
-			clearOutput(event);
-		}, 1000);
-		
-	});
-	
 	// ROTATION
-	rectangle.addEventListener("rotatestart", function(event){
-		ROTATIONACTIVE = true;
-	});
-	
-	rectangle.addEventListener("rotate", function(event){
-	
-		onRotation(event);
-		
-		showOutput(event);
-	});
-	
-	rectangle.addEventListener("rotateend", function(event){
-	
-		ROTATIONACTIVE = false;
-	
-		onEnd(event);
-	
-		showOutput(event);
-		
-		setTimeout(function(){
-			clearOutput(event);
-		}, 1000);
-	});
+	pointerListener.on("rotatestart", onRotationStart);
+	pointerListener.on("rotate", onRotation);
+	pointerListener.on("rotateend", onRotationEnd);
 	
 	
 	// TWOFINGERPAN
-	rectangle.addEventListener("twofingerpanstart", function(event){
-		TWOFINGERPANACTIVE = true;
-		
-		showOutput(event);
-	});
-	
-	
-	rectangle.addEventListener("twofingerpan", function(event){
-	
-		onTwoFingerPan(event);
-		
-		showOutput(event);
-	});
-	
-	rectangle.addEventListener("twofingerpanend", function(event){
-	
-		TWOFINGERPANACTIVE = true;
-	
-		onEnd(event);
-		
-		showOutput(event);
-		
-		setTimeout(function(){
-			clearOutput(event);
-		}, 1000);
-	});
+	pointerListener.on("twofingerpanstart", onTwoFingerPanStart);
+	pointerListener.on("twofingerpan", onTwoFingerPan);	
+	pointerListener.on("twofingerpanend", onTwoFingerPanEnd);
 	
 }
 
@@ -300,6 +176,8 @@ function requestElementUpdate(wait) {
 
 function onPan (event){
 
+	showOutput (event)
+
 	rectangle.className = '';
 
 	var pointerInput = event.detail.contact.getPrimaryPointerInput();
@@ -320,6 +198,29 @@ function onPan (event){
 	}
 }
 
+function onPanEnd(event) {
+	let recognizer = event.detail.recognizer;
+
+	if (recognizer.isSwipe == true){
+		//output.textContent = "Pan end with SWIPE detected";
+	}
+	else {
+		showOutput (event)
+	}
+	
+	setTimeout(function(){
+		clearOutput(event);
+	}, 1000);
+	
+	onEnd(event);
+}
+
+/* TwoFingerPan */
+function onTwoFingerPanStart(event) {
+	TWOFINGERPANACTIVE = true;
+	
+	showOutput(event);
+}
 
 function onTwoFingerPan (event) {
 
@@ -337,10 +238,27 @@ function onTwoFingerPan (event) {
 	
 	requestElementUpdate();
 
+	showOutput(event);
+
+}
+
+function onTwoFingerPanEnd(event){
+	TWOFINGERPANACTIVE = true;
+
+	onEnd(event);
+	
+	showOutput(event);
+	
+	setTimeout(function(){
+		clearOutput(event);
+	}, 1000);
+
 }
 
 
 function onTap (event) {
+
+	TAP_ACTIVE = true;
 
 	rectangle.className = "animate";
 	
@@ -357,18 +275,40 @@ function onTap (event) {
 
     
     requestElementUpdate();
+	
+	showOutput(event);
+	
+	setTimeout(function(){
+		TAP_ACTIVE = false;
+	}, 200);
+	
+	setTimeout(function(){
+		clearOutput(event);
+	}, 1000);
 }
 
 
 function onPress (event) {
 
+	PRESS_ACTIVE = true;
 	
+	showOutput(event);
+	
+	setTimeout(function(){
+		PRESS_ACTIVE = false;
+	}, 200);
+	
+	setTimeout(function(){
+		clearOutput(event);
+	}, 1000);
 
 }
 
-function onPinch (event){
+function onPinchStart(event) {
+	PINCHACTIVE = true;
+}
 
-	rectangle.className = "";
+function onPinch (event){
 
 	var contact = event.detail.contact;
 	
@@ -389,6 +329,27 @@ function onPinch (event){
 				
 	}
 
+	showOutput(event);
+
+	rectangle.className = "";
+
+}
+
+function onPinchEnd(event){
+	PINCHACTIVE = false;
+
+	onEnd(event);
+
+	showOutput(event);
+	
+	setTimeout(function(){
+		clearOutput(event);
+	}, 1000);
+}
+
+
+function onRotationStart(event) {
+	ROTATIONACTIVE = true;
 }
 
 function onRotation (event) {
@@ -406,8 +367,19 @@ function onRotation (event) {
 	
 	console.log(transform)
 	requestElementUpdate();
+
+	showOutput(event);
 	
 }
 
+function onRotationEnd(event) {
+	ROTATIONACTIVE = false;
 
-loadContact ();
+	onEnd(event);
+
+	showOutput(event);
+	
+	setTimeout(function(){
+		clearOutput(event);
+	}, 1000);
+}

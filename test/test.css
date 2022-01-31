@@ -43,8 +43,12 @@ html, body {
 	transform-origin:center;
 }
 
-#recognition-output {
-	font-size: 1rem;
+.recognition-output {
+	font-size: .8rem;
+}
+
+.recognition-output > div {
+	flex-grow: 1;
 }
 
 .animate {
