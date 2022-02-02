@@ -16,8 +16,6 @@ var ALL_GESTURE_CLASSES = [Tap, Press, Pan, Pinch, Rotate, TwoFingerPan];
 class PointerListener {
 
 	constructor (domElement, options){
-	
-		this.DEBUG = false;
 		
 		// registry for events like "pan", "rotate", which have to be removed on this.destroy();
 		this.eventHandlers = {}; 
@@ -32,7 +30,10 @@ class PointerListener {
 		
 		this.options = {
 			"bubbles" : true,
-			"handleTouchEvents" : false
+			"handleTouchEvents" : true,
+			"DEBUG" : false,
+			"DEBUG_GESTURES" : false,
+			"DEBUG_CONTACT" : false
 		};
 		
 		// add user-defined options to this.options
@@ -43,6 +44,8 @@ class PointerListener {
 
 			this.options[key] = options[key];
 		}
+
+		this.DEBUG = this.options.DEBUG;
 
 		// add instantiatedGestures to options.supportedGestures
 		var supportedGestures = ALL_GESTURE_CLASSES;
@@ -59,7 +62,8 @@ class PointerListener {
 			let gesture;
 			let GestureClass = supportedGestures[i];
 			let gestureOptions = {
-				bubbles : this.options.bubbles
+				"bubbles" : this.options.bubbles,
+				"DEBUG" : this.options.DEBUG_GESTURES
 			};
 
 			if (typeof GestureClass == "function"){
@@ -102,13 +106,20 @@ class PointerListener {
 		// javascript fires the events "pointerdown", "pointermove", "pointerup" and "pointercancel"
 		// on each of these events, the contact instance is updated and GestureRecognizers of this.supported_events are run	
 		var onPointerDown = function (event) {
+
+			if (self.DEBUG == true){
+				console.log("[PointerListener] pointerdown event detected");
+			}
 			
 			// re-target all pointerevents to the current element
 			// see https://developer.mozilla.org/en-US/docs/Web/API/Element/setPointerCapture
 			domElement.setPointerCapture(event.pointerId);
 			
 			if (self.contact == null || self.contact.isActive == false) {
-				self.contact = new Contact(event);
+				let contactOptions = {
+					"DEBUG" : self.options.DEBUG_CONTACT
+				};
+				self.contact = new Contact(event, contactOptions);
 			}
 			else {
 				// use existing contact instance if a second pointer becomes present
@@ -152,6 +163,10 @@ class PointerListener {
 		}
 		
 		var onPointerUp = function (event) {
+
+			if (self.DEBUG == true){
+				console.log("[PointerListener] pointerup event detected");
+			}
 		
 			domElement.releasePointerCapture(event.pointerId);
 		
@@ -180,6 +195,10 @@ class PointerListener {
 		* MDN: Pointer capture allows events for a particular pointer event (PointerEvent) to be re-targeted to a particular element instead of the normal (or hit test) target at a pointer's location. This can be used to ensure that an element continues to receive pointer events even if the pointer device's contact moves off the element (such as by scrolling or panning). 
 		*/
 		var onPointerLeave = function (event) {
+
+			if (self.DEBUG == true){
+				console.log("[PointerListener] pointerleave detected");
+			}
 		
 			if (self.contact != null && self.contact.isActive == true){
 				self.contact.onPointerLeave(event);
@@ -193,7 +212,7 @@ class PointerListener {
 		
 			domElement.releasePointerCapture(event.pointerId);
 		
-			if (this.DEBUG == true){
+			if (self.DEBUG == true){
 				console.log("[PointerListener] pointercancel detected");
 			}
 		
@@ -286,10 +305,6 @@ class PointerListener {
 	
 	// to recognize Press, recognition has to be run if the user does nothing while having contact with the surfave (no pointermove, no pointerup, no pointercancel)
 	onIdle () {
-	
-		if (this.DEBUG == true){
-			console.log("[PointerListener] onIdle");
-		}
 		
 		if (this.contact == null || this.contact.isActive == false){
 			this.clearIdleRecognitionInterval();
@@ -308,7 +323,7 @@ class PointerListener {
 				this.contact.onIdle();
 			
 				if (this.DEBUG == true){
-					console.log("[PointerListener] run idle recognition");
+					console.log("[PointerListener] onIdle - running idle recognition");
 				}
 			
 				this.recognizeGestures();

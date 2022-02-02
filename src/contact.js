@@ -18,9 +18,19 @@
 */
 class Contact {
 
-	constructor (pointerdownEvent) {
+	constructor (pointerdownEvent, options) {
 	
-		this.DEBUG = false;
+		options = options || {};
+
+		this.options = {
+			"DEBUG" : false
+		};
+		
+		for (let key in options){
+			this.options[key] = options[key];
+		}
+
+		this.DEBUG = this.options.DEBUG;
 		
 		this.id = new Date().getTime();
 	
@@ -69,8 +79,12 @@ class Contact {
 	addPointer (pointerdownEvent) {
 		
 		this.currentPointerEvent = pointerdownEvent;
+
+		var pointerInputOptions = {
+			"DEBUG" : this.DEBUG
+		};
 	
-		var pointerInput = new PointerInput(pointerdownEvent);
+		var pointerInput = new PointerInput(pointerdownEvent, pointerInputOptions);
 		this.pointerInputs[pointerdownEvent.pointerId] = pointerInput;
 		this.activePointerInputs[pointerdownEvent.pointerId] = pointerInput;
 	}
@@ -418,15 +432,23 @@ class PointerInput {
 
 	constructor (pointerdownEvent, options) {
 	
-		this.DEBUG = false;
-		
 		options = options || {};
+
+		this.options = {
+			"DEBUG" : false
+		};
+
+		for (let key in options){
+			this.options[key] = options[key];
+		}
+
+		this.DEBUG = this.options.DEBUG;
 		
 		var now = new Date().getTime();
 
 		this.pointerId = pointerdownEvent.pointerId;
-		var hasVectorTimespan = Object.prototype.hasOwnProperty.call(options, "vectorTimespan");
-		this.vectorTimespan = hasVectorTimespan == true ? options.vectorTimespan : 100; // milliseconds
+		var hasVectorTimespan = Object.prototype.hasOwnProperty.call(this.options, "vectorTimespan");
+		this.vectorTimespan = hasVectorTimespan == true ? this.options.vectorTimespan : 100; // milliseconds
 
 		// events used for vector calculation
 		this.initialPointerEvent = pointerdownEvent;

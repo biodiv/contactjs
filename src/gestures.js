@@ -70,7 +70,7 @@ class Gesture {
 		if (minValue != null && value != null && value < minValue){
 		
 			if (this.DEBUG == true){
-				console.log("dismissing min" + this.constructor.name + ": required " + parameterName + ": " + minValue + ", current value: " + value);
+				console.log("dismissing min" + this.eventBaseName + ": required " + parameterName + ": " + minValue + ", current value: " + value);
 			}
 		
 			return false;
@@ -79,7 +79,7 @@ class Gesture {
 		if (maxValue != null && value != null && value > maxValue){
 		
 			if (this.DEBUG == true){
-				console.log("dismissing max" + this.constructor.name + ": required " + parameterName + ": " + maxValue + ", current value: " + value);
+				console.log("dismissing max" + this.eventBaseName + ": required " + parameterName + ": " + maxValue + ", current value: " + value);
 			}
 		
 			return false;
@@ -102,7 +102,7 @@ class Gesture {
 		}
 		
 		if (this.DEBUG == true){
-			console.log("[Gestures] dismissing " + this.constructor.name + ": " + parameterName + " required: " + requiredValue + ", actual value: " + value);
+			console.log("[Gestures] dismissing " + this.eventBaseName + ": " + parameterName + " required: " + requiredValue + ", actual value: " + value);
 		}
 		
 		return false;
@@ -152,7 +152,7 @@ class Gesture {
 		var primaryPointerInput = contact.getPrimaryPointerInput();
 	
 		if (this.DEBUG == true){
-			console.log("[Gestures] running recognition for " + this.constructor.name);
+			console.log("[Gestures] running recognition for " + this.eventBaseName);
 		}
 		
 		
@@ -193,7 +193,7 @@ class Gesture {
 			if (this.options.supportedDirections.indexOf(primaryPointerInput.liveParameters.vector.direction) == -1){
 			
 				if (this.DEBUG == true){
-					console.log("[Gestures] dismissing " + this.constructor.name + ": supported directions: " + this.options.supportedDirections + ", current direction: " + primaryPointerInput.liveParameters.vector.direction);
+					console.log("[Gestures] dismissing " + this.eventBaseName + ": supported directions: " + this.options.supportedDirections + ", current direction: " + primaryPointerInput.liveParameters.vector.direction);
 				}
 				
 				return false;
@@ -241,7 +241,7 @@ class Gesture {
 			let gesture = this.options.blocks[g];
 			if (gesture.isActive == false) {
 				if (this.DEBUG == false){
-					console.log("[Gesture] blocking " + gesture.constructor.name);
+					console.log("[Gesture] blocking " + gesture.eventBaseName);
 				}
 				gesture.state = GESTURE_STATE_BLOCKED;
 			}
@@ -274,7 +274,7 @@ class Gesture {
 	emit (contact, eventName) {
 	
 		// fire general event like "pan" , "pinch", "rotate"
-		eventName = eventName || this.constructor.name.toLowerCase();
+		eventName = eventName || this.eventBaseName;
 		
 		if (this.DEBUG === true){
 			console.log("[Gestures] detected and firing event " + eventName);
@@ -339,7 +339,7 @@ class Gesture {
 		
 		this.initialPointerEvent = contact.currentPointerEvent;
 		
-		var eventName = "" + this.constructor.name.toLowerCase() + "start";
+		var eventName = "" + this.eventBaseName + "start";
 		
 		if (this.DEBUG === true) {
 			console.log("[Gestures] firing event: " + eventName);
@@ -361,7 +361,7 @@ class Gesture {
 	
 		this.isActive = false;
 	
-		var eventName = "" + this.constructor.name.toLowerCase() + "end";
+		var eventName = "" + this.eventBaseName + "end";
 		
 		if (this.DEBUG === true) {
 			console.log("[Gestures] firing event: " + eventName);
@@ -470,6 +470,8 @@ class Pan extends SinglePointerGesture {
 		options = options || {};
 	
 		super(domElement, options);
+
+		this.eventBaseName = "pan";
 		
 		this.initialMinMaxParameters["pointerCount"] = [1,1]; // 1: no pan recognized at the pointerup event. 0: pan recognized at pointerup
 		this.initialMinMaxParameters["duration"] = [0, null];
@@ -557,6 +559,8 @@ class Tap extends SinglePointerGesture {
 		options = options || {};
 	
 		super(domElement, options);
+
+		this.eventBaseName = "tap";
 		
 		this.initialMinMaxParameters["pointerCount"] = [0,0]; // count of fingers touching the surface. a tap is fired AFTER the user removed his finger
 		this.initialMinMaxParameters["duration"] = [0, 200]; // milliseconds. after a certain touch duration, it is not a TAP anymore
@@ -595,6 +599,8 @@ class Press extends SinglePointerGesture {
 		options = options || {};
 		
 		super(domElement, options);
+
+		this.eventBaseName = "press";
 	
 		this.initialMinMaxParameters["pointerCount"] = [1, 1]; // count of fingers touching the surface. a press is fired during an active contact
 		this.initialMinMaxParameters["duration"] = [600, null]; // milliseconds. after a certain touch duration, it is not a TAP anymore
@@ -797,6 +803,8 @@ class Pinch extends TwoPointerGesture {
 		options = options || {};
 	
 		super(domElement, options);
+
+		this.eventBaseName = "pinch";
 		
 		this.initialMinMaxParameters["centerMovement"] = [0, 50]; //px
 		this.initialMinMaxParameters["distanceChange"] = [5, null]; // distance between 2 fingers
@@ -822,6 +830,8 @@ class Rotate extends TwoPointerGesture {
 		options = options || {};
 	
 		super(domElement, options);
+
+		this.eventBaseName = "rotate";
 		
 		this.initialMinMaxParameters["centerMovement"] = [0, 50];
 		this.initialMinMaxParameters["distanceChange"] = [null, 50];
@@ -842,6 +852,8 @@ class TwoFingerPan extends TwoPointerGesture {
 		options = options || {};
 	
 		super(domElement, options);
+
+		this.eventBaseName = "twofingerpan";
 		
 		this.initialMinMaxParameters["centerMovement"] = [3, null];
 		this.initialMinMaxParameters["distanceChange"] = [null, 50];

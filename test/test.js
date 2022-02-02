@@ -43,6 +43,7 @@ function loadContact (){
 	twoFingerPan.block(pinch);*/
 	
 	var pointerListener = new PointerListener(rectangle, {
+		//"DEBUG_CONTACT" : true,
 		//supportedGestures : [pinch, twoFingerPan],
 		//supportedGestures : [TwoFingerPan, Pinch],
 		pointerup: function (event, pointerListener){

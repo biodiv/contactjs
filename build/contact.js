@@ -35,9 +35,19 @@ const GESTURE_STATE_BLOCKED = "blocked";
 */
 class Contact {
 
-	constructor (pointerdownEvent) {
+	constructor (pointerdownEvent, options) {
 	
-		this.DEBUG = false;
+		options = options || {};
+
+		this.options = {
+			"DEBUG" : false
+		};
+		
+		for (let key in options){
+			this.options[key] = options[key];
+		}
+
+		this.DEBUG = this.options.DEBUG;
 		
 		this.id = new Date().getTime();
 	
@@ -86,8 +96,12 @@ class Contact {
 	addPointer (pointerdownEvent) {
 		
 		this.currentPointerEvent = pointerdownEvent;
+
+		var pointerInputOptions = {
+			"DEBUG" : this.DEBUG
+		};
 	
-		var pointerInput = new PointerInput(pointerdownEvent);
+		var pointerInput = new PointerInput(pointerdownEvent, pointerInputOptions);
 		this.pointerInputs[pointerdownEvent.pointerId] = pointerInput;
 		this.activePointerInputs[pointerdownEvent.pointerId] = pointerInput;
 	}
@@ -435,15 +449,23 @@ class PointerInput {
 
 	constructor (pointerdownEvent, options) {
 	
-		this.DEBUG = false;
-		
 		options = options || {};
+
+		this.options = {
+			"DEBUG" : false
+		};
+
+		for (let key in options){
+			this.options[key] = options[key];
+		}
+
+		this.DEBUG = this.options.DEBUG;
 		
 		var now = new Date().getTime();
 
 		this.pointerId = pointerdownEvent.pointerId;
-		var hasVectorTimespan = Object.prototype.hasOwnProperty.call(options, "vectorTimespan");
-		this.vectorTimespan = hasVectorTimespan == true ? options.vectorTimespan : 100; // milliseconds
+		var hasVectorTimespan = Object.prototype.hasOwnProperty.call(this.options, "vectorTimespan");
+		this.vectorTimespan = hasVectorTimespan == true ? this.options.vectorTimespan : 100; // milliseconds
 
 		// events used for vector calculation
 		this.initialPointerEvent = pointerdownEvent;
@@ -865,7 +887,7 @@ class Gesture {
 		if (minValue != null && value != null && value < minValue){
 		
 			if (this.DEBUG == true){
-				console.log("dismissing min" + this.constructor.name + ": required " + parameterName + ": " + minValue + ", current value: " + value);
+				console.log("dismissing min" + this.eventBaseName + ": required " + parameterName + ": " + minValue + ", current value: " + value);
 			}
 		
 			return false;
@@ -874,7 +896,7 @@ class Gesture {
 		if (maxValue != null && value != null && value > maxValue){
 		
 			if (this.DEBUG == true){
-				console.log("dismissing max" + this.constructor.name + ": required " + parameterName + ": " + maxValue + ", current value: " + value);
+				console.log("dismissing max" + this.eventBaseName + ": required " + parameterName + ": " + maxValue + ", current value: " + value);
 			}
 		
 			return false;
@@ -897,7 +919,7 @@ class Gesture {
 		}
 		
 		if (this.DEBUG == true){
-			console.log("[Gestures] dismissing " + this.constructor.name + ": " + parameterName + " required: " + requiredValue + ", actual value: " + value);
+			console.log("[Gestures] dismissing " + this.eventBaseName + ": " + parameterName + " required: " + requiredValue + ", actual value: " + value);
 		}
 		
 		return false;
@@ -947,7 +969,7 @@ class Gesture {
 		var primaryPointerInput = contact.getPrimaryPointerInput();
 	
 		if (this.DEBUG == true){
-			console.log("[Gestures] running recognition for " + this.constructor.name);
+			console.log("[Gestures] running recognition for " + this.eventBaseName);
 		}
 		
 		
@@ -988,7 +1010,7 @@ class Gesture {
 			if (this.options.supportedDirections.indexOf(primaryPointerInput.liveParameters.vector.direction) == -1){
 			
 				if (this.DEBUG == true){
-					console.log("[Gestures] dismissing " + this.constructor.name + ": supported directions: " + this.options.supportedDirections + ", current direction: " + primaryPointerInput.liveParameters.vector.direction);
+					console.log("[Gestures] dismissing " + this.eventBaseName + ": supported directions: " + this.options.supportedDirections + ", current direction: " + primaryPointerInput.liveParameters.vector.direction);
 				}
 				
 				return false;
@@ -1036,7 +1058,7 @@ class Gesture {
 			let gesture = this.options.blocks[g];
 			if (gesture.isActive == false) {
 				if (this.DEBUG == false){
-					console.log("[Gesture] blocking " + gesture.constructor.name);
+					console.log("[Gesture] blocking " + gesture.eventBaseName);
 				}
 				gesture.state = GESTURE_STATE_BLOCKED;
 			}
@@ -1069,7 +1091,7 @@ class Gesture {
 	emit (contact, eventName) {
 	
 		// fire general event like "pan" , "pinch", "rotate"
-		eventName = eventName || this.constructor.name.toLowerCase();
+		eventName = eventName || this.eventBaseName;
 		
 		if (this.DEBUG === true){
 			console.log("[Gestures] detected and firing event " + eventName);
@@ -1134,7 +1156,7 @@ class Gesture {
 		
 		this.initialPointerEvent = contact.currentPointerEvent;
 		
-		var eventName = "" + this.constructor.name.toLowerCase() + "start";
+		var eventName = "" + this.eventBaseName + "start";
 		
 		if (this.DEBUG === true) {
 			console.log("[Gestures] firing event: " + eventName);
@@ -1156,7 +1178,7 @@ class Gesture {
 	
 		this.isActive = false;
 	
-		var eventName = "" + this.constructor.name.toLowerCase() + "end";
+		var eventName = "" + this.eventBaseName + "end";
 		
 		if (this.DEBUG === true) {
 			console.log("[Gestures] firing event: " + eventName);
@@ -1265,6 +1287,8 @@ class Pan extends SinglePointerGesture {
 		options = options || {};
 	
 		super(domElement, options);
+
+		this.eventBaseName = "pan";
 		
 		this.initialMinMaxParameters["pointerCount"] = [1,1]; // 1: no pan recognized at the pointerup event. 0: pan recognized at pointerup
 		this.initialMinMaxParameters["duration"] = [0, null];
@@ -1352,6 +1376,8 @@ class Tap extends SinglePointerGesture {
 		options = options || {};
 	
 		super(domElement, options);
+
+		this.eventBaseName = "tap";
 		
 		this.initialMinMaxParameters["pointerCount"] = [0,0]; // count of fingers touching the surface. a tap is fired AFTER the user removed his finger
 		this.initialMinMaxParameters["duration"] = [0, 200]; // milliseconds. after a certain touch duration, it is not a TAP anymore
@@ -1390,6 +1416,8 @@ class Press extends SinglePointerGesture {
 		options = options || {};
 		
 		super(domElement, options);
+
+		this.eventBaseName = "press";
 	
 		this.initialMinMaxParameters["pointerCount"] = [1, 1]; // count of fingers touching the surface. a press is fired during an active contact
 		this.initialMinMaxParameters["duration"] = [600, null]; // milliseconds. after a certain touch duration, it is not a TAP anymore
@@ -1592,6 +1620,8 @@ class Pinch extends TwoPointerGesture {
 		options = options || {};
 	
 		super(domElement, options);
+
+		this.eventBaseName = "pinch";
 		
 		this.initialMinMaxParameters["centerMovement"] = [0, 50]; //px
 		this.initialMinMaxParameters["distanceChange"] = [5, null]; // distance between 2 fingers
@@ -1617,6 +1647,8 @@ class Rotate extends TwoPointerGesture {
 		options = options || {};
 	
 		super(domElement, options);
+
+		this.eventBaseName = "rotate";
 		
 		this.initialMinMaxParameters["centerMovement"] = [0, 50];
 		this.initialMinMaxParameters["distanceChange"] = [null, 50];
@@ -1637,6 +1669,8 @@ class TwoFingerPan extends TwoPointerGesture {
 		options = options || {};
 	
 		super(domElement, options);
+
+		this.eventBaseName = "twofingerpan";
 		
 		this.initialMinMaxParameters["centerMovement"] = [3, null];
 		this.initialMinMaxParameters["distanceChange"] = [null, 50];
@@ -1665,8 +1699,6 @@ var ALL_GESTURE_CLASSES = [Tap, Press, Pan, Pinch, Rotate, TwoFingerPan];
 class PointerListener {
 
 	constructor (domElement, options){
-	
-		this.DEBUG = false;
 		
 		// registry for events like "pan", "rotate", which have to be removed on this.destroy();
 		this.eventHandlers = {}; 
@@ -1681,7 +1713,10 @@ class PointerListener {
 		
 		this.options = {
 			"bubbles" : true,
-			"handleTouchEvents" : false
+			"handleTouchEvents" : true,
+			"DEBUG" : false,
+			"DEBUG_GESTURES" : false,
+			"DEBUG_CONTACT" : false
 		};
 		
 		// add user-defined options to this.options
@@ -1692,6 +1727,8 @@ class PointerListener {
 
 			this.options[key] = options[key];
 		}
+
+		this.DEBUG = this.options.DEBUG;
 
 		// add instantiatedGestures to options.supportedGestures
 		var supportedGestures = ALL_GESTURE_CLASSES;
@@ -1708,7 +1745,8 @@ class PointerListener {
 			let gesture;
 			let GestureClass = supportedGestures[i];
 			let gestureOptions = {
-				bubbles : this.options.bubbles
+				"bubbles" : this.options.bubbles,
+				"DEBUG" : this.options.DEBUG_GESTURES
 			};
 
 			if (typeof GestureClass == "function"){
@@ -1751,13 +1789,20 @@ class PointerListener {
 		// javascript fires the events "pointerdown", "pointermove", "pointerup" and "pointercancel"
 		// on each of these events, the contact instance is updated and GestureRecognizers of this.supported_events are run	
 		var onPointerDown = function (event) {
+
+			if (self.DEBUG == true){
+				console.log("[PointerListener] pointerdown event detected");
+			}
 			
 			// re-target all pointerevents to the current element
 			// see https://developer.mozilla.org/en-US/docs/Web/API/Element/setPointerCapture
 			domElement.setPointerCapture(event.pointerId);
 			
 			if (self.contact == null || self.contact.isActive == false) {
-				self.contact = new Contact(event);
+				let contactOptions = {
+					"DEBUG" : self.options.DEBUG_CONTACT
+				};
+				self.contact = new Contact(event, contactOptions);
 			}
 			else {
 				// use existing contact instance if a second pointer becomes present
@@ -1801,6 +1846,10 @@ class PointerListener {
 		}
 		
 		var onPointerUp = function (event) {
+
+			if (self.DEBUG == true){
+				console.log("[PointerListener] pointerup event detected");
+			}
 		
 			domElement.releasePointerCapture(event.pointerId);
 		
@@ -1829,6 +1878,10 @@ class PointerListener {
 		* MDN: Pointer capture allows events for a particular pointer event (PointerEvent) to be re-targeted to a particular element instead of the normal (or hit test) target at a pointer's location. This can be used to ensure that an element continues to receive pointer events even if the pointer device's contact moves off the element (such as by scrolling or panning). 
 		*/
 		var onPointerLeave = function (event) {
+
+			if (self.DEBUG == true){
+				console.log("[PointerListener] pointerleave detected");
+			}
 		
 			if (self.contact != null && self.contact.isActive == true){
 				self.contact.onPointerLeave(event);
@@ -1842,7 +1895,7 @@ class PointerListener {
 		
 			domElement.releasePointerCapture(event.pointerId);
 		
-			if (this.DEBUG == true){
+			if (self.DEBUG == true){
 				console.log("[PointerListener] pointercancel detected");
 			}
 		
@@ -1935,10 +1988,6 @@ class PointerListener {
 	
 	// to recognize Press, recognition has to be run if the user does nothing while having contact with the surfave (no pointermove, no pointerup, no pointercancel)
 	onIdle () {
-	
-		if (this.DEBUG == true){
-			console.log("[PointerListener] onIdle");
-		}
 		
 		if (this.contact == null || this.contact.isActive == false){
 			this.clearIdleRecognitionInterval();
@@ -1957,7 +2006,7 @@ class PointerListener {
 				this.contact.onIdle();
 			
 				if (this.DEBUG == true){
-					console.log("[PointerListener] run idle recognition");
+					console.log("[PointerListener] onIdle - running idle recognition");
 				}
 			
 				this.recognizeGestures();
