@@ -37,15 +37,92 @@ var pointerListener = new PointerListener(domElement, options);
 var options = {
 	supportedGestures : [Tap, Pan, Pinch, Rotate, TwoFingerPan],
 	bubbles : false, // defaults to true
+	handleTouchEvents : false, // defaults to true
 	pointerDown : function(event, pointerListener){},
 	pointerMove : function(event, pointerListener){},
 	pointerUp : function(event, pointerListener){},
 	pointerOut : function(event, pointerListener){},
-	pointerCancel : function(event, pointerListener){}
+	pointerCancel : function(event, pointerListener){},
+	DEBUG : true, // defaults to false
+	DEBUG_GESTURES : true, // defaults to false
+	DEBUG_CONTACT : true // defaults to false	
 };
 var pointerListener = new PointerListener(domElement, options);
 {% endhighlight %}
 					</div>
+				</div>
+				<div class="col-12 my-3">
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th scope="col">Option</th>
+								<th scope="col">Values</th>
+								<th scope="col">Description</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<th scope="row">supportedGestures</th>
+								<td>
+									<i>Array[]</i> <br>
+									items can be gesture classes or instances of gesture classes
+								</td>
+								<td>
+									Defines which gestures can be recognized
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">bubbles</th>
+								<td>
+									<i>Boolean</i> <br>
+									<i>true</i> or <i>false</i>
+								</td>
+								<td>
+									Turn event bubbling on or off.
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">handleTouchEvents</th>
+								<td>
+									<i>Boolean</i> <br>
+									<i>true</i> or <i>false</i>
+								</td>
+								<td>
+									Let PointerListener block default TouchEvents which might interfere with PointerEvents.
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">DEBUG</th>
+								<td>
+									<i>Boolean</i> <br>
+									<i>true</i> or <i>false</i>
+								</td>
+								<td>
+									Show console output of the PointerListener instance.
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">DEBUG_GESTURES</th>
+								<td>
+									<i>Boolean</i> <br>
+									<i>true</i> or <i>false</i>
+								</td>
+								<td>
+									Show console output of the Gesture instances. Displays the recognition process.
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">DEBUG_CONTACT</th>
+								<td>
+									<i>Boolean</i> <br>
+									<i>true</i> or <i>false</i>
+								</td>
+								<td>
+									Show console output of the Contact and PointerInput instances. Displays information about vectors and collected data.
+								</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 			</div>
 			<div id="Events" class="row mt-5">
