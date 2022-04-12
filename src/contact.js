@@ -721,10 +721,10 @@ class Vector {
 		else {
 			// up or down
 			if (this.startPoint.y < this.endPoint.y){
-				this.direction = DIRECTION_UP;
+				this.direction = DIRECTION_DOWN;
 			}
 			else {
-				this.direction = DIRECTION_DOWN;
+				this.direction = DIRECTION_UP;
 			}
 		}
 		
