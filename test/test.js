@@ -225,6 +225,12 @@ function showOutput (event){
 	else {
 		outputElement.textContent = "on"; //event.type + " detected";
 	}
+	document.getElementById("deltaX-global").textContent = event.detail.global.deltaX
+	document.getElementById("deltaY-global").textContent = event.detail.global.deltaY
+	document.getElementById("direction-global").textContent = event.detail.global.direction
+	document.getElementById("deltaX-live").textContent = event.detail.live.deltaX
+	document.getElementById("deltaY-live").textContent = event.detail.live.deltaY
+	document.getElementById("direction-live").textContent = event.detail.live.direction
 }
 
 function clearOutput (event) {

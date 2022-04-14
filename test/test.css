@@ -37,18 +37,24 @@ html, body {
 	touch-action: none;
 	user-select: none;
 	-webkit-tap-highlight-color: transparent;
-	-webkit-user-select: none; 
-    -moz-user-select: none; 
+	-webkit-user-select: none;
+    -moz-user-select: none;
     -ms-user-select: none;
 	transform-origin:center;
 }
 
 .recognition-output {
-	font-size: .8rem;
+	font-size: 1rem;
+}
+
+.recognition-output article {
+	font-weight: bold;
+	width: 120px;
 }
 
 .recognition-output > div {
 	flex-grow: 1;
+	max-width: 250px;
 }
 
 .animate {

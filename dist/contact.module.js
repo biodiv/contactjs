@@ -1,6 +1,6 @@
 "use strict";
 
-// contactjs - v1.4.0
+// contact.js - v1.4.1
 
 const DIRECTION_NONE = "0";
 const DIRECTION_LEFT = "left";
@@ -740,10 +740,10 @@ class Vector {
 		else {
 			// up or down
 			if (this.startPoint.y < this.endPoint.y){
-				this.direction = DIRECTION_UP;
+				this.direction = DIRECTION_DOWN;
 			}
 			else {
-				this.direction = DIRECTION_DOWN;
+				this.direction = DIRECTION_UP;
 			}
 		}
 		
