@@ -24,7 +24,7 @@ import {
  * Contact collects data of the interaction with the surface, but does not decide if a gesture has been detected.
  */
 export class Contact {
-  constructor(pointerdownEvent, options) {
+  constructor(pointerdownEvent: PointerEvent, options) {
     options = options || {};
 
     this.options = {
@@ -80,7 +80,7 @@ export class Contact {
   }
 
   // add more pointers
-  addPointer(pointerdownEvent) {
+  addPointer(pointerdownEvent: PointerEvent) {
     this.currentPointerEvent = pointerdownEvent;
 
     const pointerInputOptions = {
@@ -135,7 +135,7 @@ export class Contact {
   }
 
   // pointermove contains only one single pointer, not multiple like on touch events (touches, changedTouches,...)
-  onPointerMove(pointermoveEvent) {
+  onPointerMove(pointermoveEvent: PointerEvent) {
     this.currentPointerEvent = pointermoveEvent;
     this.currentTimestamp = pointermoveEvent.timeStamp;
 
@@ -150,7 +150,7 @@ export class Contact {
   }
 
   // pointerup event: finger released, or mouse button released
-  onPointerUp(pointerupEvent) {
+  onPointerUp(pointerupEvent: PointerEvent) {
     const pointerId = pointerupEvent.pointerId;
 
     this.currentPointerEvent = pointerupEvent;
@@ -165,7 +165,7 @@ export class Contact {
     this.updateState();
   }
 
-  onPointerCancel(pointercancelEvent) {
+  onPointerCancel(pointercancelEvent: PointerEvent) {
     this.onPointerUp(pointercancelEvent);
 
     if (this.DEBUG == true) {
@@ -175,7 +175,7 @@ export class Contact {
 
   // also covers pointerleave
   // not necessary - using element.setPointerCapture and element.releasePointerCapture instead
-  onPointerLeave(pointerleaveEvent) {
+  onPointerLeave(pointerleaveEvent: PointerEvent) {
     this.onPointerUp(pointerleaveEvent);
 
     if (this.DEBUG == true) {
@@ -468,7 +468,7 @@ export class Contact {
 **********************************************************************************************/
 
 class PointerInput {
-  constructor(pointerdownEvent, options) {
+  constructor(pointerdownEvent: PointerEvent, options) {
     options = options || {};
 
     this.options = {
