@@ -136,12 +136,12 @@ export class Contact {
     this.activePointerInputs[pointerdownEvent.pointerId] = pointerInput;
   }
 
-  removePointer(pointerId): void {
+  removePointer(pointerId: number): void {
     delete this.activePointerInputs[pointerId];
   }
 
   // return a specific pointer input by its identifier
-  getPointerInput(pointerId) {
+  getPointerInput(pointerId: number): PointerInput {
     const hasPointerId = Object.prototype.hasOwnProperty.call(
       this.pointers,
       pointerId
@@ -161,12 +161,12 @@ export class Contact {
   }
 
   // return the pointer input which started this specific contact phenomenon
-  getPrimaryPointerInput() {
+  getPrimaryPointerInput(): PointerInput {
     return this.pointerInputs[this.primaryPointerId];
   }
 
   // currently, on 2 Inputs are supported
-  getMultiPointerInputs() {
+  getMultiPointerInputs(): PointerInput[] {
     const pointerId_1 = Object.keys(this.activePointerInputs)[0];
     const pointerInput_1 = this.activePointerInputs[pointerId_1];
 
