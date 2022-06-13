@@ -2,7 +2,7 @@
   "name": "contactjs",
   "version": "1.4.1",
   "description": "Pointer gestures for your webapp",
-  "main": "lib/contact.module.js",
+  "main": "build/index.js",
   "directories": {
     "lib": "lib",
     "test": "test"
