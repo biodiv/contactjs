@@ -517,6 +517,46 @@ interface PointerInputOptions {
 **********************************************************************************************/
 
 class PointerInput {
+  readonly options: PointerInputOptions;
+  DEBUG: boolean;
+  vectorTimespan: number;
+
+  readonly pointerId: number;
+
+  readonly liveParameters: {
+    vector: Vector | null; // provides the traveled distance as length
+    speed: number; // length of the vector
+    currentSpeed?: number;
+    isMoving: boolean;
+  };
+
+  readonly globalParameters: {
+    startX: number;
+    startY: number;
+    vector: Vector | null;
+    deltaX: number;
+    deltaY: number;
+    startTimestampUTC: number;
+    startTimestamp: number;
+    currentTimestamp: number;
+    endTimestamp: number | null;
+    maximumSpeed: number;
+    averageSpeed: number;
+    finalSpeed: number | null;
+    traveledDistance: number;
+    hasBeenMoved: boolean;
+    duration: number;
+  };
+
+  readonly initialPointerEvent: PointerEvent;
+  currentPointerEvent: PointerEvent;
+  recognizedEvents: PointerEvent[];
+
+  isActive: boolean;
+  canceled: boolean;
+
+  duration?: never;
+
   constructor(pointerdownEvent: PointerEvent, options?: PointerInputOptions) {
     options = options || {};
 
