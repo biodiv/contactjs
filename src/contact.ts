@@ -725,15 +725,31 @@ class PointerInput {
 }
 
 export class Point {
-  constructor(x, y) {
+  public readonly x: number;
+  public readonly y: number;
+
+  public constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
   }
 }
 
 export class Vector {
+  public readonly vectorLength: number;
+
+  public readonly startPoint: Point;
+  public readonly endPoint: Point;
+
+  public readonly direction: string;
+
+  public readonly deltaX: number;
+  public readonly deltaY: number;
+
+  public readonly x: number;
+  public readonly y: number;
+
   // vector between 2 points: START(x,y) and END(x,y)
-  constructor(startPoint, endPoint) {
+  public constructor(startPoint: Point, endPoint: Point) {
     this.startPoint = startPoint;
     this.endPoint = endPoint;
 
@@ -770,40 +786,36 @@ export class Vector {
 }
 
 // helper functions
-export function deg2rad(angleDeg) {
+export function deg2rad(angleDeg: number): number {
   const rad = (Math.PI / 180) * angleDeg;
-
   return rad;
 }
 
-export function rad2deg(angleRad) {
+export function rad2deg(angleRad: number): number {
   const deg = angleRad / (Math.PI / 180);
-
   return deg;
 }
 
-function getCenter(pointA, pointB) {
+function getCenter(pointA: Point, pointB: Point): Point {
   const centerX = (pointA.x + pointB.x) / 2;
   const centerY = (pointA.y + pointB.y) / 2;
 
   const center = new Point(centerX, centerY);
-
   return center;
 }
 
-function translatePoint(point, vector) {
+function translatePoint(point: Point, vector: Vector): Point {
   const newX = point.x + vector.x;
   const newY = point.y + vector.y;
 
   const translatedPoint = new Point(newX, newY);
-
   return translatedPoint;
 }
 
 // return the counter-clockwise angle between the positive x-axis and a point.
 // from 0 degrees to 360 degrees
 // see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/atan2
-export function calcAngleDegrees(point) {
+export function calcAngleDegrees(point: Point): number {
   // angle in degrees between -180 and 180
   let angle = (Math.atan2(point.y, point.x) * 180) / Math.PI;
 
@@ -814,7 +826,7 @@ export function calcAngleDegrees(point) {
   return angle;
 }
 
-export function calcAngleRad(point) {
+export function calcAngleRad(point: Point): number {
   let angle = Math.atan2(point.y, point.x); // [-PI, PI]
 
   if (angle < 0) {
