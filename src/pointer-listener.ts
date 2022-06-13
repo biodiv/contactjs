@@ -104,7 +104,7 @@ export class PointerListener {
     this.addTouchListeners();
   }
 
-  addPointerListeners() {
+  addPointerListeners(): void {
     const self = this;
 
     const domElement = this.domElement;
@@ -259,7 +259,7 @@ export class PointerListener {
     };
   }
 
-  removePointerListeners() {
+  removePointerListeners(): void {
     for (const event in this.pointerEventHandlers) {
       const handler = this.pointerEventHandlers[event];
       this.domElement.removeEventListener(event, handler);
@@ -269,7 +269,7 @@ export class PointerListener {
   // provide the ability to interact/prevent touch events
   // scrolling (touchmove event) results in pointerCancel event, stopping horizontal panning if user scrolls vertically
   // the better solution is using eg css: touch-action: pan-y;
-  addTouchListeners() {
+  addTouchListeners(): void {
     const self = this;
 
     if (self.options.handleTouchEvents == true) {
@@ -300,7 +300,7 @@ export class PointerListener {
     }
   }
 
-  removeTouchListeners() {
+  removeTouchListeners(): void {
     for (const event in this.touchEventHandlers) {
       const handler = this.touchEventHandlers[event];
       this.domElement.removeEventListener(event, handler);
@@ -308,7 +308,7 @@ export class PointerListener {
   }
 
   // to recognize Press, recognition has to be run if the user does nothing while having contact with the surfave (no pointermove, no pointerup, no pointercancel)
-  onIdle() {
+  onIdle(): void {
     if (this.contact == null || this.contact.isActive == false) {
       this.clearIdleRecognitionInterval();
     } else {
@@ -331,7 +331,7 @@ export class PointerListener {
     }
   }
 
-  clearIdleRecognitionInterval() {
+  clearIdleRecognitionInterval(): void {
     if (this.idleRecognitionIntervalId != null) {
       clearInterval(this.idleRecognitionIntervalId);
       this.idleRecognitionIntervalId = null;
@@ -339,7 +339,7 @@ export class PointerListener {
   }
 
   // run all configured recognizers
-  recognizeGestures() {
+  recognizeGestures(): void {
     this.lastRecognitionTimestamp = new Date().getTime();
 
     for (let g = 0; g < this.options.supportedGestures.length; g++) {
@@ -355,11 +355,11 @@ export class PointerListener {
    *	currently, it is not supported to add the same handlerReference twice (once with useCapture = true, and once with useCapture = false)
    *	useCapture defaults to false
    */
-  parseEventsString(eventsString) {
+  parseEventsString(eventsString: string): string[] {
     return eventsString.trim().split(/\s+/g);
   }
 
-  on(eventsString, handlerReference) {
+  on(eventsString: string, handlerReference): void {
     const eventTypes = this.parseEventsString(eventsString);
 
     for (let e = 0; e < eventTypes.length; e++) {
@@ -377,7 +377,7 @@ export class PointerListener {
     }
   }
 
-  off(eventsString, handlerReference) {
+  off(eventsString: string, handlerReference): void {
     const eventTypes = this.parseEventsString(eventsString);
 
     for (let e = 0; e < eventTypes.length; e++) {
@@ -399,7 +399,7 @@ export class PointerListener {
     }
   }
 
-  destroy() {
+  destroy(): void {
     // remove all EventListeners from self.domElement
     for (const event in this.eventHandlers) {
       const handlerList = this.eventHandlers[event];
