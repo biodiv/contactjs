@@ -11,6 +11,15 @@ type GestureState = typeof GESTURE_STATE_POSSIBLE | typeof GESTURE_STATE_BLOCKED
 type MinMaxParameter = [number | null, number | null];
 type BooleanParameter = null | boolean;
 
+interface GestureEventData {
+  contact: Contact;
+  recognizer: Gesture;
+  global?: unknown;
+  live?: {
+    direction: string;
+  }
+}
+
 interface GestureOptions {
   DEBUG: boolean;
   blocks: Gesture[];
@@ -339,7 +348,7 @@ class Gesture {
     }
   }
 
-  getEventData(contact: Contact) {
+  getEventData(contact: Contact): GestureEventData {
     // provide short-cuts to the values collected in the Contact object
     // match this to the event used by hammer.js
     const eventData = {
@@ -458,6 +467,34 @@ class Gesture {
   onTouchCancel(): void { }
 }
 
+interface SinglePointerGestureEventData extends GestureEventData {
+  global: {
+    deltaX: number;
+    deltaY: number;
+    distance: number;
+    speedX: number;
+    speedY: number;
+    speed: number;
+    direction: string;
+    scale: number;
+    rotation: number;
+    srcEvent: PointerEvent;
+  },
+  live: {
+    deltaX: number;
+    deltaY: number;
+    distance: number;
+    speedX: number;
+    speedY: number;
+    speed: number;
+    direction: string;
+    scale: number;
+    rotation: number;
+    center: Point;
+    srcEvent: PointerEvent;
+  }
+}
+
 class SinglePointerGesture extends Gesture {
   constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
     options = options || {};
@@ -465,10 +502,10 @@ class SinglePointerGesture extends Gesture {
     super(domElement, options);
   }
 
-  getEventData(contact: Contact) {
+  getEventData(contact: Contact): SinglePointerGestureEventData {
     // provide short-cuts to the values collected in the Contact object
     // match this to the event used by hammer.js
-    const eventData = super.getEventData(contact);
+    const eventData = super.getEventData(contact) as Partial<SinglePointerGestureEventData>;
 
     // this should be optimized in the future, not using primaryPointerInput, but something like currentPointerInput
     const primaryPointerInput = contact.getPrimaryPointerInput();
@@ -766,6 +803,34 @@ class MultiPointerGesture extends Gesture {
   }
 }
 
+interface TwoPointerGestureEventData extends GestureEventData {
+  global: {
+    deltaX: number;
+    deltaY: number;
+    distance: number;
+    speedX: number;
+    speedY: number;
+    speed: number;
+    direction: string;
+    scale: number;
+    rotation: number;
+    srcEvent: PointerEvent;
+  },
+  live: {
+    deltaX: number;
+    deltaY: number;
+    distance: number;
+    speedX: number;
+    speedY: number;
+    speed: number;
+    direction: string;
+    scale: number;
+    rotation: number;
+    center: Point;
+    srcEvent: PointerEvent;
+  }
+}
+
 class TwoPointerGesture extends MultiPointerGesture {
   constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
     options = options || {};
@@ -808,10 +873,10 @@ class TwoPointerGesture extends MultiPointerGesture {
     return minMaxParameters;
   }
 
-  getEventData(contact: Contact) {
+  getEventData(contact: Contact): TwoPointerGestureEventData {
     // provide short-cuts to the values collected in the Contact object
     // match this to the event used by hammer.js
-    const eventData = super.getEventData(contact);
+    const eventData = super.getEventData(contact) as Partial<TwoPointerGestureEventData>;
 
     const globalDuration =
       contact.currentPointerEvent.timeStamp -
