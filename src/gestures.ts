@@ -6,8 +6,29 @@ import {
 
 import { Point, Vector } from "./contact";
 
+type GestureState = typeof GESTURE_STATE_POSSIBLE | typeof GESTURE_STATE_BLOCKED;
+
+type MinMaxParameter = [number | null, number | null];
+type BooleanParameter = null | boolean;
+
 // single finger gestures
 class Gesture {
+  options: unknown;
+  DEBUG: boolean;
+
+  eventBaseName!: string;
+
+  readonly domElement: HTMLElement;
+
+  initialPointerEvent: PointerEvent | null;
+
+  boolParameters: Record<string, BooleanParameter>;
+  initialMinMaxParameters: Record<string, MinMaxParameter>;
+  activeStateMinMaxParameters: Record<string, MinMaxParameter>;
+
+  isActive: boolean;
+  state: GestureState;
+
   constructor(domElement, options) {
     this.domElement = domElement;
 
@@ -506,6 +527,10 @@ class SinglePointerGesture extends Gesture {
  *	- Pan supports directions. options["supportedDirections"] = []
  */
 export class Pan extends SinglePointerGesture {
+  swipeFinalSpeed: number;
+  isSwipe: boolean;
+  initialSupportedDirections: string[];
+
   constructor(domElement, options) {
     options = options || {};
 
@@ -624,6 +649,9 @@ export class Tap extends SinglePointerGesture {
  *
  */
 export class Press extends SinglePointerGesture {
+  hasBeenEmitted: boolean;
+  hasBeenInvalidatedForContactId: number | null;
+
   constructor(domElement, options) {
     options = options || {};
 
