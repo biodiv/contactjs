@@ -11,9 +11,16 @@ type GestureState = typeof GESTURE_STATE_POSSIBLE | typeof GESTURE_STATE_BLOCKED
 type MinMaxParameter = [number | null, number | null];
 type BooleanParameter = null | boolean;
 
+interface GestureOptions {
+  DEBUG: boolean;
+  blocks: Gesture[];
+  bubbles: boolean;
+  supportedDirections?: string[];
+}
+
 // single finger gestures
 class Gesture {
-  options: unknown;
+  options: GestureOptions;
   DEBUG: boolean;
 
   eventBaseName!: string;
@@ -29,7 +36,7 @@ class Gesture {
   isActive: boolean;
   state: GestureState;
 
-  constructor(domElement, options) {
+  constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
     this.domElement = domElement;
 
     this.isActive = false;
@@ -445,7 +452,7 @@ class Gesture {
 }
 
 class SinglePointerGesture extends Gesture {
-  constructor(domElement, options) {
+  constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
     options = options || {};
 
     super(domElement, options);
@@ -531,7 +538,7 @@ export class Pan extends SinglePointerGesture {
   isSwipe: boolean;
   initialSupportedDirections: string[];
 
-  constructor(domElement, options) {
+  constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
     options = options || {};
 
     super(domElement, options);
@@ -616,7 +623,7 @@ export class Pan extends SinglePointerGesture {
  * - the finger is released, Tap is no recognized
  */
 export class Tap extends SinglePointerGesture {
-  constructor(domElement, options) {
+  constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
     options = options || {};
 
     super(domElement, options);
@@ -652,7 +659,7 @@ export class Press extends SinglePointerGesture {
   hasBeenEmitted: boolean;
   hasBeenInvalidatedForContactId: number | null;
 
-  constructor(domElement, options) {
+  constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
     options = options || {};
 
     super(domElement, options);
@@ -730,7 +737,7 @@ export class Press extends SinglePointerGesture {
 }
 
 class MultiPointerGesture extends Gesture {
-  constructor(domElement, options) {
+  constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
     options = options || {};
 
     super(domElement, options);
@@ -753,7 +760,7 @@ class MultiPointerGesture extends Gesture {
 }
 
 class TwoPointerGesture extends MultiPointerGesture {
-  constructor(domElement, options) {
+  constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
     options = options || {};
 
     super(domElement, options);
@@ -850,7 +857,7 @@ class TwoPointerGesture extends MultiPointerGesture {
  * - the distance between the 2 start points and the two end points is reduces (diameter shrinks)
  */
 export class Pinch extends TwoPointerGesture {
-  constructor(domElement, options) {
+  constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
     options = options || {};
 
     super(domElement, options);
@@ -871,7 +878,7 @@ export class Pinch extends TwoPointerGesture {
  */
 
 export class Rotate extends TwoPointerGesture {
-  constructor(domElement, options) {
+  constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
     options = options || {};
 
     super(domElement, options);
@@ -888,7 +895,7 @@ export class Rotate extends TwoPointerGesture {
  * 2 fingers are moved across the surface, in the same direction
  */
 export class TwoFingerPan extends TwoPointerGesture {
-  constructor(domElement, options) {
+  constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
     options = options || {};
 
     super(domElement, options);
