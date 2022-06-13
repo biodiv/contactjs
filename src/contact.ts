@@ -11,6 +11,16 @@ interface DistanceChange {
   relative: number;
 }
 
+interface MultiPointerParameters {
+  center?: Point;
+  centerMovement: number | null;
+  centerMovementVector: Vector | null;
+  distanceChange: number | null; // px
+  relativeDistanceChange: number | null; // %
+  rotationAngle: number | null; //deg ccw[0,360], cw[0,-360]
+  vectorAngle: number | null;
+}
+
 interface ContactOptions {
   DEBUG: boolean;
 }
@@ -33,6 +43,31 @@ interface ContactOptions {
  * Contact collects data of the interaction with the surface, but does not decide if a gesture has been detected.
  */
 export class Contact {
+  options: ContactOptions;
+  DEBUG: boolean;
+
+  readonly id: number;
+  readonly primaryPointerId: number;
+  
+  readonly pointerInputs: Record<number, PointerInput>;
+  readonly activePointerInputs: Record<number, PointerInput>;
+  
+  readonly initialPointerEvent: PointerEvent;
+  currentPointerEvent: PointerEvent;
+
+  isActive: boolean;
+
+  readonly startTimestamp: number;
+  currentTimestamp: number;
+  endTimestamp: number | null;
+  
+  readonly multipointer: {
+    liveParameters: MultiPointerParameters;
+    globalParameters: MultiPointerParameters;
+  };
+  
+  pointers?: Record<number, PointerInput>;
+  
   constructor(pointerdownEvent: PointerEvent, options?: Partial<ContactOptions>) {
     options = options || {};
 
