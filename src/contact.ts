@@ -579,7 +579,7 @@ class PointerInput {
   }
 
   // do not update vector, only update time
-  onIdle() {
+  onIdle(): void {
     const now = new Date().getTime();
 
     // currentTimestamp is not an UTC millisecond timestamp.
@@ -589,14 +589,14 @@ class PointerInput {
     this.globalParameters.duration = duration;
   }
 
-  onMove(pointermoveEvent) {
+  onMove(pointermoveEvent: PointerEvent): void {
     this.globalParameters.hasBeenMoved = true;
     this.liveParameters.isMoving = true;
 
     this.update(pointermoveEvent, true);
   }
 
-  onUp(pointerupEvent) {
+  onUp(pointerupEvent: PointerEvent): void {
     this.globalParameters.finalSpeed = this.liveParameters.speed;
 
     this.liveParameters.currentSpeed = 0;
@@ -617,7 +617,7 @@ class PointerInput {
     }
   }
 
-  onCancel(pointercancelEvent) {
+  onCancel(pointercancelEvent: PointerEvent): void {
     this.update(pointercancelEvent);
 
     this.liveParameters.speed = 0;
@@ -634,7 +634,7 @@ class PointerInput {
     }
   }
 
-  update(pointerEvent) {
+  update(pointerEvent: PointerEvent): void {
     // update general parameters
     this.currentPointerEvent = pointerEvent;
     this.recognizedEvents.push(pointerEvent);
@@ -731,7 +731,7 @@ class PointerInput {
   }
 
   // create and return a vector based on 2 PointerEvents
-  getVector(startPointerEvent, endPointerEvent) {
+  getVector(startPointerEvent: PointerEvent | null, endPointerEvent: PointerEvent | null): Vector | null {
     let vector = null;
 
     if (startPointerEvent != null && endPointerEvent != null) {
@@ -752,7 +752,7 @@ class PointerInput {
   }
 
   // update speed. speed = distance / time
-  getSpeed(vector, startTimestamp, endTimestamp) {
+  getSpeed(vector: Vector | null, startTimestamp: number, endTimestamp: number): number {
     if (this.DEBUG === true) {
       console.log("[PointerInput vector] " + vector);
       console.log("[PointerInput startTimestamp] " + startTimestamp);
