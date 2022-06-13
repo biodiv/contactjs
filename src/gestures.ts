@@ -90,14 +90,17 @@ class Gesture {
     this.DEBUG = this.options.DEBUG;
   }
 
-  validateMinMax(minMaxParameters, parameterName, value) {
+  validateMinMax<
+    T extends Record<string, MinMaxParameter>,
+    K extends Extract<keyof T, string>
+  >(minMaxParameters: T, parameterName: K, value: number | null): boolean {
     const minValue = minMaxParameters[parameterName][0];
     const maxValue = minMaxParameters[parameterName][1];
 
     if (this.DEBUG == true) {
       console.log(
         "[Gestures] checking " +
-        parameterName +
+        parameterName as string +
         "[gesture.isActive: " +
         this.isActive.toString() +
         "]" +
@@ -147,7 +150,10 @@ class Gesture {
     return true;
   }
 
-  validateBool(parameterName, value) {
+  validateBool<K extends Extract<keyof this["boolParameters"], string>>(
+    parameterName: K,
+    value: boolean | null
+  ): boolean {
     // requiresPointerMove = null -> it does not matter if the pointer has been moved
     const requiredValue = this.boolParameters[parameterName];
 
@@ -214,19 +220,20 @@ class Gesture {
       console.log("[Gestures] running recognition for " + this.eventBaseName);
     }
 
-    const contactBoolParameters = this.getBoolParameters(contact);
+    const contactBoolParameters: Record<string, boolean | null> = this.getBoolParameters(contact);
+    type BooleanParameterKey = Extract<keyof this["boolParameters"], string>;
 
     for (const boolParameterName in this.boolParameters) {
       const boolValue = contactBoolParameters[boolParameterName];
-      isValid = this.validateBool(boolParameterName, boolValue);
+      isValid = this.validateBool(boolParameterName as BooleanParameterKey, boolValue);
       if (isValid == false) {
         return false;
         //break;
       }
     }
 
-    const contactMinMaxParameters = this.getMinMaxParameters(contact);
-    let minMaxParameters;
+    const contactMinMaxParameters: Record<string, number | null> = this.getMinMaxParameters(contact);
+    let minMaxParameters: Record<string, MinMaxParameter>;
 
     // check duration
     if (this.isActive == true) {
