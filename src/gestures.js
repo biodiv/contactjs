@@ -1,3 +1,11 @@
+import {
+  DIRECTION_ALL,
+  GESTURE_STATE_POSSIBLE,
+  GESTURE_STATE_BLOCKED
+} from "./input-consts";
+
+import { Point, Vector } from "./contact";
+
 // single finger gestures
 class Gesture {
   constructor(domElement, options) {
@@ -497,7 +505,7 @@ class SinglePointerGesture extends Gesture {
  *	- a SWIPE is a pan that ended with a high speed (velocity without direction)
  *	- Pan supports directions. options["supportedDirections"] = []
  */
-class Pan extends SinglePointerGesture {
+export class Pan extends SinglePointerGesture {
   constructor(domElement, options) {
     options = options || {};
 
@@ -582,7 +590,7 @@ class Pan extends SinglePointerGesture {
  * - the finger does not move for x ms
  * - the finger is released, Tap is no recognized
  */
-class Tap extends SinglePointerGesture {
+export class Tap extends SinglePointerGesture {
   constructor(domElement, options) {
     options = options || {};
 
@@ -615,7 +623,7 @@ class Tap extends SinglePointerGesture {
  * if global duration is above Press.initialMinMaxParameters["duration"][0] AND press already has been emitted, set Press to impossible
  *
  */
-class Press extends SinglePointerGesture {
+export class Press extends SinglePointerGesture {
   constructor(domElement, options) {
     options = options || {};
 
@@ -813,7 +821,7 @@ class TwoPointerGesture extends MultiPointerGesture {
  * - the center between the 2 fingers stays at the same coordinates
  * - the distance between the 2 start points and the two end points is reduces (diameter shrinks)
  */
-class Pinch extends TwoPointerGesture {
+export class Pinch extends TwoPointerGesture {
   constructor(domElement, options) {
     options = options || {};
 
@@ -834,7 +842,7 @@ class Pinch extends TwoPointerGesture {
  * - 1 or 2 fingers are moved in a circular motion. the center is between the 2 fingers
  */
 
-class Rotate extends TwoPointerGesture {
+export class Rotate extends TwoPointerGesture {
   constructor(domElement, options) {
     options = options || {};
 
@@ -851,7 +859,7 @@ class Rotate extends TwoPointerGesture {
 /*
  * 2 fingers are moved across the surface, in the same direction
  */
-class TwoFingerPan extends TwoPointerGesture {
+export class TwoFingerPan extends TwoPointerGesture {
   constructor(domElement, options) {
     options = options || {};
 

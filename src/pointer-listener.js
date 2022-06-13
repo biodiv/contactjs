@@ -1,3 +1,14 @@
+import {
+  Tap,
+  Press,
+  Pan,
+  Pinch,
+  Rotate,
+  TwoFingerPan
+} from "./gestures";
+
+import { Contact } from "./contact";
+
 /*
  * PointerListener class
  *	- implements the possibility to listen to gesture events performed on a specific DOM Element
@@ -12,7 +23,7 @@
 
 var ALL_GESTURE_CLASSES = [Tap, Press, Pan, Pinch, Rotate, TwoFingerPan];
 
-class PointerListener {
+export class PointerListener {
   constructor(domElement, options) {
     // registry for events like "pan", "rotate", which have to be removed on this.destroy();
     this.eventHandlers = {};

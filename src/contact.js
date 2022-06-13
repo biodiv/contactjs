@@ -1,3 +1,11 @@
+import {
+  DIRECTION_NONE,
+  DIRECTION_UP,
+  DIRECTION_DOWN,
+  DIRECTION_LEFT,
+  DIRECTION_RIGHT
+} from "./input-consts";
+
 /*
  * contact-js uses pointer events, which combine touch and mouse events (and more)
  * for readability, "touch" is used in comments
@@ -15,7 +23,7 @@
  * Therefore, the first pointerdownEvent is the point in time where Contact becomes alive. It dies with the last pointerup event
  * Contact collects data of the interaction with the surface, but does not decide if a gesture has been detected.
  */
-class Contact {
+export class Contact {
   constructor(pointerdownEvent, options) {
     options = options || {};
 
@@ -716,14 +724,14 @@ class PointerInput {
   }
 }
 
-class Point {
+export class Point {
   constructor(x, y) {
     this.x = x;
     this.y = y;
   }
 }
 
-class Vector {
+export class Vector {
   // vector between 2 points: START(x,y) and END(x,y)
   constructor(startPoint, endPoint) {
     this.startPoint = startPoint;
@@ -762,13 +770,13 @@ class Vector {
 }
 
 // helper functions
-function deg2rad(angleDeg) {
+export function deg2rad(angleDeg) {
   var rad = (Math.PI / 180) * angleDeg;
 
   return rad;
 }
 
-function rad2deg(angleRad) {
+export function rad2deg(angleRad) {
   var deg = angleRad / (Math.PI / 180);
 
   return deg;
@@ -795,7 +803,7 @@ function translatePoint(point, vector) {
 // return the counter-clockwise angle between the positive x-axis and a point.
 // from 0 degrees to 360 degrees
 // see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/atan2
-function calcAngleDegrees(point) {
+export function calcAngleDegrees(point) {
   // angle in degrees between -180 and 180
   var angle = (Math.atan2(point.y, point.x) * 180) / Math.PI;
 
@@ -806,7 +814,7 @@ function calcAngleDegrees(point) {
   return angle;
 }
 
-function calcAngleRad(point) {
+export function calcAngleRad(point) {
   var angle = Math.atan2(point.y, point.x); // [-PI, PI]
 
   if (angle < 0) {
