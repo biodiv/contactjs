@@ -31,7 +31,7 @@ export class Contact {
       DEBUG: false,
     };
 
-    for (let key in options) {
+    for (const key in options) {
       this.options[key] = options[key];
     }
 
@@ -83,11 +83,11 @@ export class Contact {
   addPointer(pointerdownEvent) {
     this.currentPointerEvent = pointerdownEvent;
 
-    var pointerInputOptions = {
+    const pointerInputOptions = {
       DEBUG: this.DEBUG,
     };
 
-    var pointerInput = new PointerInput(pointerdownEvent, pointerInputOptions);
+    const pointerInput = new PointerInput(pointerdownEvent, pointerInputOptions);
     this.pointerInputs[pointerdownEvent.pointerId] = pointerInput;
     this.activePointerInputs[pointerdownEvent.pointerId] = pointerInput;
   }
@@ -98,17 +98,17 @@ export class Contact {
 
   // return a specific pointer input by its identifier
   getPointerInput(pointerId) {
-    var hasPointerId = Object.prototype.hasOwnProperty.call(
+    const hasPointerId = Object.prototype.hasOwnProperty.call(
       this.pointers,
       pointerId
     );
 
     if (hasPointerId) {
-      let pointerInput = this.pointers[pointerId];
+      const pointerInput = this.pointers[pointerId];
 
       return pointerInput;
     } else {
-      let msg =
+      const msg =
         "invalid pointerId: " +
         pointerId +
         ". Pointer not found in Contact.pointers";
@@ -123,13 +123,13 @@ export class Contact {
 
   // currently, on 2 Inputs are supported
   getMultiPointerInputs() {
-    var pointerId_1 = Object.keys(this.activePointerInputs)[0];
-    var pointerInput_1 = this.activePointerInputs[pointerId_1];
+    const pointerId_1 = Object.keys(this.activePointerInputs)[0];
+    const pointerInput_1 = this.activePointerInputs[pointerId_1];
 
-    var pointerId_2 = Object.keys(this.activePointerInputs)[1];
-    var pointerInput_2 = this.activePointerInputs[pointerId_2];
+    const pointerId_2 = Object.keys(this.activePointerInputs)[1];
+    const pointerInput_2 = this.activePointerInputs[pointerId_2];
 
-    var multiPointerInputs = [pointerInput_1, pointerInput_2];
+    const multiPointerInputs = [pointerInput_1, pointerInput_2];
 
     return multiPointerInputs;
   }
@@ -139,7 +139,7 @@ export class Contact {
     this.currentPointerEvent = pointermoveEvent;
     this.currentTimestamp = pointermoveEvent.timeStamp;
 
-    var movedPointer = this.pointerInputs[pointermoveEvent.pointerId];
+    const movedPointer = this.pointerInputs[pointermoveEvent.pointerId];
     movedPointer.onMove(pointermoveEvent);
 
     if (this.DEBUG === true) {
@@ -151,13 +151,13 @@ export class Contact {
 
   // pointerup event: finger released, or mouse button released
   onPointerUp(pointerupEvent) {
-    var pointerId = pointerupEvent.pointerId;
+    const pointerId = pointerupEvent.pointerId;
 
     this.currentPointerEvent = pointerupEvent;
 
     this.currentTimestamp = pointerupEvent.timeStamp;
 
-    var removedPointer = this.pointerInputs[pointerId];
+    const removedPointer = this.pointerInputs[pointerId];
     removedPointer.onUp(pointerupEvent);
 
     this.removePointer(pointerId);
@@ -186,15 +186,15 @@ export class Contact {
   // if the contact idles (no Momvement), the time still passes
   // therefore, the pointerInput has to be updated
   onIdle() {
-    for (let pointerInputId in this.activePointerInputs) {
-      let activePointer = this.activePointerInputs[pointerInputId];
+    for (const pointerInputId in this.activePointerInputs) {
+      const activePointer = this.activePointerInputs[pointerInputId];
       activePointer.onIdle();
     }
   }
 
   // update this contact instance. invoked on pointermove, pointerup and pointercancel events
   updateState() {
-    var isActive = false;
+    let isActive = false;
 
     if (Object.keys(this.activePointerInputs).length > 0) {
       isActive = true;
@@ -211,19 +211,19 @@ export class Contact {
 
   // functions for multi pointer gestures, currently only 2 pointers are supported
   updateMultipointerParameters() {
-    var multiPointerInputs = this.getMultiPointerInputs();
+    const multiPointerInputs = this.getMultiPointerInputs();
 
-    var pointerInput_1 = multiPointerInputs[0];
-    var pointerInput_2 = multiPointerInputs[1];
+    const pointerInput_1 = multiPointerInputs[0];
+    const pointerInput_2 = multiPointerInputs[1];
 
-    var vector_1 = pointerInput_1.liveParameters.vector;
-    var vector_2 = pointerInput_2.liveParameters.vector;
+    const vector_1 = pointerInput_1.liveParameters.vector;
+    const vector_2 = pointerInput_2.liveParameters.vector;
 
     if (vector_1 != null && vector_2 != null) {
-      var currentCenter = getCenter(vector_1.startPoint, vector_2.startPoint);
+      const currentCenter = getCenter(vector_1.startPoint, vector_2.startPoint);
       this.multipointer.liveParameters.center = currentCenter;
 
-      var centerMovementVector = this.calculateCenterMovement(
+      const centerMovementVector = this.calculateCenterMovement(
         vector_1,
         vector_2
       );
@@ -232,33 +232,33 @@ export class Contact {
       this.multipointer.liveParameters.centerMovement =
         centerMovementVector.vectorLength;
 
-      var liveDistanceChange = this.calculateDistanceChange(vector_1, vector_2);
+      const liveDistanceChange = this.calculateDistanceChange(vector_1, vector_2);
       this.multipointer.liveParameters.distanceChange =
         liveDistanceChange.absolute;
       this.multipointer.liveParameters.relativeDistanceChange =
         liveDistanceChange.relative;
 
       // calculate rotation angle. imagine the user turning a wheel with 2 fingers
-      var liveRotationAngle = this.calculateRotationAngle(vector_1, vector_2);
+      const liveRotationAngle = this.calculateRotationAngle(vector_1, vector_2);
       this.multipointer.liveParameters.rotationAngle = liveRotationAngle;
 
       // calculate the simple vectorAngle for determining if the fingers moved into the same direction
-      var liveVectorAngle = this.calculateVectorAngle(vector_1, vector_2);
+      const liveVectorAngle = this.calculateVectorAngle(vector_1, vector_2);
       this.multipointer.liveParameters.vectorAngle = liveVectorAngle;
     }
 
     // global distance change and rotation
-    var globalVector_1 = pointerInput_1.globalParameters.vector;
-    var globalVector_2 = pointerInput_2.globalParameters.vector;
+    const globalVector_1 = pointerInput_1.globalParameters.vector;
+    const globalVector_2 = pointerInput_2.globalParameters.vector;
 
     if (globalVector_1 != null && globalVector_2 != null) {
-      var globalCenter = getCenter(
+      const globalCenter = getCenter(
         globalVector_1.startPoint,
         globalVector_2.startPoint
       );
       this.multipointer.globalParameters.center = globalCenter;
 
-      var globalCenterMovementVector = this.calculateCenterMovement(
+      const globalCenterMovementVector = this.calculateCenterMovement(
         globalVector_1,
         globalVector_2
       );
@@ -267,7 +267,7 @@ export class Contact {
       this.multipointer.globalParameters.centerMovement =
         globalCenterMovementVector.vectorLength;
 
-      var globalDistanceChange = this.calculateDistanceChange(
+      const globalDistanceChange = this.calculateDistanceChange(
         globalVector_1,
         globalVector_2
       );
@@ -276,13 +276,13 @@ export class Contact {
       this.multipointer.globalParameters.relativeDistanceChange =
         globalDistanceChange.relative;
 
-      var globalRotationAngle = this.calculateRotationAngle(
+      const globalRotationAngle = this.calculateRotationAngle(
         globalVector_1,
         globalVector_2
       );
       this.multipointer.globalParameters.rotationAngle = globalRotationAngle;
 
-      var globalVectorAngle = this.calculateVectorAngle(
+      const globalVectorAngle = this.calculateVectorAngle(
         globalVector_1,
         globalVector_2
       );
@@ -323,34 +323,34 @@ export class Contact {
 
   calculateCenterMovement(vector_1, vector_2) {
     // start point is the center between the starting points of the 2 vectors
-    var startPoint = getCenter(vector_1.startPoint, vector_2.startPoint);
+    const startPoint = getCenter(vector_1.startPoint, vector_2.startPoint);
 
     // center between the end points of the vectors
-    var endPoint = getCenter(vector_1.endPoint, vector_2.endPoint);
+    const endPoint = getCenter(vector_1.endPoint, vector_2.endPoint);
 
-    var vectorBetweenCenterPoints = new Vector(startPoint, endPoint);
+    const vectorBetweenCenterPoints = new Vector(startPoint, endPoint);
 
     return vectorBetweenCenterPoints;
   }
 
   calculateDistanceChange(vector_1, vector_2) {
-    var vectorBetweenStartPoints = new Vector(
+    const vectorBetweenStartPoints = new Vector(
       vector_1.startPoint,
       vector_2.startPoint
     );
-    var vectorBetweenEndPoints = new Vector(
+    const vectorBetweenEndPoints = new Vector(
       vector_1.endPoint,
       vector_2.endPoint
     );
 
-    var absoluteDistanceChange =
+    const absoluteDistanceChange =
       vectorBetweenEndPoints.vectorLength -
       vectorBetweenStartPoints.vectorLength;
-    var relativeDistanceChange =
+    const relativeDistanceChange =
       vectorBetweenEndPoints.vectorLength /
       vectorBetweenStartPoints.vectorLength;
 
-    var distanceChange = {
+    const distanceChange = {
       absolute: absoluteDistanceChange,
       relative: relativeDistanceChange,
     };
@@ -373,10 +373,10 @@ export class Contact {
   calculateRotationAngle(vector_1, vector_2) {
     // vector_ are vectors between 2 points in time, same finger
     // angleAector_ are vectors between 2 fingers
-    var angleVector_1 = new Vector(vector_1.startPoint, vector_2.startPoint); // in time: occured first
-    var angleVector_2 = new Vector(vector_1.endPoint, vector_2.endPoint); // in time: occured second
+    const angleVector_1 = new Vector(vector_1.startPoint, vector_2.startPoint); // in time: occured first
+    const angleVector_2 = new Vector(vector_1.endPoint, vector_2.endPoint); // in time: occured second
 
-    var origin = new Point(0, 0);
+    const origin = new Point(0, 0);
 
     // translate the points of the vector, so that their startPoints are attached to (0,0)
     /*
@@ -389,16 +389,16 @@ export class Contact {
           0
 
     */
-    var translationVector_1 = new Vector(angleVector_1.startPoint, origin);
-    var translatedEndPoint_1 = translatePoint(
+    const translationVector_1 = new Vector(angleVector_1.startPoint, origin);
+    const translatedEndPoint_1 = translatePoint(
       angleVector_1.endPoint,
       translationVector_1
     );
 
     //var v_1_translated = new Vector(origin, translatedEndPoint_1);
 
-    var translationVector_2 = new Vector(angleVector_2.startPoint, origin);
-    var translatedEndPoint_2 = translatePoint(
+    const translationVector_2 = new Vector(angleVector_2.startPoint, origin);
+    const translatedEndPoint_2 = translatePoint(
       angleVector_2.endPoint,
       translationVector_2
     );
@@ -412,7 +412,7 @@ export class Contact {
         0
 
     */
-    var rotationAngle = calcAngleRad(translatedEndPoint_1) * -1;
+    const rotationAngle = calcAngleRad(translatedEndPoint_1) * -1;
 
     // rottation matrix
     //var x_1_rotated =  ( translatedEndPoint_1.x * Math.cos(rotationAngle) ) - ( translatedEndPoint_1.y * Math.sin(rotationAngle) );
@@ -421,10 +421,10 @@ export class Contact {
     //var v_1_rotated = new Vector(origin, new Point(x_1_rotated, y_1_rotated));
 
     // rotate the second vector (in time: after 1st)
-    var x_2_rotated =
+    const x_2_rotated =
       translatedEndPoint_2.x * Math.cos(rotationAngle) -
       translatedEndPoint_2.y * Math.sin(rotationAngle);
-    var y_2_rotated = Math.round(
+    const y_2_rotated = Math.round(
       translatedEndPoint_2.x * Math.sin(rotationAngle) +
       translatedEndPoint_2.y * Math.cos(rotationAngle)
     );
@@ -433,20 +433,20 @@ export class Contact {
 
     // calculate the angle between v_1 and v_2
 
-    var angleDeg = (Math.atan2(y_2_rotated, x_2_rotated) * 180) / Math.PI;
+    const angleDeg = (Math.atan2(y_2_rotated, x_2_rotated) * 180) / Math.PI;
 
     return angleDeg;
   }
 
   calculateVectorAngle(vector_1, vector_2) {
-    var angleDeg = null;
+    let angleDeg = null;
 
     if (vector_1.vectorLength > 0 && vector_2.vectorLength > 0) {
-      var cos =
+      const cos =
         (vector_1.x * vector_2.x + vector_1.y * vector_2.y) /
         (vector_1.vectorLength * vector_2.vectorLength);
 
-      var angleRad = Math.acos(cos);
+      const angleRad = Math.acos(cos);
       angleDeg = rad2deg(angleRad);
     }
 
@@ -475,16 +475,16 @@ class PointerInput {
       DEBUG: false,
     };
 
-    for (let key in options) {
+    for (const key in options) {
       this.options[key] = options[key];
     }
 
     this.DEBUG = this.options.DEBUG;
 
-    var now = new Date().getTime();
+    const now = new Date().getTime();
 
     this.pointerId = pointerdownEvent.pointerId;
-    var hasVectorTimespan = Object.prototype.hasOwnProperty.call(
+    const hasVectorTimespan = Object.prototype.hasOwnProperty.call(
       this.options,
       "vectorTimespan"
     );
@@ -500,7 +500,7 @@ class PointerInput {
     this.isActive = true;
 
     // start with the NullVector to support idle
-    var nullVector = this.getVector(pointerdownEvent, pointerdownEvent);
+    const nullVector = this.getVector(pointerdownEvent, pointerdownEvent);
 
     // parameters within this.vectorTimespan
     this.liveParameters = {
@@ -531,12 +531,12 @@ class PointerInput {
 
   // do not update vector, only update time
   onIdle() {
-    var now = new Date().getTime();
+    const now = new Date().getTime();
 
     // currentTimestamp is not an UTC millisecond timestamp.
     // this.globalParameters.currentTimestamp = now;
 
-    let duration = now - this.globalParameters.startTimestampUTC;
+    const duration = now - this.globalParameters.startTimestampUTC;
     this.globalParameters.duration = duration;
   }
 
@@ -592,9 +592,9 @@ class PointerInput {
 
     // update liveParameters
 
-    var timedPointerEvents = this.getTimedPointerEvents();
+    const timedPointerEvents = this.getTimedPointerEvents();
 
-    var liveVector = this.getVector(
+    const liveVector = this.getVector(
       timedPointerEvents[0],
       timedPointerEvents[1]
     );
@@ -621,7 +621,7 @@ class PointerInput {
       this.globalParameters.deltaY =
         liveVector.endPoint.y - this.globalParameters.startY;
 
-      var globalVector = this.getVector(
+      const globalVector = this.getVector(
         this.initialPointerEvent,
         this.currentPointerEvent
       );
@@ -653,14 +653,14 @@ class PointerInput {
   getTimedPointerEvents() {
     // if the duration is lower than the vectorTimespan, startPointerEvent would be null
     // if so, use this.initialPointerEvent as a fallback
-    var startPointerEvent = this.initialPointerEvent;
-    var endPointerEvent =
+    let startPointerEvent = this.initialPointerEvent;
+    const endPointerEvent =
       this.recognizedEvents[this.recognizedEvents.length - 1];
 
-    var startIndex = this.recognizedEvents.length - 1;
+    let startIndex = this.recognizedEvents.length - 1;
 
-    var elapsedTime = 0;
-    var endTimeStamp = endPointerEvent.timeStamp;
+    let elapsedTime = 0;
+    const endTimeStamp = endPointerEvent.timeStamp;
 
     while (elapsedTime < this.vectorTimespan) {
       startIndex = startIndex - 1;
@@ -674,7 +674,7 @@ class PointerInput {
       elapsedTime = endTimeStamp - startPointerEvent.timeStamp;
     }
 
-    var pointerEvents = [startPointerEvent, endPointerEvent];
+    const pointerEvents = [startPointerEvent, endPointerEvent];
 
     this.recognizedEvents = this.recognizedEvents.slice(-20);
 
@@ -683,15 +683,15 @@ class PointerInput {
 
   // create and return a vector based on 2 PointerEvents
   getVector(startPointerEvent, endPointerEvent) {
-    var vector = null;
+    let vector = null;
 
     if (startPointerEvent != null && endPointerEvent != null) {
-      let startPoint = new Point(
+      const startPoint = new Point(
         startPointerEvent.clientX,
         startPointerEvent.clientY
       );
 
-      let endPoint = new Point(
+      const endPoint = new Point(
         endPointerEvent.clientX,
         endPointerEvent.clientY
       );
@@ -710,10 +710,10 @@ class PointerInput {
       console.log("[PointerInput endTimestamp] " + endTimestamp);
     }
 
-    var speed = 0;
+    let speed = 0;
 
-    var timespan_ms = endTimestamp - startTimestamp;
-    var timespan_s = timespan_ms / 1000;
+    const timespan_ms = endTimestamp - startTimestamp;
+    const timespan_s = timespan_ms / 1000;
 
     if (vector != null && timespan_s != 0) {
       // px/s
@@ -771,31 +771,31 @@ export class Vector {
 
 // helper functions
 export function deg2rad(angleDeg) {
-  var rad = (Math.PI / 180) * angleDeg;
+  const rad = (Math.PI / 180) * angleDeg;
 
   return rad;
 }
 
 export function rad2deg(angleRad) {
-  var deg = angleRad / (Math.PI / 180);
+  const deg = angleRad / (Math.PI / 180);
 
   return deg;
 }
 
 function getCenter(pointA, pointB) {
-  var centerX = (pointA.x + pointB.x) / 2;
-  var centerY = (pointA.y + pointB.y) / 2;
+  const centerX = (pointA.x + pointB.x) / 2;
+  const centerY = (pointA.y + pointB.y) / 2;
 
-  var center = new Point(centerX, centerY);
+  const center = new Point(centerX, centerY);
 
   return center;
 }
 
 function translatePoint(point, vector) {
-  var newX = point.x + vector.x;
-  var newY = point.y + vector.y;
+  const newX = point.x + vector.x;
+  const newY = point.y + vector.y;
 
-  var translatedPoint = new Point(newX, newY);
+  const translatedPoint = new Point(newX, newY);
 
   return translatedPoint;
 }
@@ -805,7 +805,7 @@ function translatePoint(point, vector) {
 // see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/atan2
 export function calcAngleDegrees(point) {
   // angle in degrees between -180 and 180
-  var angle = (Math.atan2(point.y, point.x) * 180) / Math.PI;
+  let angle = (Math.atan2(point.y, point.x) * 180) / Math.PI;
 
   if (angle < 0) {
     angle = 360 + angle;
@@ -815,7 +815,7 @@ export function calcAngleDegrees(point) {
 }
 
 export function calcAngleRad(point) {
-  var angle = Math.atan2(point.y, point.x); // [-PI, PI]
+  let angle = Math.atan2(point.y, point.x); // [-PI, PI]
 
   if (angle < 0) {
     angle = 2 * Math.PI + angle;

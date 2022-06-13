@@ -21,7 +21,7 @@ import { Contact } from "./contact";
  *	- domElement.addEventListener("pan", function(){});
  */
 
-var ALL_GESTURE_CLASSES = [Tap, Press, Pan, Pinch, Rotate, TwoFingerPan];
+const ALL_GESTURE_CLASSES = [Tap, Press, Pan, Pinch, Rotate, TwoFingerPan];
 
 export class PointerListener {
   constructor(domElement, options) {
@@ -45,7 +45,7 @@ export class PointerListener {
     };
 
     // add user-defined options to this.options
-    for (let key in options) {
+    for (const key in options) {
       if (key == "supportedGestures") {
         continue;
       }
@@ -56,11 +56,11 @@ export class PointerListener {
     this.DEBUG = this.options.DEBUG;
 
     // add instantiatedGestures to options.supportedGestures
-    var supportedGestures = ALL_GESTURE_CLASSES;
-    var instantiatedGestures = [];
+    let supportedGestures = ALL_GESTURE_CLASSES;
+    const instantiatedGestures = [];
 
     // instantiate gesture classes on domElement and add them to this.options
-    var hasSupportedGestures = Object.prototype.hasOwnProperty.call(
+    const hasSupportedGestures = Object.prototype.hasOwnProperty.call(
       options,
       "supportedGestures"
     );
@@ -70,8 +70,8 @@ export class PointerListener {
 
     for (let i = 0; i < supportedGestures.length; i++) {
       let gesture;
-      let GestureClass = supportedGestures[i];
-      let gestureOptions = {
+      const GestureClass = supportedGestures[i];
+      const gestureOptions = {
         bubbles: this.options.bubbles,
         DEBUG: this.options.DEBUG_GESTURES,
       };
@@ -105,13 +105,13 @@ export class PointerListener {
   }
 
   addPointerListeners() {
-    var self = this;
+    const self = this;
 
-    var domElement = this.domElement;
+    const domElement = this.domElement;
 
     // javascript fires the events "pointerdown", "pointermove", "pointerup" and "pointercancel"
     // on each of these events, the contact instance is updated and GestureRecognizers of this.supported_events are run
-    var onPointerDown = function (event) {
+    const onPointerDown = function (event) {
       if (self.DEBUG == true) {
         console.log("[PointerListener] pointerdown event detected");
       }
@@ -121,7 +121,7 @@ export class PointerListener {
       domElement.setPointerCapture(event.pointerId);
 
       if (self.contact == null || self.contact.isActive == false) {
-        let contactOptions = {
+        const contactOptions = {
           DEBUG: self.options.DEBUG_CONTACT,
         };
         self.contact = new Contact(event, contactOptions);
@@ -130,7 +130,7 @@ export class PointerListener {
         self.contact.addPointer(event);
       }
 
-      var hasPointerDownHook = Object.prototype.hasOwnProperty.call(
+      const hasPointerDownHook = Object.prototype.hasOwnProperty.call(
         self.options,
         "pointerdown"
       );
@@ -148,7 +148,7 @@ export class PointerListener {
       }, 100);
     };
 
-    var onPointerMove = function (event) {
+    const onPointerMove = function (event) {
       // pointermove is also firing if the mouse button is not pressed
 
       if (self.contact != null && self.contact.isActive == true) {
@@ -158,7 +158,7 @@ export class PointerListener {
         self.contact.onPointerMove(event);
         self.recognizeGestures();
 
-        var hasPointerMoveHook = Object.prototype.hasOwnProperty.call(
+        const hasPointerMoveHook = Object.prototype.hasOwnProperty.call(
           self.options,
           "pointermove"
         );
@@ -168,7 +168,7 @@ export class PointerListener {
       }
     };
 
-    var onPointerUp = function (event) {
+    const onPointerUp = function (event) {
       if (self.DEBUG == true) {
         console.log("[PointerListener] pointerup event detected");
       }
@@ -182,7 +182,7 @@ export class PointerListener {
         self.contact.onPointerUp(event);
         self.recognizeGestures();
 
-        var hasPointerUpHook = Object.prototype.hasOwnProperty.call(
+        const hasPointerUpHook = Object.prototype.hasOwnProperty.call(
           self.options,
           "pointerup"
         );
@@ -200,7 +200,7 @@ export class PointerListener {
      *		during pan, pan should not end if the pointer leaves the element.
      * MDN: Pointer capture allows events for a particular pointer event (PointerEvent) to be re-targeted to a particular element instead of the normal (or hit test) target at a pointer's location. This can be used to ensure that an element continues to receive pointer events even if the pointer device's contact moves off the element (such as by scrolling or panning).
      */
-    var onPointerLeave = function (event) {
+    const onPointerLeave = function (event) {
       if (self.DEBUG == true) {
         console.log("[PointerListener] pointerleave detected");
       }
@@ -213,7 +213,7 @@ export class PointerListener {
       self.clearIdleRecognitionInterval();
     };
 
-    var onPointerCancel = function (event) {
+    const onPointerCancel = function (event) {
       domElement.releasePointerCapture(event.pointerId);
 
       if (self.DEBUG == true) {
@@ -227,7 +227,7 @@ export class PointerListener {
 
       self.clearIdleRecognitionInterval();
 
-      var hasPointerCancelHook = Object.prototype.hasOwnProperty.call(
+      const hasPointerCancelHook = Object.prototype.hasOwnProperty.call(
         self.options,
         "pointercancel"
       );
@@ -260,8 +260,8 @@ export class PointerListener {
   }
 
   removePointerListeners() {
-    for (let event in this.pointerEventHandlers) {
-      let handler = this.pointerEventHandlers[event];
+    for (const event in this.pointerEventHandlers) {
+      const handler = this.pointerEventHandlers[event];
       this.domElement.removeEventListener(event, handler);
     }
   }
@@ -270,13 +270,13 @@ export class PointerListener {
   // scrolling (touchmove event) results in pointerCancel event, stopping horizontal panning if user scrolls vertically
   // the better solution is using eg css: touch-action: pan-y;
   addTouchListeners() {
-    var self = this;
+    const self = this;
 
     if (self.options.handleTouchEvents == true) {
-      var onTouchMove = function (event) {
+      const onTouchMove = function (event) {
         // fire onTouchMove for all gestures
         for (let g = 0; g < self.options.supportedGestures.length; g++) {
-          let gesture = self.options.supportedGestures[g];
+          const gesture = self.options.supportedGestures[g];
 
           gesture.onTouchMove(event);
         }
@@ -301,8 +301,8 @@ export class PointerListener {
   }
 
   removeTouchListeners() {
-    for (let event in this.touchEventHandlers) {
-      let handler = this.touchEventHandlers[event];
+    for (const event in this.touchEventHandlers) {
+      const handler = this.touchEventHandlers[event];
       this.domElement.removeEventListener(event, handler);
     }
   }
@@ -312,7 +312,7 @@ export class PointerListener {
     if (this.contact == null || this.contact.isActive == false) {
       this.clearIdleRecognitionInterval();
     } else {
-      let now = new Date().getTime();
+      const now = new Date().getTime();
       let timedelta = null;
 
       if (this.lastRecognitionTimestamp != null) {
@@ -343,7 +343,7 @@ export class PointerListener {
     this.lastRecognitionTimestamp = new Date().getTime();
 
     for (let g = 0; g < this.options.supportedGestures.length; g++) {
-      let gesture = this.options.supportedGestures[g];
+      const gesture = this.options.supportedGestures[g];
 
       gesture.recognize(this.contact);
     }
@@ -360,10 +360,10 @@ export class PointerListener {
   }
 
   on(eventsString, handlerReference) {
-    let eventTypes = this.parseEventsString(eventsString);
+    const eventTypes = this.parseEventsString(eventsString);
 
     for (let e = 0; e < eventTypes.length; e++) {
-      let eventType = eventTypes[e];
+      const eventType = eventTypes[e];
 
       if (!(eventType in this.eventHandlers)) {
         this.eventHandlers[eventType] = [];
@@ -378,15 +378,15 @@ export class PointerListener {
   }
 
   off(eventsString, handlerReference) {
-    let eventTypes = this.parseEventsString(eventsString);
+    const eventTypes = this.parseEventsString(eventsString);
 
     for (let e = 0; e < eventTypes.length; e++) {
-      let eventType = eventTypes[e];
+      const eventType = eventTypes[e];
 
       if (eventType in this.eventHandlers) {
-        let handlerReferences = this.eventHandlers[eventType];
+        const handlerReferences = this.eventHandlers[eventType];
 
-        let index = handlerReferences.indexOf(handlerReference);
+        const index = handlerReferences.indexOf(handlerReference);
 
         if (index >= 0) {
           handlerReferences.splice(index, 1);
@@ -401,10 +401,10 @@ export class PointerListener {
 
   destroy() {
     // remove all EventListeners from self.domElement
-    for (let event in this.eventHandlers) {
-      let handlerList = this.eventHandlers[event];
+    for (const event in this.eventHandlers) {
+      const handlerList = this.eventHandlers[event];
       for (let h = 0; h < handlerList.length; h++) {
-        let handler = handlerList[h];
+        const handler = handlerList[h];
         this.domElement.removeEventListener(event, handler);
       }
 

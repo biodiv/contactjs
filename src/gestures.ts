@@ -45,7 +45,7 @@ class Gesture {
       distance: [null, null], // px
     };
 
-    let defaultOptions = {
+    const defaultOptions = {
       bubbles: true,
       blocks: [],
       DEBUG: false,
@@ -53,7 +53,7 @@ class Gesture {
 
     this.options = options || {};
 
-    for (let key in defaultOptions) {
+    for (const key in defaultOptions) {
       if (!(key in this.options)) {
         this.options[key] = defaultOptions[key];
       }
@@ -63,8 +63,8 @@ class Gesture {
   }
 
   validateMinMax(minMaxParameters, parameterName, value) {
-    var minValue = minMaxParameters[parameterName][0];
-    var maxValue = minMaxParameters[parameterName][1];
+    const minValue = minMaxParameters[parameterName][0];
+    const maxValue = minMaxParameters[parameterName][1];
 
     if (this.DEBUG == true) {
       console.log(
@@ -121,7 +121,7 @@ class Gesture {
 
   validateBool(parameterName, value) {
     // requiresPointerMove = null -> it does not matter if the pointer has been moved
-    var requiredValue = this.boolParameters[parameterName];
+    const requiredValue = this.boolParameters[parameterName];
 
     if (requiredValue != null && value != null && requiredValue === value) {
       return true;
@@ -146,9 +146,9 @@ class Gesture {
   }
 
   getMinMaxParameters(contact) {
-    var primaryPointerInput = contact.getPrimaryPointerInput();
+    const primaryPointerInput = contact.getPrimaryPointerInput();
 
-    var minMaxParameters = {
+    const minMaxParameters = {
       pointerCount: Object.keys(contact.activePointerInputs).length,
       duration: primaryPointerInput.globalParameters.duration,
       currentSpeed: primaryPointerInput.liveParameters.speed,
@@ -161,9 +161,9 @@ class Gesture {
   }
 
   getBoolParameters(contact) {
-    var primaryPointerInput = contact.getPrimaryPointerInput();
+    const primaryPointerInput = contact.getPrimaryPointerInput();
 
-    var boolParameters = {
+    const boolParameters = {
       requiresPointerUp: primaryPointerInput.isActive === false,
       requiresActivePointer: primaryPointerInput.isActive === true,
       requiresPointerMove:
@@ -174,22 +174,22 @@ class Gesture {
   }
 
   validate(contact) {
-    var isValid = false;
+    let isValid = false;
 
     if (this.state == GESTURE_STATE_BLOCKED) {
       return false;
     }
 
-    var primaryPointerInput = contact.getPrimaryPointerInput();
+    const primaryPointerInput = contact.getPrimaryPointerInput();
 
     if (this.DEBUG == true) {
       console.log("[Gestures] running recognition for " + this.eventBaseName);
     }
 
-    var contactBoolParameters = this.getBoolParameters(contact);
+    const contactBoolParameters = this.getBoolParameters(contact);
 
-    for (let boolParameterName in this.boolParameters) {
-      let boolValue = contactBoolParameters[boolParameterName];
+    for (const boolParameterName in this.boolParameters) {
+      const boolValue = contactBoolParameters[boolParameterName];
       isValid = this.validateBool(boolParameterName, boolValue);
       if (isValid == false) {
         return false;
@@ -197,8 +197,8 @@ class Gesture {
       }
     }
 
-    var contactMinMaxParameters = this.getMinMaxParameters(contact);
-    var minMaxParameters;
+    const contactMinMaxParameters = this.getMinMaxParameters(contact);
+    let minMaxParameters;
 
     // check duration
     if (this.isActive == true) {
@@ -206,8 +206,8 @@ class Gesture {
     } else {
       minMaxParameters = this.initialMinMaxParameters;
     }
-    for (let minMaxParameterName in minMaxParameters) {
-      let value = contactMinMaxParameters[minMaxParameterName];
+    for (const minMaxParameterName in minMaxParameters) {
+      const value = contactMinMaxParameters[minMaxParameterName];
       isValid = this.validateMinMax(
         minMaxParameters,
         minMaxParameterName,
@@ -220,7 +220,7 @@ class Gesture {
     }
 
     // check direction
-    var hasSupportedDirections = Object.prototype.hasOwnProperty.call(
+    const hasSupportedDirections = Object.prototype.hasOwnProperty.call(
       this.options,
       "supportedDirections"
     );
@@ -252,7 +252,7 @@ class Gesture {
   }
 
   recognize(contact) {
-    var isValid = this.validate(contact);
+    const isValid = this.validate(contact);
 
     if (
       isValid == true &&
@@ -287,7 +287,7 @@ class Gesture {
 
   blockGestures() {
     for (let g = 0; g < this.options.blocks.length; g++) {
-      let gesture = this.options.blocks[g];
+      const gesture = this.options.blocks[g];
       if (gesture.isActive == false) {
         if (this.DEBUG == false) {
           console.log("[Gesture] blocking " + gesture.eventBaseName);
@@ -299,7 +299,7 @@ class Gesture {
 
   unblockGestures() {
     for (let g = 0; g < this.options.blocks.length; g++) {
-      let gesture = this.options.blocks[g];
+      const gesture = this.options.blocks[g];
       gesture.state = GESTURE_STATE_POSSIBLE;
     }
   }
@@ -307,7 +307,7 @@ class Gesture {
   getEventData(contact) {
     // provide short-cuts to the values collected in the Contact object
     // match this to the event used by hammer.js
-    var eventData = {
+    const eventData = {
       contact: contact,
       recognizer: this,
     };
@@ -324,16 +324,16 @@ class Gesture {
       console.log("[Gestures] detected and firing event " + eventName);
     }
 
-    var eventData = this.getEventData(contact);
+    const eventData = this.getEventData(contact);
 
-    var eventOptions = {
+    const eventOptions = {
       detail: eventData,
       bubbles: this.options.bubbles,
     };
 
-    var event = new CustomEvent(eventName, eventOptions);
+    const event = new CustomEvent(eventName, eventOptions);
 
-    var initialTarget = contact.initialPointerEvent.target;
+    const initialTarget = contact.initialPointerEvent.target;
 
     if (eventOptions.bubbles == true) {
       initialTarget.dispatchEvent(event);
@@ -342,18 +342,18 @@ class Gesture {
     }
 
     // fire direction specific events
-    var currentDirection = eventData.live.direction;
+    const currentDirection = eventData.live.direction;
 
-    var hasSupportedDirections = Object.prototype.hasOwnProperty.call(
+    const hasSupportedDirections = Object.prototype.hasOwnProperty.call(
       this.options,
       "supportedDirections"
     );
     if (hasSupportedDirections == true) {
       for (let d = 0; d < this.options.supportedDirections.length; d++) {
-        let direction = this.options.supportedDirections[d];
+        const direction = this.options.supportedDirections[d];
 
         if (direction == currentDirection) {
-          let directionEventName = eventName + direction;
+          const directionEventName = eventName + direction;
 
           if (this.DEBUG == true) {
             console.log(
@@ -361,7 +361,7 @@ class Gesture {
             );
           }
 
-          let directionEvent = new CustomEvent(
+          const directionEvent = new CustomEvent(
             directionEventName,
             eventOptions
           );
@@ -383,16 +383,16 @@ class Gesture {
 
     this.initialPointerEvent = contact.currentPointerEvent;
 
-    var eventName = "" + this.eventBaseName + "start";
+    const eventName = "" + this.eventBaseName + "start";
 
     if (this.DEBUG === true) {
       console.log("[Gestures] firing event: " + eventName);
     }
 
     // fire gestureend event
-    var eventData = this.getEventData(contact);
+    const eventData = this.getEventData(contact);
 
-    var event = new CustomEvent(eventName, { detail: eventData });
+    const event = new CustomEvent(eventName, { detail: eventData });
 
     this.domElement.dispatchEvent(event);
   }
@@ -402,16 +402,16 @@ class Gesture {
 
     this.isActive = false;
 
-    var eventName = "" + this.eventBaseName + "end";
+    const eventName = "" + this.eventBaseName + "end";
 
     if (this.DEBUG === true) {
       console.log("[Gestures] firing event: " + eventName);
     }
 
     // fire gestureend event
-    let eventData = this.getEventData(contact);
+    const eventData = this.getEventData(contact);
 
-    var event = new CustomEvent(eventName, { detail: eventData });
+    const event = new CustomEvent(eventName, { detail: eventData });
 
     this.domElement.dispatchEvent(event);
   }
@@ -433,22 +433,22 @@ class SinglePointerGesture extends Gesture {
   getEventData(contact) {
     // provide short-cuts to the values collected in the Contact object
     // match this to the event used by hammer.js
-    var eventData = super.getEventData(contact);
+    const eventData = super.getEventData(contact);
 
     // this should be optimized in the future, not using primaryPointerInput, but something like currentPointerInput
-    var primaryPointerInput = contact.getPrimaryPointerInput();
+    const primaryPointerInput = contact.getPrimaryPointerInput();
 
     // gesture specific - dependant on the beginning of the gesture (when the gesture has initially been recognized)
-    var globalStartPoint = new Point(
+    const globalStartPoint = new Point(
       this.initialPointerEvent.clientX,
       this.initialPointerEvent.clientY
     );
-    var globalEndPoint = new Point(
+    const globalEndPoint = new Point(
       contact.currentPointerEvent.clientX,
       contact.currentPointerEvent.clientY
     );
-    var globalVector = new Vector(globalStartPoint, globalEndPoint);
-    var globalDuration =
+    const globalVector = new Vector(globalStartPoint, globalEndPoint);
+    const globalDuration =
       contact.currentPointerEvent.timeStamp -
       this.initialPointerEvent.timeStamp;
 
@@ -528,7 +528,7 @@ export class Pan extends SinglePointerGesture {
 
     this.initialSupportedDirections = DIRECTION_ALL;
 
-    var hasSupportedDirections = Object.prototype.hasOwnProperty.call(
+    const hasSupportedDirections = Object.prototype.hasOwnProperty.call(
       options,
       "supportedDirections"
     );
@@ -545,7 +545,7 @@ export class Pan extends SinglePointerGesture {
       this.options.supportedDirections = DIRECTION_ALL;
     }
 
-    var isValid = super.validate(contact);
+    const isValid = super.validate(contact);
 
     return isValid;
   }
@@ -558,7 +558,7 @@ export class Pan extends SinglePointerGesture {
 
   // check if it was a swipe
   onEnd(contact) {
-    var primaryPointerInput = contact.getPrimaryPointerInput();
+    const primaryPointerInput = contact.getPrimaryPointerInput();
 
     if (
       this.swipeFinalSpeed < primaryPointerInput.globalParameters.finalSpeed
@@ -608,7 +608,7 @@ export class Tap extends SinglePointerGesture {
   }
 
   recognize(contact) {
-    var isValid = this.validate(contact);
+    const isValid = this.validate(contact);
 
     if (isValid == true && this.state == GESTURE_STATE_POSSIBLE) {
       this.initialPointerEvent = contact.currentPointerEvent;
@@ -647,9 +647,9 @@ export class Press extends SinglePointerGesture {
 
   // distance has to use the global vector
   getMinMaxParameters(contact) {
-    var minMaxParameters = super.getMinMaxParameters(contact);
+    const minMaxParameters = super.getMinMaxParameters(contact);
 
-    var primaryPointerInput = contact.getPrimaryPointerInput();
+    const primaryPointerInput = contact.getPrimaryPointerInput();
 
     minMaxParameters.distance =
       primaryPointerInput.globalParameters.vector.vectorLength;
@@ -658,9 +658,9 @@ export class Press extends SinglePointerGesture {
   }
 
   recognize(contact) {
-    var isValid = this.validate(contact);
+    const isValid = this.validate(contact);
 
-    var primaryPointerInput = contact.getPrimaryPointerInput();
+    const primaryPointerInput = contact.getPrimaryPointerInput();
 
     if (
       this.hasBeenInvalidatedForContactId != null &&
@@ -689,7 +689,7 @@ export class Press extends SinglePointerGesture {
 
       this.hasBeenEmitted = true;
     } else {
-      let duration = primaryPointerInput.globalParameters.duration;
+      const duration = primaryPointerInput.globalParameters.duration;
 
       if (
         this.hasBeenEmitted == true &&
@@ -747,7 +747,7 @@ class TwoPointerGesture extends MultiPointerGesture {
   }
 
   getMinMaxParameters(contact) {
-    var minMaxParameters = super.getMinMaxParameters(contact);
+    const minMaxParameters = super.getMinMaxParameters(contact);
 
     minMaxParameters.centerMovement =
       contact.multipointer.liveParameters.centerMovement;
@@ -769,13 +769,13 @@ class TwoPointerGesture extends MultiPointerGesture {
   getEventData(contact) {
     // provide short-cuts to the values collected in the Contact object
     // match this to the event used by hammer.js
-    var eventData = super.getEventData(contact);
+    const eventData = super.getEventData(contact);
 
-    var globalDuration =
+    const globalDuration =
       contact.currentPointerEvent.timeStamp -
       this.initialPointerEvent.timeStamp;
-    var globalParameters = contact.multipointer.globalParameters;
-    var liveParameters = contact.multipointer.liveParameters;
+    const globalParameters = contact.multipointer.globalParameters;
+    const liveParameters = contact.multipointer.liveParameters;
 
     // global: global for this recognizer, not the Contact object
     eventData["global"] = {
