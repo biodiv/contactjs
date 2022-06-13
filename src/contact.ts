@@ -11,6 +11,10 @@ interface DistanceChange {
   relative: number;
 }
 
+interface ContactOptions {
+  DEBUG: boolean;
+}
+
 /*
  * contact-js uses pointer events, which combine touch and mouse events (and more)
  * for readability, "touch" is used in comments
@@ -29,7 +33,7 @@ interface DistanceChange {
  * Contact collects data of the interaction with the surface, but does not decide if a gesture has been detected.
  */
 export class Contact {
-  constructor(pointerdownEvent: PointerEvent, options) {
+  constructor(pointerdownEvent: PointerEvent, options?: Partial<ContactOptions>) {
     options = options || {};
 
     this.options = {
