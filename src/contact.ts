@@ -498,6 +498,11 @@ export class Contact {
   }
 }
 
+interface PointerInputOptions {
+  DEBUG?: boolean;
+  vectorTimespan?: number;
+}
+
 /*********************************************************************************************
   PointerInput
 
@@ -512,7 +517,7 @@ export class Contact {
 **********************************************************************************************/
 
 class PointerInput {
-  constructor(pointerdownEvent: PointerEvent, options) {
+  constructor(pointerdownEvent: PointerEvent, options?: PointerInputOptions) {
     options = options || {};
 
     this.options = {
