@@ -6,6 +6,11 @@ import {
   DIRECTION_RIGHT
 } from "./input-consts";
 
+interface DistanceChange {
+  absolute: number;
+  relative: number;
+}
+
 /*
  * contact-js uses pointer events, which combine touch and mouse events (and more)
  * for readability, "touch" is used in comments
@@ -80,7 +85,7 @@ export class Contact {
   }
 
   // add more pointers
-  addPointer(pointerdownEvent: PointerEvent) {
+  addPointer(pointerdownEvent: PointerEvent): void {
     this.currentPointerEvent = pointerdownEvent;
 
     const pointerInputOptions = {
@@ -92,7 +97,7 @@ export class Contact {
     this.activePointerInputs[pointerdownEvent.pointerId] = pointerInput;
   }
 
-  removePointer(pointerId) {
+  removePointer(pointerId): void {
     delete this.activePointerInputs[pointerId];
   }
 
@@ -135,7 +140,7 @@ export class Contact {
   }
 
   // pointermove contains only one single pointer, not multiple like on touch events (touches, changedTouches,...)
-  onPointerMove(pointermoveEvent: PointerEvent) {
+  onPointerMove(pointermoveEvent: PointerEvent): void {
     this.currentPointerEvent = pointermoveEvent;
     this.currentTimestamp = pointermoveEvent.timeStamp;
 
@@ -150,7 +155,7 @@ export class Contact {
   }
 
   // pointerup event: finger released, or mouse button released
-  onPointerUp(pointerupEvent: PointerEvent) {
+  onPointerUp(pointerupEvent: PointerEvent): void {
     const pointerId = pointerupEvent.pointerId;
 
     this.currentPointerEvent = pointerupEvent;
@@ -165,7 +170,7 @@ export class Contact {
     this.updateState();
   }
 
-  onPointerCancel(pointercancelEvent: PointerEvent) {
+  onPointerCancel(pointercancelEvent: PointerEvent): void {
     this.onPointerUp(pointercancelEvent);
 
     if (this.DEBUG == true) {
@@ -175,7 +180,7 @@ export class Contact {
 
   // also covers pointerleave
   // not necessary - using element.setPointerCapture and element.releasePointerCapture instead
-  onPointerLeave(pointerleaveEvent: PointerEvent) {
+  onPointerLeave(pointerleaveEvent: PointerEvent): void {
     this.onPointerUp(pointerleaveEvent);
 
     if (this.DEBUG == true) {
@@ -185,7 +190,7 @@ export class Contact {
 
   // if the contact idles (no Momvement), the time still passes
   // therefore, the pointerInput has to be updated
-  onIdle() {
+  onIdle(): void {
     for (const pointerInputId in this.activePointerInputs) {
       const activePointer = this.activePointerInputs[pointerInputId];
       activePointer.onIdle();
@@ -193,7 +198,7 @@ export class Contact {
   }
 
   // update this contact instance. invoked on pointermove, pointerup and pointercancel events
-  updateState() {
+  updateState(): void {
     let isActive = false;
 
     if (Object.keys(this.activePointerInputs).length > 0) {
@@ -210,7 +215,7 @@ export class Contact {
   }
 
   // functions for multi pointer gestures, currently only 2 pointers are supported
-  updateMultipointerParameters() {
+  updateMultipointerParameters(): void {
     const multiPointerInputs = this.getMultiPointerInputs();
 
     const pointerInput_1 = multiPointerInputs[0];
@@ -321,7 +326,7 @@ export class Contact {
     }
   }
 
-  calculateCenterMovement(vector_1, vector_2) {
+  calculateCenterMovement(vector_1: Vector, vector_2: Vector): Vector {
     // start point is the center between the starting points of the 2 vectors
     const startPoint = getCenter(vector_1.startPoint, vector_2.startPoint);
 
@@ -333,7 +338,7 @@ export class Contact {
     return vectorBetweenCenterPoints;
   }
 
-  calculateDistanceChange(vector_1, vector_2) {
+  calculateDistanceChange(vector_1: Vector, vector_2: Vector): DistanceChange {
     const vectorBetweenStartPoints = new Vector(
       vector_1.startPoint,
       vector_2.startPoint
@@ -370,7 +375,7 @@ export class Contact {
    * - if the wheel has been turned cw, its state has a positive angle
    * - possible values for the angle: [-360,360]
    */
-  calculateRotationAngle(vector_1, vector_2) {
+  calculateRotationAngle(vector_1: Vector, vector_2: Vector): number {
     // vector_ are vectors between 2 points in time, same finger
     // angleAector_ are vectors between 2 fingers
     const angleVector_1 = new Vector(vector_1.startPoint, vector_2.startPoint); // in time: occured first
@@ -438,7 +443,7 @@ export class Contact {
     return angleDeg;
   }
 
-  calculateVectorAngle(vector_1, vector_2) {
+  calculateVectorAngle(vector_1: Vector, vector_2: Vector): number | null {
     let angleDeg = null;
 
     if (vector_1.vectorLength > 0 && vector_2.vectorLength > 0) {
