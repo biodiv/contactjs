@@ -111,7 +111,7 @@ export class PointerListener {
 
     // javascript fires the events "pointerdown", "pointermove", "pointerup" and "pointercancel"
     // on each of these events, the contact instance is updated and GestureRecognizers of this.supported_events are run
-    const onPointerDown = function (event) {
+    const onPointerDown = function (event: PointerEvent) {
       if (self.DEBUG == true) {
         console.log("[PointerListener] pointerdown event detected");
       }
@@ -148,7 +148,7 @@ export class PointerListener {
       }, 100);
     };
 
-    const onPointerMove = function (event) {
+    const onPointerMove = function (event: PointerEvent) {
       // pointermove is also firing if the mouse button is not pressed
 
       if (self.contact != null && self.contact.isActive == true) {
@@ -168,7 +168,7 @@ export class PointerListener {
       }
     };
 
-    const onPointerUp = function (event) {
+    const onPointerUp = function (event: PointerEvent) {
       if (self.DEBUG == true) {
         console.log("[PointerListener] pointerup event detected");
       }
@@ -200,7 +200,7 @@ export class PointerListener {
      *		during pan, pan should not end if the pointer leaves the element.
      * MDN: Pointer capture allows events for a particular pointer event (PointerEvent) to be re-targeted to a particular element instead of the normal (or hit test) target at a pointer's location. This can be used to ensure that an element continues to receive pointer events even if the pointer device's contact moves off the element (such as by scrolling or panning).
      */
-    const onPointerLeave = function (event) {
+    const onPointerLeave = function (event: PointerEvent) {
       if (self.DEBUG == true) {
         console.log("[PointerListener] pointerleave detected");
       }
@@ -213,7 +213,7 @@ export class PointerListener {
       self.clearIdleRecognitionInterval();
     };
 
-    const onPointerCancel = function (event) {
+    const onPointerCancel = function (event: PointerEvent) {
       domElement.releasePointerCapture(event.pointerId);
 
       if (self.DEBUG == true) {
@@ -273,7 +273,7 @@ export class PointerListener {
     const self = this;
 
     if (self.options.handleTouchEvents == true) {
-      const onTouchMove = function (event) {
+      const onTouchMove = function (event: TouchEvent) {
         // fire onTouchMove for all gestures
         for (let g = 0; g < self.options.supportedGestures.length; g++) {
           const gesture = self.options.supportedGestures[g];
