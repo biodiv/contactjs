@@ -461,10 +461,12 @@ class Gesture {
   }
 
   // provide the ability to react (eg block) to touch events
-  onTouchStart(): void { }
-  onTouchMove(): void { }
-  onTouchEnd(): void { }
-  onTouchCancel(): void { }
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  onTouchStart(event: TouchEvent): void { /* empty */ }
+  onTouchMove(event: TouchEvent): void { /* empty */ }
+  onTouchEnd(event: TouchEvent): void { /* empty */ }
+  onTouchCancel(event: TouchEvent): void { /* empty */ }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 }
 
 interface SinglePointerGestureEventData extends GestureEventData {
