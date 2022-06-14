@@ -145,14 +145,9 @@ export class Contact {
 
   // return a specific pointer input by its identifier
   getPointerInput(pointerId: number): PointerInput {
-    const hasPointerId = Object.prototype.hasOwnProperty.call(
-      this.pointers,
-      pointerId
-    );
+    const pointerInput = this.pointers?.[pointerId];
 
-    if (hasPointerId) {
-      const pointerInput = this.pointers[pointerId];
-
+    if (pointerInput) {
       return pointerInput;
     } else {
       const msg =
