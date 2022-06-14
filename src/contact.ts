@@ -72,15 +72,10 @@ export class Contact {
   pointers?: Record<number, PointerInput>;
   
   constructor(pointerdownEvent: PointerEvent, options?: Partial<ContactOptions>) {
-    options = options || {};
-
     this.options = {
       DEBUG: false,
+      ...options
     };
-
-    for (const key in options) {
-      this.options[key] = options[key];
-    }
 
     this.DEBUG = this.options.DEBUG;
 
@@ -489,7 +484,7 @@ export class Contact {
 }
 
 interface PointerInputOptions {
-  DEBUG?: boolean;
+  DEBUG: boolean;
   vectorTimespan?: number;
 }
 
@@ -548,15 +543,10 @@ class PointerInput {
   duration?: never;
 
   constructor(pointerdownEvent: PointerEvent, options?: PointerInputOptions) {
-    options = options || {};
-
     this.options = {
       DEBUG: false,
+      ...options,
     };
-
-    for (const key in options) {
-      this.options[key] = options[key];
-    }
 
     this.DEBUG = this.options.DEBUG;
 
