@@ -82,19 +82,12 @@ export class Gesture {
       distance: [null, null], // px
     };
 
-    const defaultOptions = {
+    this.options = {
       bubbles: true,
       blocks: [],
       DEBUG: false,
+      ...options
     };
-
-    this.options = options || {};
-
-    for (const key in defaultOptions) {
-      if (!(key in this.options)) {
-        this.options[key] = defaultOptions[key];
-      }
-    }
 
     this.DEBUG = this.options.DEBUG;
   }
@@ -499,8 +492,6 @@ interface SinglePointerGestureEventData extends GestureEventData {
 
 class SinglePointerGesture extends Gesture {
   constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
-    options = options || {};
-
     super(domElement, options);
   }
 
@@ -585,8 +576,6 @@ export class Pan extends SinglePointerGesture {
   initialSupportedDirections: string[];
 
   constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
-    options = options || {};
-
     super(domElement, options);
 
     this.eventBaseName = "pan";
@@ -670,8 +659,6 @@ export class Pan extends SinglePointerGesture {
  */
 export class Tap extends SinglePointerGesture {
   constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
-    options = options || {};
-
     super(domElement, options);
 
     this.eventBaseName = "tap";
@@ -706,8 +693,6 @@ export class Press extends SinglePointerGesture {
   hasBeenInvalidatedForContactId: number | null;
 
   constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
-    options = options || {};
-
     super(domElement, options);
 
     this.eventBaseName = "press";
@@ -784,8 +769,6 @@ export class Press extends SinglePointerGesture {
 
 class MultiPointerGesture extends Gesture {
   constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
-    options = options || {};
-
     super(domElement, options);
 
     this.boolParameters = {
@@ -800,8 +783,6 @@ class MultiPointerGesture extends Gesture {
     this.activeStateMinMaxParameters = {
       pointerCount: [2, null],
     };
-
-    this.options = options || {};
   }
 }
 
@@ -835,8 +816,6 @@ interface TwoPointerGestureEventData extends GestureEventData {
 
 class TwoPointerGesture extends MultiPointerGesture {
   constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
-    options = options || {};
-
     super(domElement, options);
 
     this.boolParameters.requiresPointerMove = true;
@@ -932,8 +911,6 @@ class TwoPointerGesture extends MultiPointerGesture {
  */
 export class Pinch extends TwoPointerGesture {
   constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
-    options = options || {};
-
     super(domElement, options);
 
     this.eventBaseName = "pinch";
@@ -953,8 +930,6 @@ export class Pinch extends TwoPointerGesture {
 
 export class Rotate extends TwoPointerGesture {
   constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
-    options = options || {};
-
     super(domElement, options);
 
     this.eventBaseName = "rotate";
@@ -970,8 +945,6 @@ export class Rotate extends TwoPointerGesture {
  */
 export class TwoFingerPan extends TwoPointerGesture {
   constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
-    options = options || {};
-
     super(domElement, options);
 
     this.eventBaseName = "twofingerpan";
