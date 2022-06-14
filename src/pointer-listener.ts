@@ -24,6 +24,20 @@ import { Contact } from "./contact";
 const ALL_GESTURE_CLASSES = [Tap, Press, Pan, Pinch, Rotate, TwoFingerPan];
 
 export class PointerListener {
+  options: unknown;
+  DEBUG: boolean;
+
+  readonly domElement: HTMLElement;
+
+  private readonly eventHandlers: Record<string, ((event: Event) => void)[]>;
+  private pointerEventHandlers: Record<string, (event: PointerEvent) => void>;
+  private touchEventHandlers: Record<string, (event: TouchEvent) => void>;
+
+  contact: Contact | null;
+
+  lastRecognitionTimestamp: number | null;
+  idleRecognitionIntervalId: number | null;
+
   constructor(domElement, options) {
     // registry for events like "pan", "rotate", which have to be removed on this.destroy();
     this.eventHandlers = {};
