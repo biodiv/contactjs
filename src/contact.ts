@@ -613,7 +613,7 @@ class PointerInput {
     this.globalParameters.hasBeenMoved = true;
     this.liveParameters.isMoving = true;
 
-    this.update(pointermoveEvent, true);
+    this.update(pointermoveEvent);
   }
 
   onUp(pointerupEvent: PointerEvent): void {
