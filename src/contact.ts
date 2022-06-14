@@ -553,12 +553,7 @@ class PointerInput {
     const now = new Date().getTime();
 
     this.pointerId = pointerdownEvent.pointerId;
-    const hasVectorTimespan = Object.prototype.hasOwnProperty.call(
-      this.options,
-      "vectorTimespan"
-    );
-    this.vectorTimespan =
-      hasVectorTimespan == true ? this.options.vectorTimespan : 100; // milliseconds
+    this.vectorTimespan = this.options.vectorTimespan ?? 100; // milliseconds
 
     // events used for vector calculation
     this.initialPointerEvent = pointerdownEvent;
