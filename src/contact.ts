@@ -170,15 +170,7 @@ export class Contact {
 
   // currently, on 2 Inputs are supported
   getMultiPointerInputs(): PointerInput[] {
-    const pointerId_1 = Object.keys(this.activePointerInputs)[0];
-    const pointerInput_1 = this.activePointerInputs[pointerId_1];
-
-    const pointerId_2 = Object.keys(this.activePointerInputs)[1];
-    const pointerInput_2 = this.activePointerInputs[pointerId_2];
-
-    const multiPointerInputs = [pointerInput_1, pointerInput_2];
-
-    return multiPointerInputs;
+    return Object.values(this.activePointerInputs).slice(2);
   }
 
   // pointermove contains only one single pointer, not multiple like on touch events (touches, changedTouches,...)
