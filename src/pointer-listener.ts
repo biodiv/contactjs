@@ -4,7 +4,8 @@ import {
   Pan,
   Pinch,
   Rotate,
-  TwoFingerPan
+  TwoFingerPan,
+  Gesture
 } from "./gestures";
 
 import { Contact } from "./contact";
@@ -21,24 +22,32 @@ import { Contact } from "./contact";
  *	- domElement.addEventListener("pan", function(){});
  */
 
-const ALL_GESTURE_CLASSES = [Tap, Press, Pan, Pinch, Rotate, TwoFingerPan];
+type GestureConstructor = new (...args: ConstructorParameters<typeof Gesture>) => Gesture;
+
+const ALL_GESTURE_CLASSES: GestureConstructor[] = [Tap, Press, Pan, Pinch, Rotate, TwoFingerPan];
 
 type Timer = ReturnType<typeof setInterval>;
 
-interface PointerListenerOptions {
+interface PointerListenerOptionsInit {
   DEBUG: boolean;
   DEBUG_GESTURES: boolean;
   DEBUG_CONTACT: boolean;
 
   bubbles: boolean;
   handleTouchEvents: boolean;
-  supportedGestures: unknown[];
+  supportedGestures: (Gesture | GestureConstructor)[];
 
   // Hooks
   pointerdown?: (event: PointerEvent, self: PointerListener) => void;
   pointermove?: (event: PointerEvent, self: PointerListener) => void;
   pointerup?: (event: PointerEvent, self: PointerListener) => void;
   pointercancel?: (event: PointerEvent, self: PointerListener) => void;
+}
+
+interface PointerListenerOptions extends PointerListenerOptionsInit {
+  // All supported gestures are instanitated when the PointerListener
+  // constructor runs.
+  supportedGestures: Gesture[];
 }
 
 export class PointerListener {
@@ -56,7 +65,7 @@ export class PointerListener {
   lastRecognitionTimestamp: number | null;
   idleRecognitionIntervalId: Timer | null;
 
-  constructor(domElement: HTMLElement, options?: Partial<PointerListenerOptions>) {
+  constructor(domElement: HTMLElement, options?: Partial<PointerListenerOptionsInit>) {
     // registry for events like "pan", "rotate", which have to be removed on this.destroy();
     this.eventHandlers = {};
 
@@ -88,8 +97,8 @@ export class PointerListener {
     this.DEBUG = this.options.DEBUG;
 
     // add instantiatedGestures to options.supportedGestures
-    let supportedGestures = ALL_GESTURE_CLASSES;
-    const instantiatedGestures = [];
+    let supportedGestures: (Gesture | GestureConstructor)[] = ALL_GESTURE_CLASSES;
+    const instantiatedGestures: Gesture[] = [];
 
     // instantiate gesture classes on domElement and add them to this.options
     const hasSupportedGestures = Object.prototype.hasOwnProperty.call(

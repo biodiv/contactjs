@@ -28,7 +28,7 @@ interface GestureOptions {
 }
 
 // single finger gestures
-class Gesture {
+export class Gesture {
   options: GestureOptions;
   DEBUG: boolean;
 
