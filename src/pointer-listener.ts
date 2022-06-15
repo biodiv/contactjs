@@ -23,6 +23,8 @@ import { Contact } from "./contact";
 
 const ALL_GESTURE_CLASSES = [Tap, Press, Pan, Pinch, Rotate, TwoFingerPan];
 
+type Timer = ReturnType<typeof setInterval>;
+
 interface PointerListenerOptions {
   DEBUG: boolean;
   DEBUG_GESTURES: boolean;
@@ -52,7 +54,7 @@ export class PointerListener {
   contact: Contact | null;
 
   lastRecognitionTimestamp: number | null;
-  idleRecognitionIntervalId: number | null;
+  idleRecognitionIntervalId: Timer | null;
 
   constructor(domElement: HTMLElement, options?: Partial<PointerListenerOptions>) {
     // registry for events like "pan", "rotate", which have to be removed on this.destroy();
