@@ -380,7 +380,7 @@ class Gesture {
     const initialTarget = contact.initialPointerEvent.target;
 
     if (eventOptions.bubbles == true) {
-      initialTarget.dispatchEvent(event);
+      initialTarget!.dispatchEvent(event);
     } else {
       this.domElement.dispatchEvent(event);
     }
@@ -411,7 +411,7 @@ class Gesture {
           );
 
           if (eventOptions.bubbles == true) {
-            initialTarget.dispatchEvent(directionEvent);
+            initialTarget!.dispatchEvent(directionEvent);
           } else {
             this.domElement.dispatchEvent(directionEvent);
           }
