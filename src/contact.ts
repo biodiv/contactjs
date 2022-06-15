@@ -728,7 +728,7 @@ class PointerInput {
 
         console.log(
           "[Contact] live vector length within vectorTimespan: " +
-          this.liveParameters.vector.vectorLength +
+          this.liveParameters.vector!.vectorLength +
           "px"
         );
       }
