@@ -135,7 +135,7 @@ export class PointerListener {
     this.contact = null;
 
     // disable context menu on long taps - this kills pointermove
-    /*domElement.addEventListener("contextmenu", function(event) {
+    /*domElement.addEventListener("contextmenu", (event) => {
       event.preventDefault();
       return false;
     });*/
@@ -146,14 +146,12 @@ export class PointerListener {
   }
 
   addPointerListeners(): void {
-    const self = this;
-
     const domElement = this.domElement;
 
     // javascript fires the events "pointerdown", "pointermove", "pointerup" and "pointercancel"
     // on each of these events, the contact instance is updated and GestureRecognizers of this.supported_events are run
-    const onPointerDown = function (event: PointerEvent) {
-      if (self.DEBUG == true) {
+    const onPointerDown = (event: PointerEvent) => {
+      if (this.DEBUG == true) {
         console.log("[PointerListener] pointerdown event detected");
       }
 
@@ -161,78 +159,78 @@ export class PointerListener {
       // see https://developer.mozilla.org/en-US/docs/Web/API/Element/setPointerCapture
       domElement.setPointerCapture(event.pointerId);
 
-      if (self.contact == null || self.contact.isActive == false) {
+      if (this.contact == null || this.contact.isActive == false) {
         const contactOptions = {
-          DEBUG: self.options.DEBUG_CONTACT,
+          DEBUG: this.options.DEBUG_CONTACT,
         };
-        self.contact = new Contact(event, contactOptions);
+        this.contact = new Contact(event, contactOptions);
       } else {
         // use existing contact instance if a second pointer becomes present
-        self.contact.addPointer(event);
+        this.contact.addPointer(event);
       }
 
       const hasPointerDownHook = Object.prototype.hasOwnProperty.call(
-        self.options,
+        this.options,
         "pointerdown"
       );
       if (hasPointerDownHook == true) {
-        self.options.pointerdown(event, self);
+        this.options.pointerdown(event, this);
       }
 
       // before starting a new interval, make sure the old one is stopped if present
-      if (self.idleRecognitionIntervalId != null) {
-        self.clearIdleRecognitionInterval();
+      if (this.idleRecognitionIntervalId != null) {
+        this.clearIdleRecognitionInterval();
       }
 
-      self.idleRecognitionIntervalId = setInterval(function () {
-        self.onIdle();
+      this.idleRecognitionIntervalId = setInterval(() => {
+        this.onIdle();
       }, 100);
     };
 
-    const onPointerMove = function (event: PointerEvent) {
+    const onPointerMove = (event: PointerEvent) => {
       // pointermove is also firing if the mouse button is not pressed
 
-      if (self.contact != null && self.contact.isActive == true) {
+      if (this.contact != null && this.contact.isActive == true) {
         // this would disable vertical scrolling - which should only be disabled if a panup/down or swipeup/down listener has been triggered
         // event.preventDefault();
 
-        self.contact.onPointerMove(event);
-        self.recognizeGestures();
+        this.contact.onPointerMove(event);
+        this.recognizeGestures();
 
         const hasPointerMoveHook = Object.prototype.hasOwnProperty.call(
-          self.options,
+          this.options,
           "pointermove"
         );
         if (hasPointerMoveHook == true) {
-          self.options.pointermove(event, self);
+          this.options.pointermove(event, this);
         }
       }
     };
 
-    const onPointerUp = function (event: PointerEvent) {
-      if (self.DEBUG == true) {
+    const onPointerUp = (event: PointerEvent) => {
+      if (this.DEBUG == true) {
         console.log("[PointerListener] pointerup event detected");
       }
 
       domElement.releasePointerCapture(event.pointerId);
 
-      if (self.contact != null && self.contact.isActive == true) {
+      if (this.contact != null && this.contact.isActive == true) {
         // use css: touch-action: none instead of js to disable scrolling
         //self.domElement.classList.remove("disable-scrolling");
 
-        self.contact.onPointerUp(event);
-        self.recognizeGestures();
+        this.contact.onPointerUp(event);
+        this.recognizeGestures();
 
         const hasPointerUpHook = Object.prototype.hasOwnProperty.call(
-          self.options,
+          this.options,
           "pointerup"
         );
         if (hasPointerUpHook == true) {
-          self.options.pointerup(event, self);
+          this.options.pointerup(event, this);
         }
       }
 
-      self.clearIdleRecognitionInterval();
+      this.clearIdleRecognitionInterval();
     };
 
     /*
@@ -241,39 +239,39 @@ export class PointerListener {
      *		during pan, pan should not end if the pointer leaves the element.
      * MDN: Pointer capture allows events for a particular pointer event (PointerEvent) to be re-targeted to a particular element instead of the normal (or hit test) target at a pointer's location. This can be used to ensure that an element continues to receive pointer events even if the pointer device's contact moves off the element (such as by scrolling or panning).
      */
-    const onPointerLeave = function (event: PointerEvent) {
-      if (self.DEBUG == true) {
+    const onPointerLeave = (event: PointerEvent) => {
+      if (this.DEBUG == true) {
         console.log("[PointerListener] pointerleave detected");
       }
 
-      if (self.contact != null && self.contact.isActive == true) {
-        self.contact.onPointerLeave(event);
-        self.recognizeGestures();
+      if (this.contact != null && this.contact.isActive == true) {
+        this.contact.onPointerLeave(event);
+        this.recognizeGestures();
       }
 
-      self.clearIdleRecognitionInterval();
+      this.clearIdleRecognitionInterval();
     };
 
-    const onPointerCancel = function (event: PointerEvent) {
+    const onPointerCancel = (event: PointerEvent) => {
       domElement.releasePointerCapture(event.pointerId);
 
-      if (self.DEBUG == true) {
+      if (this.DEBUG == true) {
         console.log("[PointerListener] pointercancel detected");
       }
 
       //self.domElement.classList.remove("disable-scrolling");
 
-      self.contact!.onPointerCancel(event);
-      self.recognizeGestures();
+      this.contact!.onPointerCancel(event);
+      this.recognizeGestures();
 
-      self.clearIdleRecognitionInterval();
+      this.clearIdleRecognitionInterval();
 
       const hasPointerCancelHook = Object.prototype.hasOwnProperty.call(
-        self.options,
+        this.options,
         "pointercancel"
       );
       if (hasPointerCancelHook == true) {
-        self.options.pointercancel(event, self);
+        this.options.pointercancel(event, this);
       }
     };
 
@@ -311,13 +309,11 @@ export class PointerListener {
   // scrolling (touchmove event) results in pointerCancel event, stopping horizontal panning if user scrolls vertically
   // the better solution is using eg css: touch-action: pan-y;
   addTouchListeners(): void {
-    const self = this;
-
-    if (self.options.handleTouchEvents == true) {
-      const onTouchMove = function (event: TouchEvent) {
+    if (this.options.handleTouchEvents == true) {
+      const onTouchMove = (event: TouchEvent) => {
         // fire onTouchMove for all gestures
-        for (let g = 0; g < self.options.supportedGestures.length; g++) {
-          const gesture = self.options.supportedGestures[g];
+        for (let g = 0; g < this.options.supportedGestures.length; g++) {
+          const gesture = this.options.supportedGestures[g];
 
           gesture.onTouchMove(event);
         }
@@ -329,14 +325,14 @@ export class PointerListener {
         touchmove: onTouchMove,
       };
 
-      /*this.domElement.addEventListener("touchstart", function(event){
+      /*this.domElement.addEventListener("touchstart", (event) => {
 
       });*/
 
-      /*this.domElement.addEventListener("touchend", function(event){
+      /*this.domElement.addEventListener("touchend", (event) => {
       });
 
-      this.domElement.addEventListener("touchcancel", function(event){
+      this.domElement.addEventListener("touchcancel", (event) => {
       });*/
     }
   }
