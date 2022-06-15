@@ -7,8 +7,7 @@ export {
     DIRECTION_VERTICAL,
     DIRECTION_HORIZONTAL,
 
-    GESTURE_STATE_BLOCKED,
-    GESTURE_STATE_POSSIBLE,
+    GestureState
 } from "./input-consts";
 
 export {

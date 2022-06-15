@@ -1,12 +1,9 @@
 import {
   DIRECTION_ALL,
-  GESTURE_STATE_POSSIBLE,
-  GESTURE_STATE_BLOCKED
+  GestureState
 } from "./input-consts";
 
 import { type Contact, Point, Vector } from "./contact";
-
-type GestureState = typeof GESTURE_STATE_POSSIBLE | typeof GESTURE_STATE_BLOCKED;
 
 type MinMaxParameter = [number | null, number | null];
 type BooleanParameter = null | boolean;
@@ -50,7 +47,7 @@ export class Gesture {
 
     this.isActive = false;
 
-    this.state = GESTURE_STATE_POSSIBLE;
+    this.state = GestureState.Possible;
 
     // the PointerEvent when the gesture has been recognized, used for some global calculations
     // it is not always reasonable to use contact.pointerdownEvent, because the user could first rotate and object, and after some time perform a pinch
@@ -181,7 +178,7 @@ export class Gesture {
   validate(contact: Contact): boolean {
     let isValid = false;
 
-    if (this.state == GESTURE_STATE_BLOCKED) {
+    if (this.state == GestureState.Blocked) {
       return false;
     }
 
@@ -251,7 +248,7 @@ export class Gesture {
     if (
       isValid == true &&
       this.isActive == false &&
-      this.state == GESTURE_STATE_POSSIBLE
+      this.state == GestureState.Possible
     ) {
       this.onStart(contact);
     }
@@ -259,7 +256,7 @@ export class Gesture {
     if (
       isValid == true &&
       this.isActive == true &&
-      this.state == GESTURE_STATE_POSSIBLE
+      this.state == GestureState.Possible
     ) {
       this.emit(contact);
     } else if (this.isActive == true && isValid == false) {
@@ -286,7 +283,7 @@ export class Gesture {
         if (this.DEBUG == false) {
           console.log(`[Gesture] blocking ${gesture.eventBaseName}`);
         }
-        gesture.state = GESTURE_STATE_BLOCKED;
+        gesture.state = GestureState.Blocked;
       }
     }
   }
@@ -294,7 +291,7 @@ export class Gesture {
   unblockGestures(): void {
     for (let g = 0; g < this.options.blocks.length; g++) {
       const gesture = this.options.blocks[g];
-      gesture.state = GESTURE_STATE_POSSIBLE;
+      gesture.state = GestureState.Possible;
     }
   }
 
@@ -620,7 +617,7 @@ export class Tap extends SinglePointerGesture {
   recognize(contact: Contact): void {
     const isValid = this.validate(contact);
 
-    if (isValid == true && this.state == GESTURE_STATE_POSSIBLE) {
+    if (isValid == true && this.state == GestureState.Possible) {
       this.initialPointerEvent = contact.currentPointerEvent;
       this.emit(contact);
     }

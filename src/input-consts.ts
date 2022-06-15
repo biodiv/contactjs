@@ -15,5 +15,7 @@ export const DIRECTION_ALL = [
   DIRECTION_DOWN,
 ];
 
-export const GESTURE_STATE_POSSIBLE = "possible";
-export const GESTURE_STATE_BLOCKED = "blocked";
+export enum GestureState {
+  Possible = "possible",
+  Blocked = "blocked"
+}
