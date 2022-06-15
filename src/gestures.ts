@@ -270,10 +270,10 @@ class Gesture {
     );
     if (
       hasSupportedDirections == true &&
-      this.options.supportedDirections.length > 0
+      this.options.supportedDirections!.length > 0
     ) {
       if (
-        this.options.supportedDirections.indexOf(
+        this.options.supportedDirections!.indexOf(
           primaryPointerInput.liveParameters.vector!.direction
         ) == -1
       ) {
@@ -613,7 +613,7 @@ export class Pan extends SinglePointerGesture {
     if (!hasSupportedDirections) {
       this.options.supportedDirections = DIRECTION_ALL;
     } else {
-      this.initialSupportedDirections = options.supportedDirections;
+      this.initialSupportedDirections = options!.supportedDirections!;
     }
   }
 
