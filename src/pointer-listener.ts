@@ -23,8 +23,24 @@ import { Contact } from "./contact";
 
 const ALL_GESTURE_CLASSES = [Tap, Press, Pan, Pinch, Rotate, TwoFingerPan];
 
+interface PointerListenerOptions {
+  DEBUG: boolean;
+  DEBUG_GESTURES: boolean;
+  DEBUG_CONTACT: boolean;
+
+  bubbles: boolean;
+  handleTouchEvents: boolean;
+  supportedGestures: unknown[];
+
+  // Hooks
+  pointerdown?: (event: PointerEvent, self: PointerListener) => void;
+  pointermove?: (event: PointerEvent, self: PointerListener) => void;
+  pointerup?: (event: PointerEvent, self: PointerListener) => void;
+  pointercancel?: (event: PointerEvent, self: PointerListener) => void;
+}
+
 export class PointerListener {
-  options: unknown;
+  options: PointerListenerOptions;
   DEBUG: boolean;
 
   readonly domElement: HTMLElement;
@@ -38,7 +54,7 @@ export class PointerListener {
   lastRecognitionTimestamp: number | null;
   idleRecognitionIntervalId: number | null;
 
-  constructor(domElement, options) {
+  constructor(domElement: HTMLElement, options?: Partial<PointerListenerOptions>) {
     // registry for events like "pan", "rotate", which have to be removed on this.destroy();
     this.eventHandlers = {};
 
@@ -56,7 +72,7 @@ export class PointerListener {
       DEBUG: false,
       DEBUG_GESTURES: false,
       DEBUG_CONTACT: false,
-    };
+    } as PointerListenerOptions;
 
     // add user-defined options to this.options
     for (const key in options) {
