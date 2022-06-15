@@ -1,19 +1,29 @@
 "use strict";
 
-export const DIRECTION_NONE = "0";
-export const DIRECTION_LEFT = "left";
-export const DIRECTION_RIGHT = "right";
-export const DIRECTION_UP = "up";
-export const DIRECTION_DOWN = "down";
+export enum Direction {
+  None = "0",
+  Left = "left",
+  Right = "right",
+  Up = "up",
+  Down = "down"
+}
 
-export const DIRECTION_HORIZONTAL = [DIRECTION_LEFT, DIRECTION_RIGHT];
-export const DIRECTION_VERTICAL = [DIRECTION_UP, DIRECTION_DOWN];
-export const DIRECTION_ALL = [
-  DIRECTION_LEFT,
-  DIRECTION_RIGHT,
-  DIRECTION_UP,
-  DIRECTION_DOWN,
-];
+export const Directions = Object.freeze({
+  Horizontal: [
+    Direction.Left,
+    Direction.Right
+  ],
+  Vertical: [
+    Direction.Up,
+    Direction.Down
+  ],
+  All: [
+    Direction.Left,
+    Direction.Right,
+    Direction.Up,
+    Direction.Down
+  ]
+});
 
 export enum GestureState {
   Possible = "possible",

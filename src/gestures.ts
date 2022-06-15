@@ -1,5 +1,5 @@
 import {
-  DIRECTION_ALL,
+  Directions,
   GestureState
 } from "./input-consts";
 
@@ -544,14 +544,14 @@ export class Pan extends SinglePointerGesture {
 
     this.isSwipe = false;
 
-    this.options.supportedDirections = options?.supportedDirections ?? DIRECTION_ALL;
+    this.options.supportedDirections = options?.supportedDirections ?? Directions.All;
     this.initialSupportedDirections = this.options.supportedDirections;
   }
 
   validate(contact: Contact): boolean {
     // on second recognition allow all directions. otherwise, the "pan" mode would end if the finger was moved right and then down during "panleft" mode
     if (this.isActive == true) {
-      this.options.supportedDirections = DIRECTION_ALL;
+      this.options.supportedDirections = Directions.All;
     }
 
     const isValid = super.validate(contact);

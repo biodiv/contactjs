@@ -1,10 +1,4 @@
-import {
-  DIRECTION_NONE,
-  DIRECTION_UP,
-  DIRECTION_DOWN,
-  DIRECTION_LEFT,
-  DIRECTION_RIGHT
-} from "./input-consts";
+import { Direction } from "./input-consts";
 
 interface DistanceChange {
   absolute: number;
@@ -792,7 +786,7 @@ export class Vector {
     this.startPoint = startPoint;
     this.endPoint = endPoint;
 
-    this.direction = DIRECTION_NONE;
+    this.direction = Direction.None;
 
     this.deltaX = this.endPoint.x - this.startPoint.x;
     this.deltaY = this.endPoint.y - this.startPoint.y;
@@ -809,16 +803,16 @@ export class Vector {
     if (Math.abs(this.deltaX) > Math.abs(this.deltaY)) {
       // left or right
       if (this.startPoint.x < this.endPoint.x) {
-        this.direction = DIRECTION_RIGHT;
+        this.direction = Direction.Right;
       } else {
-        this.direction = DIRECTION_LEFT;
+        this.direction = Direction.Left;
       }
     } else {
       // up or down
       if (this.startPoint.y < this.endPoint.y) {
-        this.direction = DIRECTION_DOWN;
+        this.direction = Direction.Down;
       } else {
-        this.direction = DIRECTION_UP;
+        this.direction = Direction.Up;
       }
     }
   }

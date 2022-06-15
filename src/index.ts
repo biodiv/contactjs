@@ -1,11 +1,6 @@
 export {
-    DIRECTION_LEFT,
-    DIRECTION_RIGHT,
-    DIRECTION_UP,
-    DIRECTION_DOWN,
-
-    DIRECTION_VERTICAL,
-    DIRECTION_HORIZONTAL,
+    Direction,
+    Directions,
 
     GestureState
 } from "./input-consts";
