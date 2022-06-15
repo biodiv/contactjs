@@ -179,7 +179,7 @@ class Gesture {
     return false;
   }
 
-  getMinMaxParameters(contact: Contact) {
+  getMinMaxParameters(contact: Contact): Record<string, number | null> {
     const primaryPointerInput = contact.getPrimaryPointerInput();
 
     const minMaxParameters = {
@@ -194,7 +194,7 @@ class Gesture {
     return minMaxParameters;
   }
 
-  getBoolParameters(contact: Contact) {
+  getBoolParameters(contact: Contact): Record<string, boolean | null> {
     const primaryPointerInput = contact.getPrimaryPointerInput();
 
     const boolParameters = {
@@ -220,7 +220,7 @@ class Gesture {
       console.log("[Gestures] running recognition for " + this.eventBaseName);
     }
 
-    const contactBoolParameters: Record<string, boolean | null> = this.getBoolParameters(contact);
+    const contactBoolParameters = this.getBoolParameters(contact);
     type BooleanParameterKey = Extract<keyof this["boolParameters"], string>;
 
     for (const boolParameterName in this.boolParameters) {
@@ -232,7 +232,7 @@ class Gesture {
       }
     }
 
-    const contactMinMaxParameters: Record<string, number | null> = this.getMinMaxParameters(contact);
+    const contactMinMaxParameters = this.getMinMaxParameters(contact);
     let minMaxParameters: Record<string, MinMaxParameter>;
 
     // check duration
@@ -688,7 +688,7 @@ export class Press extends SinglePointerGesture {
   }
 
   // distance has to use the global vector
-  getMinMaxParameters(contact: Contact) {
+  getMinMaxParameters(contact: Contact): Record<string, number | null> {
     const minMaxParameters = super.getMinMaxParameters(contact);
 
     const primaryPointerInput = contact.getPrimaryPointerInput();
