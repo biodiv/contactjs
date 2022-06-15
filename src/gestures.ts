@@ -197,7 +197,7 @@ class Gesture {
       currentSpeed: primaryPointerInput.liveParameters.speed,
       averageSpeed: primaryPointerInput.globalParameters.averageSpeed,
       finalSpeed: primaryPointerInput.globalParameters.finalSpeed,
-      distance: primaryPointerInput.liveParameters.vector.vectorLength,
+      distance: primaryPointerInput.liveParameters.vector!.vectorLength,
     };
 
     return minMaxParameters;
@@ -274,7 +274,7 @@ class Gesture {
     ) {
       if (
         this.options.supportedDirections.indexOf(
-          primaryPointerInput.liveParameters.vector.direction
+          primaryPointerInput.liveParameters.vector!.direction
         ) == -1
       ) {
         if (this.DEBUG == true) {
@@ -284,7 +284,7 @@ class Gesture {
             ": supported directions: " +
             this.options.supportedDirections +
             ", current direction: " +
-            primaryPointerInput.liveParameters.vector.direction
+            primaryPointerInput.liveParameters.vector!.direction
           );
         }
 
@@ -639,7 +639,7 @@ export class Pan extends SinglePointerGesture {
     const primaryPointerInput = contact.getPrimaryPointerInput();
 
     if (
-      this.swipeFinalSpeed < primaryPointerInput.globalParameters.finalSpeed
+      this.swipeFinalSpeed < primaryPointerInput.globalParameters.finalSpeed!
     ) {
       this.isSwipe = true;
       this.emit(contact, "swipe");
@@ -733,7 +733,7 @@ export class Press extends SinglePointerGesture {
     const primaryPointerInput = contact.getPrimaryPointerInput();
 
     minMaxParameters.distance =
-      primaryPointerInput.globalParameters.vector.vectorLength;
+      primaryPointerInput.globalParameters.vector!.vectorLength;
 
     return minMaxParameters;
   }
@@ -752,8 +752,8 @@ export class Press extends SinglePointerGesture {
 
     if (isValid == false) {
       if (
-        primaryPointerInput.globalParameters.vector.vectorLength >
-        this.initialMinMaxParameters["distance"][1]
+        primaryPointerInput.globalParameters.vector!.vectorLength >
+        this.initialMinMaxParameters["distance"][1]!
       ) {
         this.hasBeenInvalidatedForContactId = contact.id;
       }
@@ -774,7 +774,7 @@ export class Press extends SinglePointerGesture {
 
       if (
         this.hasBeenEmitted == true &&
-        duration <= this.initialMinMaxParameters["duration"][0]
+        duration <= this.initialMinMaxParameters["duration"][0]!
       ) {
         this.hasBeenEmitted = false;
       }
