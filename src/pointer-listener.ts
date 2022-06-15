@@ -87,35 +87,25 @@ export class PointerListener {
 
     this.DEBUG = this.options.DEBUG;
 
-    let supportedGestures: (Gesture | GestureConstructor)[] = ALL_GESTURE_CLASSES;
-    const instantiatedGestures: Gesture[] = [];
+    const supportedGestures = options.supportedGestures ?? ALL_GESTURE_CLASSES;
 
     // instantiate gesture classes on domElement and add them to this.options
-    const hasSupportedGestures = Object.prototype.hasOwnProperty.call(
-      options,
-      "supportedGestures"
-    );
-    if (hasSupportedGestures == true) {
-      supportedGestures = options.supportedGestures;
-    }
+    const instantiatedGestures = supportedGestures.map(GestureClass => {
+      if (typeof GestureClass === "function") {
+        const gestureOptions = {
+          bubbles: this.options.bubbles,
+          DEBUG: this.options.DEBUG_GESTURES,
+        };
 
-    for (let i = 0; i < supportedGestures.length; i++) {
-      let gesture;
-      const GestureClass = supportedGestures[i];
-      const gestureOptions = {
-        bubbles: this.options.bubbles,
-        DEBUG: this.options.DEBUG_GESTURES,
-      };
-
-      if (typeof GestureClass == "function") {
-        gesture = new GestureClass(domElement, gestureOptions);
-      } else if (typeof GestureClass == "object") {
-        gesture = GestureClass;
-      } else {
-        throw new Error("unsupported gesture type: " + typeof GestureClass);
+        return new GestureClass(domElement, gestureOptions);
       }
-      instantiatedGestures.push(gesture);
-    }
+
+      if (typeof GestureClass === "object") {
+        return GestureClass;
+      }
+
+      throw new Error("unsupported gesture type: " + typeof GestureClass);
+    });
 
     // add instantiatedGestures to options.supportedGestures
     this.options.supportedGestures = instantiatedGestures;
