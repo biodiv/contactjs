@@ -45,7 +45,7 @@ export class PointerListener {
 
   readonly domElement: HTMLElement;
 
-  private readonly eventHandlers: Record<string, ((event: Event) => void)[]>;
+  private readonly eventHandlers: Record<string, EventListenerOrEventListenerObject[]>;
   private pointerEventHandlers: Record<string, (event: PointerEvent) => void>;
   private touchEventHandlers: Record<string, (event: TouchEvent) => void>;
 
@@ -292,7 +292,7 @@ export class PointerListener {
   removePointerListeners(): void {
     for (const event in this.pointerEventHandlers) {
       const handler = this.pointerEventHandlers[event];
-      this.domElement.removeEventListener(event, handler);
+      this.domElement.removeEventListener(event, handler as EventListener);
     }
   }
 
@@ -333,7 +333,7 @@ export class PointerListener {
   removeTouchListeners(): void {
     for (const event in this.touchEventHandlers) {
       const handler = this.touchEventHandlers[event];
-      this.domElement.removeEventListener(event, handler);
+      this.domElement.removeEventListener(event, handler as EventListener);
     }
   }
 
@@ -389,7 +389,7 @@ export class PointerListener {
     return eventsString.trim().split(/\s+/g);
   }
 
-  on(eventsString: string, handlerReference): void {
+  on(eventsString: string, handlerReference: EventListenerOrEventListenerObject): void {
     const eventTypes = this.parseEventsString(eventsString);
 
     for (let e = 0; e < eventTypes.length; e++) {
@@ -407,7 +407,7 @@ export class PointerListener {
     }
   }
 
-  off(eventsString: string, handlerReference): void {
+  off(eventsString: string, handlerReference: EventListenerOrEventListenerObject): void {
     const eventTypes = this.parseEventsString(eventsString);
 
     for (let e = 0; e < eventTypes.length; e++) {
