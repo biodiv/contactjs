@@ -160,13 +160,7 @@ export class PointerListener {
         this.contact.addPointer(event);
       }
 
-      const hasPointerDownHook = Object.prototype.hasOwnProperty.call(
-        this.options,
-        "pointerdown"
-      );
-      if (hasPointerDownHook == true) {
-        this.options.pointerdown(event, this);
-      }
+      this.options.pointerdown?.(event, this);
 
       // before starting a new interval, make sure the old one is stopped if present
       if (this.idleRecognitionIntervalId != null) {
@@ -188,13 +182,7 @@ export class PointerListener {
         this.contact.onPointerMove(event);
         this.recognizeGestures();
 
-        const hasPointerMoveHook = Object.prototype.hasOwnProperty.call(
-          this.options,
-          "pointermove"
-        );
-        if (hasPointerMoveHook == true) {
-          this.options.pointermove(event, this);
-        }
+        this.options.pointermove?.(event, this);
       }
     };
 
@@ -212,13 +200,7 @@ export class PointerListener {
         this.contact.onPointerUp(event);
         this.recognizeGestures();
 
-        const hasPointerUpHook = Object.prototype.hasOwnProperty.call(
-          this.options,
-          "pointerup"
-        );
-        if (hasPointerUpHook == true) {
-          this.options.pointerup(event, this);
-        }
+        this.options.pointerup?.(event, this);
       }
 
       this.clearIdleRecognitionInterval();
@@ -257,13 +239,7 @@ export class PointerListener {
 
       this.clearIdleRecognitionInterval();
 
-      const hasPointerCancelHook = Object.prototype.hasOwnProperty.call(
-        this.options,
-        "pointercancel"
-      );
-      if (hasPointerCancelHook == true) {
-        this.options.pointercancel(event, this);
-      }
+      this.options.pointercancel?.(event, this);
     };
 
     domElement.addEventListener("pointerdown", onPointerDown, {
