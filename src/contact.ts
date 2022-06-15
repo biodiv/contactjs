@@ -60,7 +60,10 @@ export class Contact {
   readonly startTimestamp: number;
   currentTimestamp: number;
   endTimestamp: number | null;
-  
+
+  // This is never assigned!
+  vectorTimespan!: number;
+
   readonly multipointer: {
     liveParameters: MultiPointerParameters;
     globalParameters: MultiPointerParameters;
