@@ -386,7 +386,7 @@ class Gesture {
     }
 
     // fire direction specific events
-    const currentDirection = eventData.live.direction;
+    const currentDirection = eventData.live!.direction;
 
     const hasSupportedDirections = Object.prototype.hasOwnProperty.call(
       this.options,
@@ -514,8 +514,8 @@ class SinglePointerGesture extends Gesture {
 
     // gesture specific - dependant on the beginning of the gesture (when the gesture has initially been recognized)
     const globalStartPoint = new Point(
-      this.initialPointerEvent.clientX,
-      this.initialPointerEvent.clientY
+      this.initialPointerEvent!.clientX,
+      this.initialPointerEvent!.clientY
     );
     const globalEndPoint = new Point(
       contact.currentPointerEvent.clientX,
@@ -524,7 +524,7 @@ class SinglePointerGesture extends Gesture {
     const globalVector = new Vector(globalStartPoint, globalEndPoint);
     const globalDuration =
       contact.currentPointerEvent.timeStamp -
-      this.initialPointerEvent.timeStamp;
+      this.initialPointerEvent!.timeStamp;
 
     // global: global for this recognizer, not the Contact object
     eventData["global"] = {
@@ -541,20 +541,20 @@ class SinglePointerGesture extends Gesture {
     };
 
     eventData["live"] = {
-      deltaX: primaryPointerInput.liveParameters.vector.x,
-      deltaY: primaryPointerInput.liveParameters.vector.y,
-      distance: primaryPointerInput.liveParameters.vector.vectorLength,
+      deltaX: primaryPointerInput.liveParameters.vector!.x,
+      deltaY: primaryPointerInput.liveParameters.vector!.y,
+      distance: primaryPointerInput.liveParameters.vector!.vectorLength,
       speedX:
-        primaryPointerInput.liveParameters.vector.x / contact.vectorTimespan,
+        primaryPointerInput.liveParameters.vector!.x / contact.vectorTimespan,
       speedY:
-        primaryPointerInput.liveParameters.vector.y / contact.vectorTimespan,
+        primaryPointerInput.liveParameters.vector!.y / contact.vectorTimespan,
       speed: primaryPointerInput.liveParameters.speed,
-      direction: primaryPointerInput.liveParameters.vector.direction,
+      direction: primaryPointerInput.liveParameters.vector!.direction,
       scale: 1,
       rotation: 0,
       center: {
-        x: primaryPointerInput.liveParameters.vector.endPoint.x,
-        y: primaryPointerInput.liveParameters.vector.endPoint.y,
+        x: primaryPointerInput.liveParameters.vector!.endPoint.x,
+        y: primaryPointerInput.liveParameters.vector!.endPoint.y,
       },
       srcEvent: contact.currentPointerEvent /*,
 			target : primaryPointerInput.touch.target,
@@ -565,7 +565,7 @@ class SinglePointerGesture extends Gesture {
 			pointers : ,*/,
     };
 
-    return eventData;
+    return eventData as SinglePointerGestureEventData;
   }
 }
 
@@ -862,11 +862,11 @@ class TwoPointerGesture extends MultiPointerGesture {
       contact.multipointer.liveParameters.centerMovement;
     // negative distance change: distance was decreased, positive: distance was increased.
     minMaxParameters.distanceChange = Math.abs(
-      contact.multipointer.liveParameters.distanceChange
+      contact.multipointer.liveParameters.distanceChange!
     );
 
     minMaxParameters.rotationAngle = Math.abs(
-      contact.multipointer.liveParameters.rotationAngle
+      contact.multipointer.liveParameters.rotationAngle!
     );
 
     minMaxParameters.vectorAngle =
@@ -882,43 +882,43 @@ class TwoPointerGesture extends MultiPointerGesture {
 
     const globalDuration =
       contact.currentPointerEvent.timeStamp -
-      this.initialPointerEvent.timeStamp;
+      this.initialPointerEvent!.timeStamp;
     const globalParameters = contact.multipointer.globalParameters;
     const liveParameters = contact.multipointer.liveParameters;
 
     // global: global for this recognizer, not the Contact object
     eventData["global"] = {
-      deltaX: globalParameters.centerMovementVector.x,
-      deltaY: globalParameters.centerMovementVector.y,
-      distance: globalParameters.centerMovement,
-      speedX: globalParameters.centerMovementVector.x / globalDuration,
-      speedY: globalParameters.centerMovementVector.y / globalDuration,
+      deltaX: globalParameters.centerMovementVector!.x,
+      deltaY: globalParameters.centerMovementVector!.y,
+      distance: globalParameters.centerMovement!,
+      speedX: globalParameters.centerMovementVector!.x / globalDuration,
+      speedY: globalParameters.centerMovementVector!.y / globalDuration,
       speed:
-        globalParameters.centerMovementVector.vectorLength / globalDuration,
-      direction: globalParameters.centerMovementVector.direction,
-      scale: globalParameters.relativeDistanceChange,
-      rotation: globalParameters.rotationAngle,
+        globalParameters.centerMovementVector!.vectorLength / globalDuration,
+      direction: globalParameters.centerMovementVector!.direction,
+      scale: globalParameters.relativeDistanceChange!,
+      rotation: globalParameters.rotationAngle!,
       srcEvent: contact.currentPointerEvent,
     };
 
     eventData["live"] = {
-      deltaX: liveParameters.centerMovementVector.x,
-      deltaY: liveParameters.centerMovementVector.y,
-      distance: liveParameters.centerMovement,
-      speedX: liveParameters.centerMovementVector.x / globalDuration,
-      speedY: liveParameters.centerMovementVector.y / globalDuration,
-      speed: liveParameters.centerMovementVector.vectorLength / globalDuration,
-      direction: liveParameters.centerMovementVector.direction,
-      scale: liveParameters.relativeDistanceChange,
-      rotation: liveParameters.rotationAngle,
+      deltaX: liveParameters.centerMovementVector!.x,
+      deltaY: liveParameters.centerMovementVector!.y,
+      distance: liveParameters.centerMovement!,
+      speedX: liveParameters.centerMovementVector!.x / globalDuration,
+      speedY: liveParameters.centerMovementVector!.y / globalDuration,
+      speed: liveParameters.centerMovementVector!.vectorLength / globalDuration,
+      direction: liveParameters.centerMovementVector!.direction,
+      scale: liveParameters.relativeDistanceChange!,
+      rotation: liveParameters.rotationAngle!,
       center: {
-        x: liveParameters.centerMovementVector.startPoint.x,
-        y: liveParameters.centerMovementVector.startPoint.y,
+        x: liveParameters.centerMovementVector!.startPoint.x,
+        y: liveParameters.centerMovementVector!.startPoint.y,
       },
       srcEvent: contact.currentPointerEvent,
     };
 
-    return eventData;
+    return eventData as TwoPointerGestureEventData;
   }
 }
 
