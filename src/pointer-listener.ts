@@ -85,18 +85,8 @@ export class PointerListener {
       DEBUG_CONTACT: false,
     } as PointerListenerOptions;
 
-    // add user-defined options to this.options
-    for (const key in options) {
-      if (key == "supportedGestures") {
-        continue;
-      }
-
-      this.options[key] = options[key];
-    }
-
     this.DEBUG = this.options.DEBUG;
 
-    // add instantiatedGestures to options.supportedGestures
     let supportedGestures: (Gesture | GestureConstructor)[] = ALL_GESTURE_CLASSES;
     const instantiatedGestures: Gesture[] = [];
 
@@ -127,6 +117,7 @@ export class PointerListener {
       instantiatedGestures.push(gesture);
     }
 
+    // add instantiatedGestures to options.supportedGestures
     this.options.supportedGestures = instantiatedGestures;
 
     this.domElement = domElement;
