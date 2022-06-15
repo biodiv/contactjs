@@ -263,7 +263,7 @@ export class PointerListener {
 
       //self.domElement.classList.remove("disable-scrolling");
 
-      self.contact.onPointerCancel(event);
+      self.contact!.onPointerCancel(event);
       self.recognizeGestures();
 
       self.clearIdleRecognitionInterval();
@@ -386,7 +386,7 @@ export class PointerListener {
     for (let g = 0; g < this.options.supportedGestures.length; g++) {
       const gesture = this.options.supportedGestures[g];
 
-      gesture.recognize(this.contact);
+      gesture.recognize(this.contact!);
     }
   }
 
