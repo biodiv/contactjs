@@ -393,8 +393,8 @@ class Gesture {
       "supportedDirections"
     );
     if (hasSupportedDirections == true) {
-      for (let d = 0; d < this.options.supportedDirections.length; d++) {
-        const direction = this.options.supportedDirections[d];
+      for (let d = 0; d < this.options.supportedDirections!.length; d++) {
+        const direction = this.options.supportedDirections![d];
 
         if (direction == currentDirection) {
           const directionEventName = eventName + direction;
