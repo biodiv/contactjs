@@ -101,31 +101,14 @@ export class Gesture {
 
     if (this.DEBUG == true) {
       console.log(
-        "[Gestures] checking " +
-        parameterName as string +
-        "[gesture.isActive: " +
-        this.isActive.toString() +
-        "]" +
-        " minValue: " +
-        minValue +
-        ", maxValue: " +
-        maxValue +
-        ", current value: " +
-        value
+        `[Gestures] checking ${parameterName}[gesture.isActive: ${this.isActive.toString()}] minValue: ${minValue}, maxValue: ${maxValue}, current value: ${value}`
       );
     }
 
     if (minValue != null && value != null && value < minValue) {
       if (this.DEBUG == true) {
         console.log(
-          "dismissing min" +
-          this.eventBaseName +
-          ": required " +
-          parameterName +
-          ": " +
-          minValue +
-          ", current value: " +
-          value
+          `dismissing min${this.eventBaseName}: required ${parameterName}: ${minValue}, current value: ${value}`
         );
       }
 
@@ -135,14 +118,7 @@ export class Gesture {
     if (maxValue != null && value != null && value > maxValue) {
       if (this.DEBUG == true) {
         console.log(
-          "dismissing max" +
-          this.eventBaseName +
-          ": required " +
-          parameterName +
-          ": " +
-          maxValue +
-          ", current value: " +
-          value
+          `dismissing max${this.eventBaseName}: required ${parameterName}: ${maxValue}, current value: ${value}`
         );
       }
 
@@ -167,14 +143,7 @@ export class Gesture {
 
     if (this.DEBUG == true) {
       console.log(
-        "[Gestures] dismissing " +
-        this.eventBaseName +
-        ": " +
-        parameterName +
-        " required: " +
-        requiredValue +
-        ", actual value: " +
-        value
+        `[Gestures] dismissing ${this.eventBaseName}: ${parameterName} required: ${requiredValue}, actual value: ${value}`
       );
     }
 
@@ -219,7 +188,7 @@ export class Gesture {
     const primaryPointerInput = contact.getPrimaryPointerInput();
 
     if (this.DEBUG == true) {
-      console.log("[Gestures] running recognition for " + this.eventBaseName);
+      console.log(`[Gestures] running recognition for ${this.eventBaseName}`);
     }
 
     const contactBoolParameters = this.getBoolParameters(contact);
@@ -266,12 +235,7 @@ export class Gesture {
     ) {
       if (this.DEBUG == true) {
         console.log(
-          "[Gestures] dismissing " +
-          this.eventBaseName +
-          ": supported directions: " +
-          this.options.supportedDirections +
-          ", current direction: " +
-          primaryPointerInput.liveParameters.vector!.direction
+          `[Gestures] dismissing ${this.eventBaseName}: supported directions: ${this.options.supportedDirections}, current direction: ${primaryPointerInput.liveParameters.vector!.direction}`
         );
       }
 
@@ -320,7 +284,7 @@ export class Gesture {
       const gesture = this.options.blocks[g];
       if (gesture.isActive == false) {
         if (this.DEBUG == false) {
-          console.log("[Gesture] blocking " + gesture.eventBaseName);
+          console.log(`[Gesture] blocking ${gesture.eventBaseName}`);
         }
         gesture.state = GESTURE_STATE_BLOCKED;
       }
@@ -351,7 +315,7 @@ export class Gesture {
     eventName = eventName || this.eventBaseName;
 
     if (this.DEBUG === true) {
-      console.log("[Gestures] detected and firing event " + eventName);
+      console.log(`[Gestures] detected and firing event ${eventName}`);
     }
 
     const eventData = this.getEventData(contact);
@@ -384,7 +348,7 @@ export class Gesture {
 
           if (this.DEBUG == true) {
             console.log(
-              "[Gestures] detected and firing event " + directionEventName
+              `[Gestures] detected and firing event ${directionEventName}`
             );
           }
 
@@ -410,10 +374,10 @@ export class Gesture {
 
     this.initialPointerEvent = contact.currentPointerEvent;
 
-    const eventName = "" + this.eventBaseName + "start";
+    const eventName = `${this.eventBaseName}start`;
 
     if (this.DEBUG === true) {
-      console.log("[Gestures] firing event: " + eventName);
+      console.log(`[Gestures] firing event: ${eventName}`);
     }
 
     // fire gestureend event
@@ -429,10 +393,10 @@ export class Gesture {
 
     this.isActive = false;
 
-    const eventName = "" + this.eventBaseName + "end";
+    const eventName = `${this.eventBaseName}end`;
 
     if (this.DEBUG === true) {
-      console.log("[Gestures] firing event: " + eventName);
+      console.log(`[Gestures] firing event: ${eventName}`);
     }
 
     // fire gestureend event

@@ -104,7 +104,7 @@ export class PointerListener {
         return GestureClass;
       }
 
-      throw new Error("unsupported gesture type: " + typeof GestureClass);
+      throw new Error(`unsupported gesture type: ${typeof GestureClass}`);
     });
 
     // add instantiatedGestures to options.supportedGestures

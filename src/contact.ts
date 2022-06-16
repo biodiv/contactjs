@@ -48,10 +48,10 @@ export class Contact {
 
   readonly id: number;
   readonly primaryPointerId: number;
-  
+
   readonly pointerInputs: Record<number, PointerInput>;
   readonly activePointerInputs: Record<number, PointerInput>;
-  
+
   readonly initialPointerEvent: PointerEvent;
   currentPointerEvent: PointerEvent;
 
@@ -68,9 +68,9 @@ export class Contact {
     liveParameters: MultiPointerParameters;
     globalParameters: MultiPointerParameters;
   };
-  
+
   pointers?: Record<number, PointerInput>;
-  
+
   constructor(pointerdownEvent: PointerEvent, options?: Partial<ContactOptions>) {
     this.options = {
       DEBUG: false,
@@ -145,10 +145,7 @@ export class Contact {
     if (pointerInput) {
       return pointerInput;
     } else {
-      const msg =
-        "invalid pointerId: " +
-        pointerId +
-        ". Pointer not found in Contact.pointers";
+      const msg = `invalid pointerId: ${pointerId}. Pointer not found in Contact.pointers`;
       throw new Error(msg);
     }
   }
@@ -320,32 +317,16 @@ export class Contact {
 
     if (this.DEBUG === true) {
       console.log(
-        "[Contact] 2 fingers: centerMovement between pointer #" +
-        pointerInput_1.pointerId +
-        " and pointer #" +
-        pointerInput_2.pointerId +
-        " : " +
-        this.multipointer.liveParameters.centerMovement +
-        "px"
+        `[Contact] 2 fingers: centerMovement between pointer #${pointerInput_1.pointerId} and pointer #${pointerInput_2.pointerId} : ${this.multipointer.liveParameters.centerMovement}px`
       );
       console.log(
-        "[Contact] 2 fingers: distanceChange: between pointer #" +
-        pointerInput_1.pointerId +
-        " and pointer #" +
-        pointerInput_2.pointerId +
-        " : " +
-        this.multipointer.liveParameters.distanceChange +
-        "px"
+        `[Contact] 2 fingers: distanceChange: between pointer #${pointerInput_1.pointerId} and pointer #${pointerInput_2.pointerId} : ${this.multipointer.liveParameters.distanceChange}px`
       );
       console.log(
-        "[Contact] 2 fingers live angle: " +
-        this.multipointer.liveParameters.rotationAngle +
-        "deg"
+        `[Contact] 2 fingers live angle: ${this.multipointer.liveParameters.rotationAngle}deg`
       );
       console.log(
-        "[Contact] 2 fingers global angle: " +
-        this.multipointer.globalParameters.rotationAngle +
-        "deg"
+        `[Contact] 2 fingers global angle: ${this.multipointer.globalParameters.rotationAngle}deg`
       );
     }
   }
@@ -625,9 +606,7 @@ class PointerInput {
 
     if (this.DEBUG === true) {
       console.log(
-        "[Contact] pointerdown ended. pointerdown duration: " +
-        this.globalParameters.duration +
-        "ms"
+        `[Contact] pointerdown ended. pointerdown duration: ${this.globalParameters.duration}ms`
       );
     }
   }
@@ -645,7 +624,7 @@ class PointerInput {
     this.globalParameters.endTimestamp = pointercancelEvent.timeStamp;
 
     if (this.DEBUG === true) {
-      console.log("[Contact] canceled, pointerdown duration:" + this.duration);
+      console.log(`[Contact] canceled, pointerdown duration:${this.duration}`);
     }
   }
 
@@ -693,18 +672,14 @@ class PointerInput {
 
       if (this.DEBUG === true) {
         console.log(
-          "[Contact] current speed: " + this.liveParameters.speed + "px/s"
+          `[Contact] current speed: ${this.liveParameters.speed}px/s`
         );
         console.log(
-          "[Contact] pointerdown duration: " +
-          this.globalParameters.duration +
-          "ms"
+          `[Contact] pointerdown duration: ${this.globalParameters.duration}ms`
         );
 
         console.log(
-          "[Contact] live vector length within vectorTimespan: " +
-          this.liveParameters.vector!.vectorLength +
-          "px"
+          `[Contact] live vector length within vectorTimespan: ${this.liveParameters.vector!.vectorLength}px`
         );
       }
     }
@@ -769,9 +744,9 @@ class PointerInput {
   // update speed. speed = distance / time
   getSpeed(vector: Vector | null, startTimestamp: number, endTimestamp: number): number {
     if (this.DEBUG === true) {
-      console.log("[PointerInput vector] " + vector);
-      console.log("[PointerInput startTimestamp] " + startTimestamp);
-      console.log("[PointerInput endTimestamp] " + endTimestamp);
+      console.log(`[PointerInput vector] ${vector}`);
+      console.log(`[PointerInput startTimestamp] ${startTimestamp}`);
+      console.log(`[PointerInput endTimestamp] ${endTimestamp}`);
     }
 
     let speed = 0;
