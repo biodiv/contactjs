@@ -257,32 +257,25 @@ export class Gesture {
     }
 
     // check direction
-    const hasSupportedDirections = Object.prototype.hasOwnProperty.call(
-      this.options,
-      "supportedDirections"
-    );
+    const hasSupportedDirections = !!this.options.supportedDirections;
     if (
-      hasSupportedDirections == true &&
-      this.options.supportedDirections!.length > 0
+      hasSupportedDirections &&
+      !this.options.supportedDirections!.includes(
+        primaryPointerInput.liveParameters.vector!.direction
+      )
     ) {
-      if (
-        this.options.supportedDirections!.indexOf(
+      if (this.DEBUG == true) {
+        console.log(
+          "[Gestures] dismissing " +
+          this.eventBaseName +
+          ": supported directions: " +
+          this.options.supportedDirections +
+          ", current direction: " +
           primaryPointerInput.liveParameters.vector!.direction
-        ) == -1
-      ) {
-        if (this.DEBUG == true) {
-          console.log(
-            "[Gestures] dismissing " +
-            this.eventBaseName +
-            ": supported directions: " +
-            this.options.supportedDirections +
-            ", current direction: " +
-            primaryPointerInput.liveParameters.vector!.direction
-          );
-        }
-
-        return false;
+        );
       }
+
+      return false;
     }
 
     return true;
@@ -381,10 +374,7 @@ export class Gesture {
     // fire direction specific events
     const currentDirection = eventData.live!.direction;
 
-    const hasSupportedDirections = Object.prototype.hasOwnProperty.call(
-      this.options,
-      "supportedDirections"
-    );
+    const hasSupportedDirections = !!this.options.supportedDirections;
     if (hasSupportedDirections == true) {
       for (let d = 0; d < this.options.supportedDirections!.length; d++) {
         const direction = this.options.supportedDirections![d];
@@ -593,17 +583,8 @@ export class Pan extends SinglePointerGesture {
 
     this.isSwipe = false;
 
-    this.initialSupportedDirections = DIRECTION_ALL;
-
-    const hasSupportedDirections = Object.prototype.hasOwnProperty.call(
-      options,
-      "supportedDirections"
-    );
-    if (!hasSupportedDirections) {
-      this.options.supportedDirections = DIRECTION_ALL;
-    } else {
-      this.initialSupportedDirections = options!.supportedDirections!;
-    }
+    this.options.supportedDirections = options?.supportedDirections ?? DIRECTION_ALL;
+    this.initialSupportedDirections = this.options.supportedDirections;
   }
 
   validate(contact: Contact): boolean {
