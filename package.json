@@ -41,5 +41,10 @@
   },
   "dependencies": {
     "parcel": "^2.6.1"
+  },
+  "targets": {
+    "main": {
+      "optimize": true
+    }
   }
 }
