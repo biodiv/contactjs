@@ -23,7 +23,7 @@
     "url": "git+https://github.com/biodiv/contactjs.git"
   },
   "files": [
-    "lib"
+    "dist"
   ],
   "author": "",
   "license": "MIT",
