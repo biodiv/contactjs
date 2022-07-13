@@ -1,10 +1,10 @@
+"use strict";
+import { PointerListener } from '../dist/module.js';
 
 var animationFrameId = null;
 
 var rectangle;
 var ticking = false;
-
-var pointerListener = null;
 	
 var START_X;
 var START_Y;
@@ -39,7 +39,15 @@ function loadContact (){
 	START_X = rectangle.getBoundingClientRect().left;
 	START_Y = rectangle.getBoundingClientRect().top;
 
-	pointerListener = new PointerListener(rectangle, {
+	/*var pinch = new Pinch(rectangle);
+	var twoFingerPan = new TwoFingerPan(rectangle);
+	pinch.block(twoFingerPan);
+	twoFingerPan.block(pinch);*/
+	
+	var pointerListener = new PointerListener(rectangle, {
+		//"DEBUG_CONTACT" : true,
+		//supportedGestures : [pinch, twoFingerPan],
+		//supportedGestures : [TwoFingerPan, Pinch],
 		pointerup: function (event, pointerListener){
 			if(pointerListener.contact.isActive == false && TAP_ACTIVE == false && PRESS_ACTIVE == false){
 				resetElementTransform();
@@ -47,45 +55,168 @@ function loadContact (){
 		}
 	});
 	
-	pointerListener.on("pan", onPan);
-	pointerListener.on("panend", onPanEnd);
+	rectangle.addEventListener("pan", function(event){
+		onPan(event);
+		showOutput (event)
+	});
 	
-	pointerListener.on("swipe", onPan);
+	rectangle.addEventListener("panend", function(event){
 	
-	pointerListener.on("tap", onTap);
-	
-	pointerListener.on("press", onPress);
-	
-	pointerListener.on("pinchstart", onPinchStart);	
-	pointerListener.on("pinch", onPinch);
-	pointerListener.on("pinchend", onPinchEnd);
-	
+		let recognizer = event.detail.recognizer;
 
+		if (recognizer.isSwipe == true){
+			//output.textContent = "Pan end with SWIPE detected";
+		}
+		else {
+			showOutput (event)
+		}
+		
+		setTimeout(function(){
+			clearOutput(event);
+		}, 1000);
+		
+		onEnd(event);
+	});
+	
+	rectangle.addEventListener("swipe", function(event){
+		onPan(event);
+		showOutput (event);
+	});
+	
+	rectangle.addEventListener("tap", function(event){
+	
+		TAP_ACTIVE = true;
+		onTap(event);
+	
+		showOutput(event);
+		
+		setTimeout(function(){
+			TAP_ACTIVE = false;
+		}, 200);
+		
+		setTimeout(function(){
+			clearOutput(event);
+		}, 1000);
+		
+		
+	});
+	
+	
+	rectangle.addEventListener("press", function(event){
+		
+		PRESS_ACTIVE = true;
+		onPress(event);
+	
+		showOutput(event);
+		
+		setTimeout(function(){
+			PRESS_ACTIVE = false;
+		}, 200);
+		
+		setTimeout(function(){
+			clearOutput(event);
+		}, 1000);
+		
+	});
+	
+	
+	rectangle.addEventListener("pinchstart", function(event){
+		PINCHACTIVE = true;
+	});
+	
+	rectangle.addEventListener("pinch", function(event){
+	
+		onPinch(event);
+	
+		showOutput(event);
+	});
+	
+	rectangle.addEventListener("pinchend", function(event){
+	
+		PINCHACTIVE = false;
+	
+		onEnd(event);
+	
+		showOutput(event);
+		
+		setTimeout(function(){
+			clearOutput(event);
+		}, 1000);
+		
+	});
+	
 	// ROTATION
-	pointerListener.on("rotatestart", onRotationStart);
-	pointerListener.on("rotate", onRotation);
-	pointerListener.on("rotateend", onRotationEnd);
+	rectangle.addEventListener("rotatestart", function(event){
+		ROTATIONACTIVE = true;
+	});
+	
+	rectangle.addEventListener("rotate", function(event){
+	
+		onRotation(event);
+		
+		showOutput(event);
+	});
+	
+	rectangle.addEventListener("rotateend", function(event){
+	
+		ROTATIONACTIVE = false;
+	
+		onEnd(event);
+	
+		showOutput(event);
+		
+		setTimeout(function(){
+			clearOutput(event);
+		}, 1000);
+	});
 	
 	
 	// TWOFINGERPAN
-	pointerListener.on("twofingerpanstart", onTwoFingerPanStart);
-	pointerListener.on("twofingerpan", onTwoFingerPan);	
-	pointerListener.on("twofingerpanend", onTwoFingerPanEnd);
+	rectangle.addEventListener("twofingerpanstart", function(event){
+		TWOFINGERPANACTIVE = true;
+		
+		showOutput(event);
+	});
+	
+	
+	rectangle.addEventListener("twofingerpan", function(event){
+	
+		onTwoFingerPan(event);
+		
+		showOutput(event);
+	});
+	
+	rectangle.addEventListener("twofingerpanend", function(event){
+	
+		TWOFINGERPANACTIVE = true;
+	
+		onEnd(event);
+		
+		showOutput(event);
+		
+		setTimeout(function(){
+			clearOutput(event);
+		}, 1000);
+	});
 	
 }
 
 
 function onEnd (event){
 
-	/*if (event.detail.contact.isActive == false){
+	//if (event.detail.contact.isActive == false){
 		resetElementTransform();
-	}*/
+	//}
 }
 
 
 function showOutput (event){
 
-	var elementId = event.detail.recognizer.constructor.name + "-output";
+	console.log(event.detail);
+
+	var elementId = event.detail.recognizer.eventBaseName + "-output";
+
+	console.log(elementId)
 
 	var outputElement = document.getElementById(elementId);
 	if (event.type.indexOf("start") != -1){
@@ -100,11 +231,17 @@ function showOutput (event){
 	else {
 		outputElement.textContent = "on"; //event.type + " detected";
 	}
+	document.getElementById("deltaX-global").textContent = event.detail.global.deltaX
+	document.getElementById("deltaY-global").textContent = event.detail.global.deltaY
+	document.getElementById("direction-global").textContent = event.detail.global.direction
+	document.getElementById("deltaX-live").textContent = event.detail.live.deltaX
+	document.getElementById("deltaY-live").textContent = event.detail.live.deltaY
+	document.getElementById("direction-live").textContent = event.detail.live.direction
 }
 
 function clearOutput (event) {
 
-	var elementId = event.detail.recognizer.constructor.name + "-output";
+	var elementId = event.detail.recognizer.eventBaseName + "-output";
 
 	var outputElement = document.getElementById(elementId);
 	outputElement.textContent = "";
@@ -176,8 +313,6 @@ function requestElementUpdate(wait) {
 
 function onPan (event){
 
-	showOutput (event)
-
 	rectangle.className = '';
 
 	var pointerInput = event.detail.contact.getPrimaryPointerInput();
@@ -198,29 +333,6 @@ function onPan (event){
 	}
 }
 
-function onPanEnd(event) {
-	let recognizer = event.detail.recognizer;
-
-	if (recognizer.isSwipe == true){
-		//output.textContent = "Pan end with SWIPE detected";
-	}
-	else {
-		showOutput (event)
-	}
-	
-	setTimeout(function(){
-		clearOutput(event);
-	}, 1000);
-	
-	onEnd(event);
-}
-
-/* TwoFingerPan */
-function onTwoFingerPanStart(event) {
-	TWOFINGERPANACTIVE = true;
-	
-	showOutput(event);
-}
 
 function onTwoFingerPan (event) {
 
@@ -238,27 +350,10 @@ function onTwoFingerPan (event) {
 	
 	requestElementUpdate();
 
-	showOutput(event);
-
-}
-
-function onTwoFingerPanEnd(event){
-	TWOFINGERPANACTIVE = true;
-
-	onEnd(event);
-	
-	showOutput(event);
-	
-	setTimeout(function(){
-		clearOutput(event);
-	}, 1000);
-
 }
 
 
 function onTap (event) {
-
-	TAP_ACTIVE = true;
 
 	rectangle.className = "animate";
 	
@@ -275,40 +370,18 @@ function onTap (event) {
 
     
     requestElementUpdate();
-	
-	showOutput(event);
-	
-	setTimeout(function(){
-		TAP_ACTIVE = false;
-	}, 200);
-	
-	setTimeout(function(){
-		clearOutput(event);
-	}, 1000);
 }
 
 
 function onPress (event) {
 
-	PRESS_ACTIVE = true;
 	
-	showOutput(event);
-	
-	setTimeout(function(){
-		PRESS_ACTIVE = false;
-	}, 200);
-	
-	setTimeout(function(){
-		clearOutput(event);
-	}, 1000);
 
-}
-
-function onPinchStart(event) {
-	PINCHACTIVE = true;
 }
 
 function onPinch (event){
+
+	rectangle.className = "";
 
 	var contact = event.detail.contact;
 	
@@ -329,27 +402,6 @@ function onPinch (event){
 				
 	}
 
-	showOutput(event);
-
-	rectangle.className = "";
-
-}
-
-function onPinchEnd(event){
-	PINCHACTIVE = false;
-
-	onEnd(event);
-
-	showOutput(event);
-	
-	setTimeout(function(){
-		clearOutput(event);
-	}, 1000);
-}
-
-
-function onRotationStart(event) {
-	ROTATIONACTIVE = true;
 }
 
 function onRotation (event) {
@@ -367,19 +419,8 @@ function onRotation (event) {
 	
 	console.log(transform)
 	requestElementUpdate();
-
-	showOutput(event);
 	
 }
 
-function onRotationEnd(event) {
-	ROTATIONACTIVE = false;
 
-	onEnd(event);
-
-	showOutput(event);
-	
-	setTimeout(function(){
-		clearOutput(event);
-	}, 1000);
-}
+loadContact ();

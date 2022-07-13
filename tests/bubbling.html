@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Contact Bubbling Test</title>
+		
+		<link rel="stylesheet" href="test-bubbling.css">
+		
+	</head>
+	<body>
+		<div class="container">
+			<h2>Event Bubbling Test</h2>
+		</div>
+		<div class="container">
+			<div class="screen">
+
+				<div>
+					<h4>Tap on one of the rectangles. PointerListener is only bound to rectangle 1. All rectangles should be detected individually.</h4>
+				</div>
+				
+				<div id="recognition-output" class="output">no tap detected yet</div>
+				
+				<div id="rectangle-1">1
+					<div id="rectangle-2">2
+						<div id="rectangle-3">3
+						</div>
+					</div>
+				</div>
+				<div style="width:100%;">
+					<hr>
+				</div>
+				<h4>Tap on one of the rectangles. PointerListener is only bound to rectangle 4.</h4>
+				<div>
+					no bubbling. expected output: always 4
+				</div>
+
+				<div id="recognition-output-nobubble" class="output">no tap detected yet</div>
+				
+				<div id="rectangle-4">4
+					<div id="rectangle-5">5
+						<div id="rectangle-6">6
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<script type="module" src="../dist/module.js"></script>
+		<script type="module" src="test-bubbling.js"></script>
+	</body>
+</html>

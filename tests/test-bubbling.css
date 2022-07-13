@@ -66,10 +66,14 @@ html, body {
 	transform-origin:center;
 }
 
-#recognition-output {
-	font-size: 1rem;
-}
-
 .animate {
 	transition: all 0.3s;
+}
+
+.output {
+	padding: 1rem;
+	background: #FFFFFF;
+	font-size: 1rem;
+	border-radius: .5em;
+	margin: 1rem;
 }
