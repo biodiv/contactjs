@@ -1,0 +1,77 @@
+---
+title: CONTACT.JS
+layout: default
+permalink: /documentation/development/
+bg-color: bg-white
+---
+
+<div class="container">
+	<div class="row mt-5">
+		<div class="col-12 col-md-4 col-lg-2">
+			{% include_relative nav.html %}
+		</div>
+		<div class="col-12 col-md-8 col-lg-10">
+			<div class="row">
+				<div class="col-12">
+					<h2>Development</h2>
+					
+					<div>
+						contact.js is developed in TypeScript and uses <a href="https://parceljs.org/">Parcel</a> as a build tool. The following describes how to build contact.js from <a href="https://github.com/biodiv/contactjs" target="_blank">source</a>.
+					</div>
+					<div id="getting-started" class="py-3">
+						<h5>Getting Started</h5>
+
+						<div class="py-3">
+							1. Install <a href="https://nodejs.org/" target="_blank">nodejs</a> if you haven't done it already.
+						</div>
+						<div>
+							2. Clone the contact.js repository:
+							<div class="bg-light p-3 mt-3">
+{% highlight console %}
+git clone https://github.com/biodiv/contactjs.git
+{% endhighlight %}
+							</div>
+						</div>
+						<div class="py-3">
+							You can now modify the contents of the <kbd>src/</kbd> folder if you want.
+						</div>
+					</div>
+
+					<div id="build-from-source" class="py-3">
+						<h5>Build from source</h5>
+
+						<div class="py-3">
+							Inside the project directory, <kbd>conactjs/</kbd>, run the following to install all dependencies.
+						</div>
+						<div class="bg-light p-3 mt-3">
+{% highlight console %}
+npm install
+{% endhighlight %}
+						</div>
+						<div class="py-3">
+							To build <kbd>.js</kbd> files you can use in your project, run
+						</div>
+						<div class="bg-light p-3 mt-3">
+{% highlight console %}
+npx parcel build
+{% endhighlight %}
+						</div>
+						<div class="py-3">
+							This will create a <kbd>dist/</kbd> directory containing the <kbd>.js</kbd> files.
+						</div>
+					</div>
+
+				</div>
+
+				<div id="manual-tests" class="py-3">
+					<h5>Manual tests</h5>
+					<div class="py-3">
+						The tests inside the <kbd>tests/</kbd> directory only work if you have previously built contactjs from source as described above.
+						These tests include the <kbd>.js</kbd> files from the <kbd>dist/</kbd> directory, so your build will automatically be covered by those tests.
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
