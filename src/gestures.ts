@@ -17,6 +17,9 @@ interface GestureEventData {
   }
 }
 
+export class GestureEvent extends CustomEvent<GestureEventData> {
+}
+
 interface GestureOptions {
   DEBUG: boolean;
   blocks: Gesture[];
@@ -322,7 +325,7 @@ export class Gesture {
       bubbles: this.options.bubbles,
     };
 
-    const event = new CustomEvent(eventName, eventOptions);
+    const event = new GestureEvent(eventName, eventOptions);
 
     const initialTarget = contact.initialPointerEvent.target;
 
@@ -349,7 +352,7 @@ export class Gesture {
             );
           }
 
-          const directionEvent = new CustomEvent(
+          const directionEvent = new GestureEvent(
             directionEventName,
             eventOptions
           );
@@ -380,7 +383,7 @@ export class Gesture {
     // fire gestureend event
     const eventData = this.getEventData(contact);
 
-    const event = new CustomEvent(eventName, { detail: eventData });
+    const event = new GestureEvent(eventName, { detail: eventData });
 
     this.domElement.dispatchEvent(event);
   }
@@ -399,7 +402,7 @@ export class Gesture {
     // fire gestureend event
     const eventData = this.getEventData(contact);
 
-    const event = new CustomEvent(eventName, { detail: eventData });
+    const event = new GestureEvent(eventName, { detail: eventData });
 
     this.domElement.dispatchEvent(event);
   }

@@ -20,5 +20,6 @@ export {
     Pan,
     Pinch,
     Rotate,
-    TwoFingerPan
+    TwoFingerPan,
+    GestureEvent
 } from "./gestures";
