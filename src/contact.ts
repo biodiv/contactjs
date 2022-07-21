@@ -773,7 +773,7 @@ export class Vector {
   public readonly startPoint: Point;
   public readonly endPoint: Point;
 
-  public readonly direction: string;
+  public readonly direction: Direction;
 
   public readonly deltaX: number;
   public readonly deltaY: number;

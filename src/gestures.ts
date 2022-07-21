@@ -1,4 +1,5 @@
 import {
+  type Direction,
   Directions,
   GestureState
 } from "./input-consts";
@@ -424,7 +425,7 @@ interface SinglePointerGestureEventData extends GestureEventData {
     speedX: number;
     speedY: number;
     speed: number;
-    direction: string;
+    direction: Direction;
     scale: number;
     rotation: number;
     srcEvent: PointerEvent;
@@ -436,7 +437,7 @@ interface SinglePointerGestureEventData extends GestureEventData {
     speedX: number;
     speedY: number;
     speed: number;
-    direction: string;
+    direction: Direction;
     scale: number;
     rotation: number;
     center: Point;
