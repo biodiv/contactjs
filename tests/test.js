@@ -1,5 +1,5 @@
 "use strict";
-import { PointerListener } from '../dist/module.js';
+import { PointerListener, Tap, Press, Pan } from '../dist/module.js';
 
 var animationFrameId = null;
 
@@ -45,11 +45,11 @@ function loadContact (){
 	twoFingerPan.block(pinch);*/
 	
 	var pointerListener = new PointerListener(rectangle, {
-		//"DEBUG_CONTACT" : true,
-		//supportedGestures : [pinch, twoFingerPan],
+		"DEBUG_POINTERMANAGER" : true,
+		supportedGestures : [Pan, Tap, Press],//[pinch, twoFingerPan],
 		//supportedGestures : [TwoFingerPan, Pinch],
 		pointerup: function (event, pointerListener){
-			if(pointerListener.contact.isActive == false && TAP_ACTIVE == false && PRESS_ACTIVE == false){
+			if(pointerListener.pointerManager.hasPointersOnSurface() == false && TAP_ACTIVE == false && PRESS_ACTIVE == false){
 				resetElementTransform();
 			}
 		}
@@ -315,22 +315,17 @@ function onPan (event){
 
 	rectangle.className = '';
 
-	var pointerInput = event.detail.contact.getPrimaryPointerInput();
+	var deltaX = event.detail.global.deltaX;
+	var deltaY = event.detail.global.deltaY
+		
+	transform.translate = {
+		x : deltaX,
+		y : deltaY
+	};
 	
-	// touchend has no coordinates
-	if (pointerInput.liveParameters.vector != null){
-
-		var deltaX = pointerInput.globalParameters.deltaX;
-		var deltaY = pointerInput.globalParameters.deltaY;
-		
-		transform.translate = {
-			x : deltaX,
-			y : deltaY
-		};
-		
-		requestElementUpdate();
+	requestElementUpdate();
 				
-	}
+	
 }
 
 
