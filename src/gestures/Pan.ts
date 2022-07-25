@@ -3,7 +3,7 @@ import { SinglePointerGesture } from "./SinglePointerGesture";
 import { PointerManager } from "../PointerManager";
 import { PointerInput } from "../PointerInput";
 
-import { 
+import {
   Directions,
   PointerManagerState,
   GestureState,
@@ -20,7 +20,7 @@ import {
  *	- Pan supports directions. options["supportedDirections"] = []
  */
 
- export class Pan extends SinglePointerGesture {
+export class Pan extends SinglePointerGesture {
   swipeFinalSpeed: number;
   isSwipe: boolean;
   initialSupportedDirections: string[];
@@ -65,7 +65,7 @@ import {
   onEnd(pointerManager: PointerManager): void {
     const pointerInput = pointerManager.activePointerInput;
 
-    if (pointerInput instanceof PointerInput){
+    if (pointerInput instanceof PointerInput) {
       if (
         this.swipeFinalSpeed < pointerInput.parameters.global.finalSpeed!
       ) {

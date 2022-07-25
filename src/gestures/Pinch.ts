@@ -10,14 +10,14 @@ import { GestureOptions } from "./Gesture";
  * - the distance between the 2 start points and the two end points is reduces (diameter shrinks)
  */
 export class Pinch extends DualPointerGesture {
-    constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
-      super(domElement, options);
-  
-      this.eventBaseName = "pinch";
-  
-      this.initialParameters.live["centerMovement"] = [0, 50]; //px
-      this.initialParameters.live["distanceChange"] = [5, null]; // distance between 2 fingers
-      this.initialParameters.live["rotationAngle"] = [null, 20]; // distance between 2 fingers
-      this.initialParameters.live["vectorAngle"] = [10, null];
-    }
+  constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
+    super(domElement, options);
+
+    this.eventBaseName = "pinch";
+
+    this.initialParameters.live["centerMovement"] = [0, 50]; //px
+    this.initialParameters.live["distanceChange"] = [5, null]; // distance between 2 fingers
+    this.initialParameters.live["rotationAngle"] = [null, 20]; // distance between 2 fingers
+    this.initialParameters.live["vectorAngle"] = [10, null];
   }
+}

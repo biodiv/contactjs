@@ -104,36 +104,36 @@ export abstract class Gesture {
   }
 
   // implementation differs for SinglePointerGesture and DualPointerGesture
-  getPointerInput (pointerManager: PointerManager) : PointerInput | DualPointerInput | null {
+  getPointerInput(pointerManager: PointerManager): PointerInput | DualPointerInput | null {
     throw new Error("[Gesture] Gesture subclasses require a .getPointerInput() method");
-  } 
+  }
 
-  recognize (pointerManager: PointerManager): void {
+  recognize(pointerManager: PointerManager): void {
     throw new Error("[Gesture] Gesture subclasses require a .recognize() method");
   }
 
-  emit (pointerManager: PointerManager, eventName?: string): void {
+  emit(pointerManager: PointerManager, eventName?: string): void {
     throw new Error("[Gesture] Gesture subclasses require a .emit() method");
   }
 
-  setInitialPointerEvent (pointerManager: PointerManager): void {
+  setInitialPointerEvent(pointerManager: PointerManager): void {
     throw new Error("[Gesture] Gesture subclasses require a .setInitialPointerEvent() method");
   }
 
   onStart(pointerManager: PointerManager): void {
     this.state = GestureState.Active;
     this.setInitialPointerEvent(pointerManager);
-    const eventName:string = `${this.eventBaseName}start`;
+    const eventName: string = `${this.eventBaseName}start`;
     this.emit(pointerManager, eventName);
   }
 
   onEnd(pointerManager: PointerManager): void {
-    if (this.DEBUG == true){
+    if (this.DEBUG == true) {
       console.log(`[${this.eventBaseName}] ended. Setting ${this.eventBaseName}.state = ${GestureState.Inactive}`);
     }
     this.state = GestureState.Inactive;
 
-    const eventName:string = `${this.eventBaseName}end`;
+    const eventName: string = `${this.eventBaseName}end`;
     this.emit(pointerManager, eventName);
 
   }

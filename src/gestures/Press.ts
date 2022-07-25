@@ -1,4 +1,4 @@
-import {  GestureOptions} from "./Gesture";
+import { GestureOptions } from "./Gesture";
 import { SinglePointerGesture } from "./SinglePointerGesture";
 import { PointerManager } from "../PointerManager";
 import { PointerInput } from "../PointerInput";
@@ -31,7 +31,7 @@ export class Press extends SinglePointerGesture {
 
     const pointerInput = this.getPointerInput(pointerManager);
 
-    if (pointerInput instanceof PointerInput){
+    if (pointerInput instanceof PointerInput) {
 
       if (
         isValid == true &&
@@ -54,8 +54,8 @@ export class Press extends SinglePointerGesture {
         }
       }
     }
-    
-    if (pointerInput == null){
+
+    if (pointerInput == null) {
       this.hasBeenEmitted = false;
     }
   }

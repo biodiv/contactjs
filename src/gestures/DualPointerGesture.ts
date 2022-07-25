@@ -1,4 +1,4 @@
-import { 
+import {
   Gesture,
   GestureOptions,
   MinMaxInterval,
@@ -16,7 +16,7 @@ import { Point } from "../geometry/Point";
  * GestureParameters are the PointerInputParameters a gesture is valid for
  * Keys match those of PointerInput.parameters.global
  */
- interface DualPointerGestureGlobalParameters {
+interface DualPointerGestureGlobalParameters {
   duration: MinMaxInterval,
   distance: MinMaxInterval,
   maximumDistance: MinMaxInterval,
@@ -75,7 +75,7 @@ interface DualPointerLiveEventData {
   srcEvent: PointerEvent;
 }
 
-interface DualPointerGestureEventData  {
+interface DualPointerGestureEventData {
   global: DualPointerGlobalEventData,
   live: DualPointerLiveEventData
 }
@@ -101,7 +101,7 @@ export abstract class DualPointerGesture extends Gesture {
         maximumDistance: [null, null],
         averageSpeed: [null, null], // px/s
         finalSpeed: [null, null], // px/s
-        hasBeenMoved : null,
+        hasBeenMoved: null,
         centerMovement: [null, null],
         distanceChange: [null, null],
         rotationAngle: [null, null],

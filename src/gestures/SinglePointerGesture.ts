@@ -96,7 +96,7 @@ export abstract class SinglePointerGesture extends Gesture {
         maximumDistance: [null, null],
         averageSpeed: [null, null], // px/s
         finalSpeed: [null, null], // px/s
-        hasBeenMoved : null,
+        hasBeenMoved: null,
       },
 
       live: {
@@ -108,12 +108,12 @@ export abstract class SinglePointerGesture extends Gesture {
 
     this.initialParameters = { ...nullRecognitionParameters };
     // a deep copy of the parameters is needed as they can have different values
-    this.activeStateParameters = JSON.parse(JSON.stringify({...nullRecognitionParameters}));
+    this.activeStateParameters = JSON.parse(JSON.stringify({ ...nullRecognitionParameters }));
 
   }
 
-  validateBooleanParameter (gestureParameter: boolean | null, pointerInputValue: boolean) {
-    if (gestureParameter == null || gestureParameter == pointerInputValue){
+  validateBooleanParameter(gestureParameter: boolean | null, pointerInputValue: boolean) {
+    if (gestureParameter == null || gestureParameter == pointerInputValue) {
 
       if (this.DEBUG == true) {
         console.log(
@@ -134,7 +134,7 @@ export abstract class SinglePointerGesture extends Gesture {
   }
 
   validateMinMaxParameter(interval: [number | null, number | null], value: number | null): boolean {
-    
+
     const minValue = interval[0];
     const maxValue = interval[1];
 
@@ -167,13 +167,13 @@ export abstract class SinglePointerGesture extends Gesture {
     return true;
   }
 
-  validateGestureParameter (gestureParameter: MinMaxInterval | BooleanParameter, pointerInputValue: number | boolean | null) {
-    
-    let isValid = true;
-    
-    if (typeof gestureParameter == "boolean" || gestureParameter == null){
+  validateGestureParameter(gestureParameter: MinMaxInterval | BooleanParameter, pointerInputValue: number | boolean | null) {
 
-      if (typeof pointerInputValue != "boolean"){
+    let isValid = true;
+
+    if (typeof gestureParameter == "boolean" || gestureParameter == null) {
+
+      if (typeof pointerInputValue != "boolean") {
         return false;
       }
 
@@ -182,8 +182,8 @@ export abstract class SinglePointerGesture extends Gesture {
     } else {
 
       const interval = gestureParameter;
-      
-      if (typeof pointerInputValue == "boolean"){
+
+      if (typeof pointerInputValue == "boolean") {
         return false;
       }
 
@@ -206,12 +206,12 @@ export abstract class SinglePointerGesture extends Gesture {
 
     if (this.state == GestureState.Active) {
       gestureParameters = this.activeStateParameters;
-      if (this.DEBUG == true){
+      if (this.DEBUG == true) {
         console.log(`[${this.eventBaseName}] validating using activeStateParameters`);
         console.log(gestureParameters);
       }
     } else {
-      if (this.DEBUG == true){
+      if (this.DEBUG == true) {
         console.log(`[${this.eventBaseName}] validating using initialParameters`);
       }
       gestureParameters = this.initialParameters;
@@ -232,10 +232,10 @@ export abstract class SinglePointerGesture extends Gesture {
 
       isValid = this.validateGestureParameter(gestureParameter, pointerInputValue);
 
-      if (isValid == false){
+      if (isValid == false) {
         return false;
       }
-      
+
     }
 
     let liveParameterName: keyof SinglePointerGestureLiveParameters;
@@ -252,7 +252,7 @@ export abstract class SinglePointerGesture extends Gesture {
 
       isValid = this.validateGestureParameter(gestureParameter, pointerInputValue);
 
-      if (isValid == false){
+      if (isValid == false) {
         return false;
       }
     }
@@ -288,31 +288,31 @@ export abstract class SinglePointerGesture extends Gesture {
 
     const pointerInput = this.getPointerInput(pointerManager);
 
-    if (pointerInput instanceof PointerInput){
+    if (pointerInput instanceof PointerInput) {
       if (
         isValid == true &&
         this.state == GestureState.Inactive
       ) {
-  
+
         this.onStart(pointerManager);
-  
+
       }
-  
+
       if (
         isValid == true &&
         this.state == GestureState.Active
       ) {
-  
-        if (this.initialPointerEvent == null){
+
+        if (this.initialPointerEvent == null) {
           this.setInitialPointerEvent(pointerManager);
         }
-  
+
         this.emit(pointerManager);
-  
+
       } else if (this.state == GestureState.Active && isValid == false) {
-  
+
         this.onEnd(pointerManager);
-  
+
       }
     }
     else {
@@ -322,7 +322,7 @@ export abstract class SinglePointerGesture extends Gesture {
   }
 
   emit(pointerManager: PointerManager, eventName?: string): void {
-    
+
     // fire general event like "tap", "press", "pan"
     eventName = eventName || this.eventBaseName;
 
@@ -336,7 +336,7 @@ export abstract class SinglePointerGesture extends Gesture {
 
       const target = pointerInput.getTarget();
 
-      if (target instanceof EventTarget){
+      if (target instanceof EventTarget) {
 
         const eventData = this.getEventData(pointerInput);
 
@@ -385,7 +385,7 @@ export abstract class SinglePointerGesture extends Gesture {
             }
           }
         }
-      }      
+      }
     }
   }
 
@@ -455,9 +455,9 @@ export abstract class SinglePointerGesture extends Gesture {
     return eventData;
   }
 
-  setInitialPointerEvent(pointerManager: PointerManager) : void {
+  setInitialPointerEvent(pointerManager: PointerManager): void {
     const pointerInput = this.getPointerInput(pointerManager);
-    if (pointerInput instanceof PointerInput){
+    if (pointerInput instanceof PointerInput) {
       const pointerEvent: PointerEvent = pointerInput.currentPointerEvent;
       this.initialPointerEvent = pointerEvent;
     }
@@ -467,9 +467,9 @@ export abstract class SinglePointerGesture extends Gesture {
   /*
    * The PointerInput for recognition has to be pointerManager.lastRemovedPointerInput if there is no active pointer left
    */
-  getPointerInput (pointerManager: PointerManager) : PointerInput | null {
-    
-    if (pointerManager.hasPointersOnSurface() == true && pointerManager && pointerManager.activePointerInput instanceof PointerInput){
+  getPointerInput(pointerManager: PointerManager): PointerInput | null {
+
+    if (pointerManager.hasPointersOnSurface() == true && pointerManager && pointerManager.activePointerInput instanceof PointerInput) {
       return pointerManager.activePointerInput;
     }
     else if (pointerManager.lastRemovedPointerInput instanceof PointerInput) {
@@ -478,5 +478,5 @@ export abstract class SinglePointerGesture extends Gesture {
 
     return null;
   }
-  
+
 }

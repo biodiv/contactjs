@@ -8,13 +8,13 @@ import { GestureOptions } from "./Gesture";
  */
 
 export class Rotate extends DualPointerGesture {
-    constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
-      super(domElement, options);
-  
-      this.eventBaseName = "rotate";
-  
-      this.initialParameters.live["centerMovement"] = [0, 50];
-      this.initialParameters.live["distanceChange"] = [null, 50];
-      this.initialParameters.live["rotationAngle"] = [5, null];
-    }
+  constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
+    super(domElement, options);
+
+    this.eventBaseName = "rotate";
+
+    this.initialParameters.live["centerMovement"] = [0, 50];
+    this.initialParameters.live["distanceChange"] = [null, 50];
+    this.initialParameters.live["rotationAngle"] = [5, null];
   }
+}

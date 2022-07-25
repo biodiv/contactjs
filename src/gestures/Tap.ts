@@ -27,13 +27,13 @@ export class Tap extends SinglePointerGesture {
 
   }
 
-  validate (pointerManager: PointerManager): boolean {
-    
+  validate(pointerManager: PointerManager): boolean {
+
     let isValid: boolean = Gesture.prototype.validate.call(this, pointerManager);
 
     if (isValid === true) {
 
-      if (pointerManager.lastInputSessionPointerCount != 1){
+      if (pointerManager.lastInputSessionPointerCount != 1) {
         return false;
       }
       else {
@@ -56,7 +56,7 @@ export class Tap extends SinglePointerGesture {
   }
 
   // do not set Tap.state = GestureState.active as Tap has no active state
-  onStart (pointerManager: PointerManager): void {
+  onStart(pointerManager: PointerManager): void {
     this.setInitialPointerEvent(pointerManager);
     this.emit(pointerManager);
   }
