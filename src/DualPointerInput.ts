@@ -8,11 +8,11 @@ import {
 
 interface DualPointerInputParameters {
 	centerMovement: number | null,
-    centerMovementVector: Vector,
-    distanceChange: number | null,
-    relativeDistanceChange: number | null,
-    rotationAngle: number | null,
-    vectorAngle: number | null,
+  centerMovementVector: Vector,
+  distanceChange: number | null,
+  relativeDistanceChange: number | null,
+  rotationAngle: number | null,
+  vectorAngle: number | null,
 }
 
 
