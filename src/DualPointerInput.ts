@@ -7,7 +7,7 @@ import {
 } from "./PointerInput";
 
 interface DualPointerInputParameters {
-	centerMovement: number | null,
+  centerMovement: number | null,
   centerMovementVector: Vector,
   distanceChange: number | null,
   relativeDistanceChange: number | null,
