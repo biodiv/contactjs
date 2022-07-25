@@ -9,8 +9,8 @@ import { Vector } from "./geometry/Vector";
   - "live" parameters are caluclated using liveTimespan
   - "global" parameters are calculated using the whole timespan of this pointerdown
   - the current vector. The vector should be calculated "live" and not over the whole pointerdown duration.
-    The user expects the pointer input to be in sync with his current finger movement on the screen,
-    not with something a second ago.
+	The user expects the pointer input to be in sync with his current finger movement on the screen,
+	not with something a second ago.
   - start and end coordinates
   - start and end timestamps
   - speeds and distances
@@ -23,7 +23,7 @@ interface PointerInputGlobalParameters {
 	averageSpeed: number, // px/s
 	finalSpeed: number | null, // px/s
 	distance: number, // px
-  maximumDistance: number, //px
+	maximumDistance: number, //px
 	// additional parameters for the GestureEvent
 	startX: number,
 	startY: number,
@@ -81,13 +81,13 @@ export class PointerInput {
 
 	state: PointerInputState;
 
-	constructor (pointerEvent: PointerEvent, options?: PointerInputOptions) {
+	constructor(pointerEvent: PointerEvent, options?: PointerInputOptions) {
 
 		this.options = {
 			DEBUG: false,
 			...options,
 		};
-	  
+
 		this.DEBUG = this.options.DEBUG;
 
 		const now = new Date().getTime();
@@ -116,7 +116,7 @@ export class PointerInput {
 			maximumSpeed: 0,
 			currentSpeed: 0,
 			distance: 0,
-      maximumDistance: 0,
+			maximumDistance: 0,
 			averageSpeed: 0,
 			finalSpeed: null,
 			traveledDistance: 0,
@@ -134,20 +134,20 @@ export class PointerInput {
 
 		var parameters: PointerInputParameters = {
 
-			global:  globalParameters,
+			global: globalParameters,
 			live: liveParameters,
-			
+
 		};
 
 		this.parameters = parameters;
 
 	}
 
-  getTarget(): EventTarget | null {
-    return this.initialPointerEvent.target;
-  }
+	getTarget(): EventTarget | null {
+		return this.initialPointerEvent.target;
+	}
 
-	onIdle (): void {
+	onIdle(): void {
 		const now = new Date().getTime();
 
 		// currentTimestamp is not an UTC millisecond timestamp.
@@ -158,10 +158,10 @@ export class PointerInput {
 	}
 
 	reset(): void {
-		
+
 	}
 
-	onPointerMove (pointermoveEvent: PointerEvent): void {
+	onPointerMove(pointermoveEvent: PointerEvent): void {
 
 		this.parameters.global.hasBeenMoved = true;
 		this.parameters.live.isMoving = true;
@@ -169,7 +169,7 @@ export class PointerInput {
 		this.update(pointermoveEvent);
 	}
 
-	onPointerUp (pointerupEvent: PointerEvent): void {
+	onPointerUp(pointerupEvent: PointerEvent): void {
 		this.parameters.global.finalSpeed = this.parameters.live.speed;
 
 		this.parameters.live.speed = 0;
@@ -188,11 +188,11 @@ export class PointerInput {
 		}
 	}
 
-	onPointerLeave (pointerleaveEvent: PointerEvent): void {
+	onPointerLeave(pointerleaveEvent: PointerEvent): void {
 		this.onPointerUp(pointerleaveEvent);
 	}
 
-	onPointerCancel (pointercancelEvent: PointerEvent): void {
+	onPointerCancel(pointercancelEvent: PointerEvent): void {
 		this.update(pointercancelEvent);
 
 		this.parameters.live.speed = 0;
@@ -224,8 +224,8 @@ export class PointerInput {
 		);
 
 		this.parameters.live.vector = liveVector;
-    this.parameters.live.distance = liveVector.vectorLength;
-		
+		this.parameters.live.distance = liveVector.vectorLength;
+
 		this.parameters.live.speed = Geometry.getSpeed(
 			liveVector,
 			timedPointerEvents[0].timeStamp,
@@ -248,10 +248,10 @@ export class PointerInput {
 		);
 		this.parameters.global.vector = globalVector;
 
-    this.parameters.global.distance = globalVector.vectorLength;
-    if (globalVector.vectorLength > this.parameters.global.maximumDistance){
-      this.parameters.global.maximumDistance = globalVector.vectorLength;
-    }
+		this.parameters.global.distance = globalVector.vectorLength;
+		if (globalVector.vectorLength > this.parameters.global.maximumDistance) {
+			this.parameters.global.maximumDistance = globalVector.vectorLength;
+		}
 
 		if (this.DEBUG === true) {
 			console.log(
@@ -265,7 +265,7 @@ export class PointerInput {
 				`[PointerInput] live vector length within vectorTimespan: ${this.parameters.live.vector.vectorLength}px`
 			);
 		}
-		
+
 	}
 
 	/*
@@ -277,29 +277,29 @@ export class PointerInput {
 		// if so, use this.initialPointerEvent as a fallback
 		let startPointerEvent = this.initialPointerEvent;
 		const endPointerEvent =
-		  this.recognizedEvents[this.recognizedEvents.length - 1];
-	
+			this.recognizedEvents[this.recognizedEvents.length - 1];
+
 		let startIndex = this.recognizedEvents.length - 1;
-	
+
 		let elapsedTime = 0;
 		const endTimeStamp = endPointerEvent.timeStamp;
-	
+
 		while (elapsedTime < this.vectorTimespan) {
-		  startIndex = startIndex - 1;
-	
-		  if (startIndex < 0) {
-			break;
-		  }
-	
-		  startPointerEvent = this.recognizedEvents[startIndex];
-	
-		  elapsedTime = endTimeStamp - startPointerEvent.timeStamp;
+			startIndex = startIndex - 1;
+
+			if (startIndex < 0) {
+				break;
+			}
+
+			startPointerEvent = this.recognizedEvents[startIndex];
+
+			elapsedTime = endTimeStamp - startPointerEvent.timeStamp;
 		}
-	
+
 		const pointerEvents = [startPointerEvent, endPointerEvent];
-	
+
 		this.recognizedEvents = this.recognizedEvents.slice(-20);
-	
+
 		return pointerEvents;
 	}
 

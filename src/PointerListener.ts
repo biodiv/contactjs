@@ -20,10 +20,10 @@ import { PointerManager } from "./PointerManager";
  *	- domElement.addEventListener("pan", function(){});
  */
 
- /**
-  * pointerdownEvent ->  PointerListener.onPointerDown -> PointerManager.addPointer -> recognizeGestures (on move, idle, up, leave, cancel)
-  * pointerupEvent -> PointerListener.onPointerUp -> PointerManager.onPointerUp -> Pointeristener.recognizeGestures
-  */
+/**
+ * pointerdownEvent ->  PointerListener.onPointerDown -> PointerManager.addPointer -> recognizeGestures (on move, idle, up, leave, cancel)
+ * pointerupEvent -> PointerListener.onPointerUp -> PointerManager.onPointerUp -> Pointeristener.recognizeGestures
+ */
 
 type GestureConstructor = new (...args: ConstructorParameters<typeof Gesture>) => Gesture;
 
