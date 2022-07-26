@@ -1,7 +1,7 @@
 import { GestureOptions } from "./Gesture";
 import { SinglePointerGesture } from "./SinglePointerGesture";
 import { PointerManager } from "../PointerManager";
-import { PointerInput } from "../PointerInput";
+import { SinglePointerInput } from "../SinglePointerInput";
 
 /*
  * press should only be fired once
@@ -29,9 +29,9 @@ export class Press extends SinglePointerGesture {
   recognize(pointerManager: PointerManager): void {
     const isValid = this.validate(pointerManager);
 
-    const pointerInput = this.getPointerInput(pointerManager);
+    const singlePointerInput = this.getPointerInput(pointerManager);
 
-    if (pointerInput instanceof PointerInput) {
+    if (singlePointerInput instanceof SinglePointerInput) {
 
       if (
         isValid == true &&
@@ -44,7 +44,7 @@ export class Press extends SinglePointerGesture {
 
         this.hasBeenEmitted = true;
       } else {
-        const duration = pointerInput.parameters.global.duration;
+        const duration = singlePointerInput.parameters.global.duration;
 
         if (
           this.hasBeenEmitted == true &&
@@ -55,7 +55,7 @@ export class Press extends SinglePointerGesture {
       }
     }
 
-    if (pointerInput == null) {
+    if (singlePointerInput == null) {
       this.hasBeenEmitted = false;
     }
   }

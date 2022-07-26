@@ -1,7 +1,6 @@
 import { PointerManagerState } from "./input-consts";
-
-import { PointerInput } from "./PointerInput";
-
+import { Pointer } from "./Pointer";
+import { SinglePointerInput } from "./SinglePointerInput";
 import { DualPointerInput } from "./DualPointerInput";
 
 /*
@@ -14,24 +13,23 @@ import { DualPointerInput } from "./DualPointerInput";
 /*
 *	PointerManager
 *	- keeps track of added and removed pointers
-*	- decides if the current gesture is SinglePointer or DualPointer
-* 	- if a second pointer is added, activeSinglePointerInput becomes null, activeDualPointerInput is instantiated
-* 	- if one pointer is removed, activeDualPointerInoput becomes null, and the remaining PointerInput instances
+*	- decides if the current gesture is SinglePointerInput or DualPointerInput
 *		becomes activeSinglePointerInput
 */
 export class PointerManager {
 
   DEBUG: boolean;
 
-  activePointerInput: PointerInput | DualPointerInput | null;
+  activePointerInput: SinglePointerInput | DualPointerInput | null;
 
-  // this pointerInput is not on the surface any more - some gestures are detected after a pointer has been released
-  lastRemovedPointerInput: PointerInput | DualPointerInput | null;
+  // this pointer is not on the surface any more - some gestures are detected after a pointer has been released
+  lastRemovedPointer: Pointer | null;
 
-  lastInputSessionPointerCount: number | null;
+  lastInputSessionPointerCount: number;
 
-  private unusedPointerInputs: Record<number, PointerInput>; // on the surface, but not used for gesture recognition, eg a third pointer
-  private onSurfacePointerInputs: Record<number, PointerInput>; // covers active and unused PointerInputs
+  private pointerAllocation: Record<number, SinglePointerInput | DualPointerInput>; // map pointerId to the *PointerInput the Pointer is currently used for
+  private unusedPointers: Record<number, Pointer>; // on the surface, but not used for gesture recognition, eg a third pointer
+  private onSurfacePointers: Record<number, Pointer>; // covers active and unused Pointers
 
   state: PointerManagerState;
 
@@ -40,10 +38,11 @@ export class PointerManager {
 
     this.state = PointerManagerState.NoPointer;
     this.activePointerInput = null;
-    this.lastRemovedPointerInput = null;
-    this.lastInputSessionPointerCount = null;
-    this.unusedPointerInputs = {}; // pointers on the surface that are not interpreted right now
-    this.onSurfacePointerInputs = {};
+    this.lastRemovedPointer = null;
+    this.lastInputSessionPointerCount = 0;
+    this.pointerAllocation = {};
+    this.unusedPointers = {}; // pointers on the surface that are not interpreted right now
+    this.onSurfacePointers = {};
 
   }
 
@@ -53,18 +52,18 @@ export class PointerManager {
       console.log(`[PointerManager] adding Pointer #${pointerdownEvent.pointerId.toString()}`);
     }
 
-    const pointerInput = new PointerInput(pointerdownEvent);
+    const pointer = new Pointer(pointerdownEvent);
 
-    this.onSurfacePointerInputs[pointerInput.pointerId] = pointerInput;
+    this.onSurfacePointers[pointer.pointerId] = pointer;
 
     if (this.activePointerInput == null) {
-      this.setActiveSinglePointerInput(pointerInput);
+      this.setActiveSinglePointerInput(pointer);
     }
-    else if (this.activePointerInput instanceof PointerInput) {
-      this.setActiveDualPointerInput(this.activePointerInput, pointerInput);
+    else if (this.activePointerInput instanceof Pointer) {
+      this.setActiveDualPointerInput(this.activePointerInput, pointer);
     }
     else if (this.activePointerInput instanceof DualPointerInput) {
-      this.unusedPointerInputs[pointerInput.pointerId] = pointerInput;
+      this.unusedPointers[pointer.pointerId] = pointer;
     }
 
     this.lastInputSessionPointerCount = this.currentPointerCount();
@@ -73,9 +72,9 @@ export class PointerManager {
 
   /**
    * called on the following events: pointerup, pointerleave(?), pointercancel
-   * 1 -> 0 : PointerInput -> null
-   * 2 -> 1 : DualPointerInput -> PointerInput
-   * 3 -> 2 : DualPointerInput -> DualPointerInput (new or keep)
+   * 1 -> 0 : SinglePointerInput -> null
+   * 2 -> 1 : DualPointerInput -> SinglePointerInput
+   * 3 -> 2 : DualPointerInput -> DualPointerInput (new combination or no change)
    */
   removePointer(pointerId: number): void {
 
@@ -83,48 +82,48 @@ export class PointerManager {
       console.log(`[PointerManager] removing Pointer #${pointerId}`);
     }
 
-    const pointerInput: PointerInput = this.onSurfacePointerInputs[pointerId];
-    this.lastRemovedPointerInput = pointerInput;
+    const pointer: Pointer = this.onSurfacePointers[pointerId];
+    this.lastRemovedPointer = pointer;
 
     // remove from registries
-    delete this.onSurfacePointerInputs[pointerId];
+    delete this.onSurfacePointers[pointerId];
 
-    if (pointerId in this.unusedPointerInputs) {
-      delete this.unusedPointerInputs[pointerId];
+    if (pointerId in this.unusedPointers) {
+      delete this.unusedPointers[pointerId];
     }
 
     // set this.activePointerInput to null if the Pointer was part of it
-    // DualPointerInput -> PointerInput
+    // DualPointerInput -> SinglePointerInput
     // OR DualPointerInput -> new DualPointerInput
     if (this.activePointerInput instanceof DualPointerInput) {
       if (pointerId in this.activePointerInput.pointerIds) {
-        const remainingPointerInput = this.activePointerInput.removePointer(pointerId);
+        const remainingPointer = this.activePointerInput.removePointer(pointerId);
         this.activePointerInput = null;
 
         // remainingPointer should be used for the next this.activePointerInput
-        const unusedPointerInput = this.getUnusedPointerInput();
-        if (unusedPointerInput instanceof PointerInput) {
-          this.setActiveDualPointerInput(remainingPointerInput, unusedPointerInput);
+        const unusedPointerInput = this.getUnusedPointer();
+        if (unusedPointerInput instanceof Pointer) {
+          this.setActiveDualPointerInput(remainingPointer, unusedPointerInput);
         }
         else {
-          this.setActiveSinglePointerInput(remainingPointerInput);
+          this.setActiveSinglePointerInput(remainingPointer);
         }
 
       }
       else {
         // a 3rd pointer which has not been part of DualPointerInput has been removed
       }
-    } else if (this.activePointerInput instanceof PointerInput) {
+    } else if (this.activePointerInput instanceof SinglePointerInput) {
       this.activePointerInput = null;
       this.state = PointerManagerState.NoPointer;
       // this should not be necessary
-      if (Object.keys(this.unusedPointerInputs).length > 0) {
-        this.unusedPointerInputs = {};
-        throw new Error("[PointerManager] found unused PointerInputs although there should not be any");
+      if (Object.keys(this.unusedPointers).length > 0) {
+        this.unusedPointers = {};
+        throw new Error("[PointerManager] found unused Pointers although there should not be any");
       }
-      if (Object.keys(this.onSurfacePointerInputs).length > 0) {
-        this.onSurfacePointerInputs = {};
-        throw new Error("[PointerManager] found onSurfacePointerInputs although there should not be any");
+      if (Object.keys(this.onSurfacePointers).length > 0) {
+        this.onSurfacePointers = {};
+        throw new Error("[PointerManager] found onSurfacePointers although there should not be any");
       }
 
     }
@@ -135,10 +134,13 @@ export class PointerManager {
 
   }
 
-  setActiveSinglePointerInput(pointerInput: PointerInput): void {
-    pointerInput.reset();
-    this.activePointerInput = pointerInput;
-    delete this.unusedPointerInputs[pointerInput.pointerId];
+  setActiveSinglePointerInput(pointer: Pointer): void {
+    pointer.reset();
+    const singlePointerInput = new SinglePointerInput(pointer);
+    this.activePointerInput = singlePointerInput;
+
+    this.pointerAllocation[pointer.pointerId] = singlePointerInput;
+    delete this.unusedPointers[pointer.pointerId];
 
     this.state = PointerManagerState.SinglePointer;
 
@@ -147,13 +149,16 @@ export class PointerManager {
     }
   }
 
-  setActiveDualPointerInput(pointerInput_1: PointerInput, pointerInput_2: PointerInput): void {
-    pointerInput_1.reset();
-    pointerInput_2.reset();
-    const dualPointerInput = new DualPointerInput(pointerInput_1, pointerInput_2);
+  setActiveDualPointerInput(pointer_1: Pointer, pointer_2: Pointer): void {
+    pointer_1.reset();
+    pointer_2.reset();
+    const dualPointerInput = new DualPointerInput(pointer_1, pointer_2);
     this.activePointerInput = dualPointerInput;
-    delete this.unusedPointerInputs[pointerInput_1.pointerId];
-    delete this.unusedPointerInputs[pointerInput_2.pointerId];
+
+    this.pointerAllocation[pointer_1.pointerId] = dualPointerInput;
+    this.pointerAllocation[pointer_2.pointerId] = dualPointerInput;
+    delete this.unusedPointers[pointer_1.pointerId];
+    delete this.unusedPointers[pointer_2.pointerId];
 
     this.state = PointerManagerState.DualPointer;
 
@@ -163,7 +168,7 @@ export class PointerManager {
   }
 
   hasPointersOnSurface(): Boolean {
-    if (Object.keys(this.onSurfacePointerInputs).length > 0) {
+    if (Object.keys(this.onSurfacePointers).length > 0) {
       return true;
     }
 
@@ -171,26 +176,59 @@ export class PointerManager {
   }
 
   currentPointerCount(): number {
-    return Object.keys(this.onSurfacePointerInputs).length;
+    return Object.keys(this.onSurfacePointers).length;
   }
 
-  getUnusedPointerInput(): PointerInput | null {
-    if (Object.keys(this.unusedPointerInputs).length > 0) {
-      const pointerInput: PointerInput = Object.values(this.unusedPointerInputs)[0];
-      return pointerInput;
+  getUnusedPointer(): Pointer | null {
+    if (Object.keys(this.unusedPointers).length > 0) {
+      const pointer: Pointer = Object.values(this.unusedPointers)[0];
+      return pointer;
     }
     return null
   }
 
-  onIdle(): void {
-    this.activePointerInput?.onIdle();
+  getPointerFromId(pointerId: number): Pointer | null {
+    if (pointerId in this.onSurfacePointers) {
+      return this.onSurfacePointers[pointerId];
+    }
+    return null;
   }
 
+  getlastRemovedPointerInput(): SinglePointerInput | DualPointerInput | null {
+    if (this.lastRemovedPointer instanceof Pointer) {
+      return this.pointerAllocation[this.lastRemovedPointer.pointerId];
+    }
+    return null;
+  }
+
+  onIdle(): void {
+    for (const pointerId in this.onSurfacePointers) {
+      const pointer: Pointer = this.onSurfacePointers[pointerId];
+      pointer.onIdle();
+    };
+
+    this.activePointerInput?.onIdle();
+
+  }
+
+  /**
+   * PointerEvent handlers
+   * - the Pointer is always updated firs
+   * - afterwards, the current activePointerInput is updated
+   */
   onPointerMove(pointermoveEvent: PointerEvent): void {
+    const pointer = this.getPointerFromId(pointermoveEvent.pointerId);
+    if (pointer instanceof Pointer) {
+      pointer.onPointerMove(pointermoveEvent);
+    }
     this.activePointerInput?.onPointerMove(pointermoveEvent);
   }
 
   onPointerUp(pointerupEvent: PointerEvent): void {
+    const pointer = this.getPointerFromId(pointerupEvent.pointerId);
+    if (pointer instanceof Pointer) {
+      pointer.onPointerUp(pointerupEvent);
+    }
     this.activePointerInput?.onPointerUp(pointerupEvent);
     this.removePointer(pointerupEvent.pointerId);
   }
@@ -200,12 +238,20 @@ export class PointerManager {
   }
 
   onPointerLeave(pointerleaveEvent: PointerEvent): void {
+    const pointer = this.getPointerFromId(pointerleaveEvent.pointerId);
+    if (pointer instanceof Pointer) {
+      pointer.onPointerLeave(pointerleaveEvent);
+    }
     this.activePointerInput?.onPointerLeave(pointerleaveEvent);
     // pointerleave does not mean th pointer left the surface
     // the pointer left the bound element
     this.removePointer(pointerleaveEvent.pointerId);
   }
   onPointerCancel(pointercancelEvent: PointerEvent): void {
+    const pointer = this.getPointerFromId(pointercancelEvent.pointerId);
+    if (pointer instanceof Pointer) {
+      pointer.onPointerCancel(pointercancelEvent);
+    }
     this.activePointerInput?.onPointerCancel(pointercancelEvent);
     this.removePointer(pointercancelEvent.pointerId);
   }

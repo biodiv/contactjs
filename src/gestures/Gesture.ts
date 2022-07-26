@@ -1,5 +1,5 @@
 import { PointerManager } from "../PointerManager";
-import { PointerInput } from "../PointerInput";
+import { SinglePointerInput } from "../SinglePointerInput";
 import { DualPointerInput } from "../DualPointerInput";
 
 import {
@@ -55,27 +55,6 @@ export abstract class Gesture {
 
   }
 
-  validateDirection(pointerInput: PointerInput): boolean {
-    // check direction
-    const hasSupportedDirections = !!this.options.supportedDirections;
-    if (
-      hasSupportedDirections &&
-      !this.options.supportedDirections!.includes(
-        pointerInput.parameters.live.vector!.direction
-      )
-    ) {
-      if (this.DEBUG == true) {
-        console.log(
-          `[Gestures] dismissing ${this.eventBaseName}: supported directions: ${this.options.supportedDirections}, current direction: ${pointerInput.parameters.live.vector!.direction}`
-        );
-      }
-
-      return false;
-    }
-
-    return true;
-  }
-
   // validate pointerCount and GestureState.Blocked
   validate(pointerManager: PointerManager): boolean {
 
@@ -104,7 +83,7 @@ export abstract class Gesture {
   }
 
   // implementation differs for SinglePointerGesture and DualPointerGesture
-  getPointerInput(pointerManager: PointerManager): PointerInput | DualPointerInput | null {
+  getPointerInput(pointerManager: PointerManager): SinglePointerInput | DualPointerInput | null {
     throw new Error("[Gesture] Gesture subclasses require a .getPointerInput() method");
   }
 

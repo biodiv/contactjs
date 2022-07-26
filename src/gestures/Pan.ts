@@ -1,7 +1,7 @@
 import { GestureOptions } from "./Gesture";
 import { SinglePointerGesture } from "./SinglePointerGesture";
 import { PointerManager } from "../PointerManager";
-import { PointerInput } from "../PointerInput";
+import { SinglePointerInput } from "../SinglePointerInput";
 
 import {
   Directions,
@@ -63,11 +63,11 @@ export class Pan extends SinglePointerGesture {
 
   // check if it was a swipe
   onEnd(pointerManager: PointerManager): void {
-    const pointerInput = pointerManager.activePointerInput;
+    const singlePointerInput = pointerManager.activePointerInput;
 
-    if (pointerInput instanceof PointerInput) {
+    if (singlePointerInput instanceof SinglePointerInput) {
       if (
-        this.swipeFinalSpeed < pointerInput.parameters.global.finalSpeed!
+        this.swipeFinalSpeed < singlePointerInput.parameters.global.finalSpeed!
       ) {
         this.isSwipe = true;
         this.emit(pointerManager, "swipe");

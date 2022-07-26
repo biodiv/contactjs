@@ -1,7 +1,7 @@
 import { Gesture, GestureOptions } from "./Gesture";
 import { SinglePointerGesture } from "./SinglePointerGesture";
 import { PointerManager } from "../PointerManager";
-import { PointerInput } from "../PointerInput";
+import { SinglePointerInput } from "../SinglePointerInput";
 import { PointerManagerState } from "../input-consts";
 
 /*
@@ -38,11 +38,11 @@ export class Tap extends SinglePointerGesture {
       }
       else {
 
-        var pointerInput = pointerManager.lastRemovedPointerInput; // cannot be a DualPointerInput
+        var singlePointerInput = pointerManager.getlastRemovedPointerInput();
 
-        if (pointerInput instanceof PointerInput) {
+        if (singlePointerInput instanceof SinglePointerInput) {
 
-          isValid = this.validateGestureParameters(pointerInput)
+          isValid = this.validateGestureParameters(singlePointerInput);
 
         }
         else {

@@ -12,13 +12,13 @@ import {
 
 import { Point } from "../geometry/Point";
 import { Vector } from "../geometry/Vector";
-
 import { PointerManager } from "../PointerManager";
-import { PointerInput } from "../PointerInput";
+import { Pointer } from "../Pointer";
+import { SinglePointerInput } from "../SinglePointerInput";
 
 /**
- * GestureParameters are the PointerInputParameters a gesture is valid for
- * Keys match those of PointerInput.parameters.global
+ * GestureParameters are the PointerParameters a gesture is valid for
+ * Keys match those of SinglePointerInput.parameters.global
  */
 interface SinglePointerGestureGlobalParameters {
   duration: MinMaxInterval,
@@ -30,7 +30,7 @@ interface SinglePointerGestureGlobalParameters {
 }
 
 /**
- * keys match those of PointerInput.parameters.live
+ * keys match those of SinglePointerInput.parameters.live
  */
 interface SinglePointerGestureLiveParameters {
   speed: MinMaxInterval,
@@ -198,7 +198,7 @@ export abstract class SinglePointerGesture extends Gesture {
 
   }
 
-  validateGestureParameters(pointerInput: PointerInput): boolean {
+  validateGestureParameters(pointerInput: SinglePointerInput): boolean {
 
     var gestureParameters: SinglePointerGestureParameters;
 
@@ -261,15 +261,41 @@ export abstract class SinglePointerGesture extends Gesture {
 
   }
 
+  validateDirection(singlePointerInput: SinglePointerInput): boolean {
+    // check direction
+    const hasSupportedDirections = !!this.options.supportedDirections;
+    if (
+      hasSupportedDirections &&
+      !this.options.supportedDirections!.includes(
+        singlePointerInput.parameters.live.vector!.direction
+      )
+    ) {
+      if (this.DEBUG == true) {
+        console.log(
+          `[Gestures] dismissing ${this.eventBaseName}: supported directions: ${this.options.supportedDirections}, current direction: ${singlePointerInput.parameters.live.vector!.direction}`
+        );
+      }
+
+      return false;
+    }
+
+    return true;
+  }
+
   validate(pointerManager: PointerManager): boolean {
     var isValid = super.validate(pointerManager);
 
     if (isValid === true) {
+
       var pointerInput = pointerManager.activePointerInput; // cannot be a DualPointerInput
 
-      if (pointerInput instanceof PointerInput) {
+      if (pointerInput instanceof SinglePointerInput) {
 
-        isValid = this.validateGestureParameters(pointerInput)
+        isValid = this.validateDirection(pointerInput);
+
+        if (isValid == true){
+          isValid = this.validateGestureParameters(pointerInput)
+        }
 
       }
       else {
@@ -286,9 +312,9 @@ export abstract class SinglePointerGesture extends Gesture {
 
     const isValid = this.validate(pointerManager);
 
-    const pointerInput = this.getPointerInput(pointerManager);
+    const singlePointerInput = this.getPointerInput(pointerManager);
 
-    if (pointerInput instanceof PointerInput) {
+    if (singlePointerInput instanceof SinglePointerInput) {
       if (
         isValid == true &&
         this.state == GestureState.Inactive
@@ -316,7 +342,7 @@ export abstract class SinglePointerGesture extends Gesture {
       }
     }
     else {
-      console.log(`not firing event ${this.eventBaseName}. No PointerInput found`);
+      console.log(`not firing event ${this.eventBaseName}. No SinglePointerInput found`);
     }
 
   }
@@ -330,15 +356,15 @@ export abstract class SinglePointerGesture extends Gesture {
       console.log(`[Gestures] detected and firing event ${eventName}`);
     }
 
-    const pointerInput = this.getPointerInput(pointerManager);
+    const singlePointerInput = this.getPointerInput(pointerManager);
 
-    if (pointerInput instanceof PointerInput) {
+    if (singlePointerInput instanceof SinglePointerInput) {
 
-      const target = pointerInput.getTarget();
+      const target = singlePointerInput.getTarget();
 
       if (target instanceof EventTarget) {
 
-        const eventData = this.getEventData(pointerInput);
+        const eventData = this.getEventData(singlePointerInput);
 
         const eventOptions = {
           detail: eventData,
@@ -389,7 +415,7 @@ export abstract class SinglePointerGesture extends Gesture {
     }
   }
 
-  getEventData(pointerInput: PointerInput): SinglePointerGestureEventData {
+  getEventData(singlePointerInput: SinglePointerInput): SinglePointerGestureEventData {
     // provide short-cuts to the values collected in the Contact object
     // match this to the event used by hammer.js
 
@@ -399,12 +425,12 @@ export abstract class SinglePointerGesture extends Gesture {
       this.initialPointerEvent!.clientY
     );
     const globalEndPoint = new Point(
-      pointerInput.currentPointerEvent.clientX,
-      pointerInput.currentPointerEvent.clientY
+      singlePointerInput.pointer.currentPointerEvent.clientX,
+      singlePointerInput.pointer.currentPointerEvent.clientY
     );
     const globalVector = new Vector(globalStartPoint, globalEndPoint);
     const globalDuration =
-      pointerInput.currentPointerEvent.timeStamp -
+      singlePointerInput.pointer.currentPointerEvent.timeStamp -
       this.initialPointerEvent!.timeStamp;
 
     // global: global for this recognizer, not the Contact object
@@ -418,26 +444,26 @@ export abstract class SinglePointerGesture extends Gesture {
       direction: globalVector.direction,
       scale: 1,
       rotation: 0,
-      srcEvent: pointerInput.currentPointerEvent,
+      srcEvent: singlePointerInput.pointer.currentPointerEvent,
     };
 
     const liveEventData: LiveSinglePointerEventData = {
-      deltaX: pointerInput.parameters.live.vector!.x,
-      deltaY: pointerInput.parameters.live.vector!.y,
-      distance: pointerInput.parameters.live.vector!.vectorLength,
+      deltaX: singlePointerInput.parameters.live.vector!.x,
+      deltaY: singlePointerInput.parameters.live.vector!.y,
+      distance: singlePointerInput.parameters.live.vector!.vectorLength,
       speedX:
-        pointerInput.parameters.live.vector!.x / pointerInput.vectorTimespan,
+        singlePointerInput.parameters.live.vector!.x / singlePointerInput.pointer.vectorTimespan,
       speedY:
-        pointerInput.parameters.live.vector!.y / pointerInput.vectorTimespan,
-      speed: pointerInput.parameters.live.speed,
-      direction: pointerInput.parameters.live.vector!.direction,
+        singlePointerInput.parameters.live.vector!.y / singlePointerInput.pointer.vectorTimespan,
+      speed: singlePointerInput.parameters.live.speed,
+      direction: singlePointerInput.parameters.live.vector!.direction,
       scale: 1,
       rotation: 0,
       center: {
-        x: pointerInput.parameters.live.vector!.endPoint.x,
-        y: pointerInput.parameters.live.vector!.endPoint.y,
+        x: singlePointerInput.parameters.live.vector!.endPoint.x,
+        y: singlePointerInput.parameters.live.vector!.endPoint.y,
       },
-      srcEvent: pointerInput.currentPointerEvent /*,
+      srcEvent: singlePointerInput.pointer.currentPointerEvent /*,
       target : primaryPointerInput.touch.target,
       pointerType : ,
       eventType : ,
@@ -456,24 +482,27 @@ export abstract class SinglePointerGesture extends Gesture {
   }
 
   setInitialPointerEvent(pointerManager: PointerManager): void {
-    const pointerInput = this.getPointerInput(pointerManager);
-    if (pointerInput instanceof PointerInput) {
-      const pointerEvent: PointerEvent = pointerInput.currentPointerEvent;
+    const singlePointerInput = this.getPointerInput(pointerManager);
+    if (singlePointerInput instanceof SinglePointerInput) {
+      const pointerEvent: PointerEvent = singlePointerInput.pointer.currentPointerEvent;
       this.initialPointerEvent = pointerEvent;
     }
   }
 
 
   /*
-   * The PointerInput for recognition has to be pointerManager.lastRemovedPointerInput if there is no active pointer left
+   * The PointerInput for recognition has to be pointerManager.lastRemovedPointer if there is no active pointer left
    */
-  getPointerInput(pointerManager: PointerManager): PointerInput | null {
+  getPointerInput(pointerManager: PointerManager): SinglePointerInput | null {
 
-    if (pointerManager.hasPointersOnSurface() == true && pointerManager && pointerManager.activePointerInput instanceof PointerInput) {
+    if (pointerManager.hasPointersOnSurface() == true && pointerManager && pointerManager.activePointerInput instanceof SinglePointerInput) {
       return pointerManager.activePointerInput;
     }
-    else if (pointerManager.lastRemovedPointerInput instanceof PointerInput) {
-      return pointerManager.lastRemovedPointerInput;
+    else if (pointerManager.lastRemovedPointer instanceof Pointer) {
+      const pointerInput = pointerManager.getlastRemovedPointerInput();
+      if (pointerInput instanceof SinglePointerInput){
+        return pointerInput;
+      }
     }
 
     return null;

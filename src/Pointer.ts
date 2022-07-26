@@ -17,11 +17,11 @@ import { Vector } from "./geometry/Vector";
 ********************************************************************************************************************/
 
 // parameters for recognizing the gesture
-interface PointerInputGlobalParameters {
+interface PointerGlobalParameters {
   duration: number, // ms
   currentSpeed: number, // px/s
   averageSpeed: number, // px/s
-  finalSpeed: number | null, // px/s
+  finalSpeed: number, // px/s
   distance: number, // px
   maximumDistance: number, //px
   // additional parameters for the GestureEvent
@@ -39,7 +39,7 @@ interface PointerInputGlobalParameters {
   hasBeenMoved: boolean,
 }
 
-interface PointerInputLiveParameters {
+interface PointerLiveParameters {
   duration: number, // ms
   speed: number,
   vector: Vector,
@@ -47,41 +47,41 @@ interface PointerInputLiveParameters {
   isMoving: boolean,
 }
 
-interface PointerInputParameters {
-  live: PointerInputLiveParameters,
-  global: PointerInputGlobalParameters,
+export interface PointerParameters {
+  live: PointerLiveParameters,
+  global: PointerGlobalParameters,
 }
 
 
 
-interface PointerInputOptions {
+interface PointerOptions {
   DEBUG: boolean;
   vectorTimespan?: number;
 }
 
-enum PointerInputState {
+enum PointerState {
   Active = "active", // on the surface
   Removed = "removed", // removed from surface
   Canceled = "canceled",
 }
 
 
-export class PointerInput {
-  readonly options: PointerInputOptions;
+export class Pointer {
+  readonly options: PointerOptions;
   DEBUG: boolean;
   vectorTimespan: number;
 
   readonly pointerId: number;
 
-  readonly parameters: PointerInputParameters;
+  readonly parameters: PointerParameters;
 
   readonly initialPointerEvent: PointerEvent;
   currentPointerEvent: PointerEvent;
   recognizedEvents: PointerEvent[];
 
-  state: PointerInputState;
+  state: PointerState;
 
-  constructor(pointerEvent: PointerEvent, options?: PointerInputOptions) {
+  constructor(pointerEvent: PointerEvent, options?: PointerOptions) {
 
     this.options = {
       DEBUG: false,
@@ -99,11 +99,11 @@ export class PointerInput {
     this.currentPointerEvent = pointerEvent;
     this.recognizedEvents = [pointerEvent];
 
-    this.state = PointerInputState.Active;
+    this.state = PointerState.Active;
 
     const nullVector = Geometry.getVector(pointerEvent, pointerEvent);
 
-    var globalParameters: PointerInputGlobalParameters = {
+    var globalParameters: PointerGlobalParameters = {
       startX: this.initialPointerEvent.clientX,
       startY: this.initialPointerEvent.clientY,
       vector: nullVector,
@@ -118,13 +118,13 @@ export class PointerInput {
       distance: 0,
       maximumDistance: 0,
       averageSpeed: 0,
-      finalSpeed: null,
+      finalSpeed: 0,
       traveledDistance: 0,
       hasBeenMoved: false,
       duration: 0,
     };
 
-    var liveParameters: PointerInputLiveParameters = {
+    var liveParameters: PointerLiveParameters = {
       duration: 0, // ms
       speed: 0,
       vector: nullVector,
@@ -132,11 +132,9 @@ export class PointerInput {
       isMoving: false,
     };
 
-    var parameters: PointerInputParameters = {
-
+    var parameters: PointerParameters = {
       global: globalParameters,
       live: liveParameters,
-
     };
 
     this.parameters = parameters;
@@ -147,6 +145,10 @@ export class PointerInput {
     return this.initialPointerEvent.target;
   }
 
+  reset(): void {
+
+  }
+
   onIdle(): void {
     const now = new Date().getTime();
 
@@ -155,10 +157,6 @@ export class PointerInput {
 
     const duration = now - this.parameters.global.startTimestampUTC;
     this.parameters.global.duration = duration;
-  }
-
-  reset(): void {
-
   }
 
   onPointerMove(pointermoveEvent: PointerEvent): void {
@@ -175,7 +173,7 @@ export class PointerInput {
     this.parameters.live.speed = 0;
 
     this.parameters.live.isMoving = false;
-    this.state = PointerInputState.Removed;
+    this.state = PointerState.Removed;
 
     this.parameters.global.endTimestamp = pointerupEvent.timeStamp;
 
@@ -197,7 +195,7 @@ export class PointerInput {
 
     this.parameters.live.speed = 0;
 
-    this.state = PointerInputState.Canceled
+    this.state = PointerState.Canceled
 
     this.parameters.live.isMoving = false;
 

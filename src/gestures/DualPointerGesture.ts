@@ -24,7 +24,8 @@ interface DualPointerGestureGlobalParameters {
   finalSpeed: MinMaxInterval,
   hasBeenMoved: BooleanParameter,
   centerMovement: MinMaxInterval,
-  distanceChange: MinMaxInterval, // change in distance between 2 pointers
+  absolutedistanceChange: MinMaxInterval, // change in distance between 2 pointers
+  relativeDistanceChange: MinMaxInterval,
   rotationAngle: MinMaxInterval,
   vectorAngle: MinMaxInterval,
 }
@@ -37,7 +38,8 @@ interface DualPointerGestureLiveParameters {
   distance: MinMaxInterval,
   isMoving: BooleanParameter,
   centerMovement: MinMaxInterval,
-  distanceChange: MinMaxInterval, // change in distance between 2 pointers
+  absoluteDistanceChange: MinMaxInterval,
+  relativeDistanceChange: MinMaxInterval,
   rotationAngle: MinMaxInterval,
   vectorAngle: MinMaxInterval,
 }
@@ -103,7 +105,8 @@ export abstract class DualPointerGesture extends Gesture {
         finalSpeed: [null, null], // px/s
         hasBeenMoved: null,
         centerMovement: [null, null],
-        distanceChange: [null, null],
+        absolutedistanceChange: [null, null],
+        relativeDistanceChange: [null, null],
         rotationAngle: [null, null],
         vectorAngle: [null, null],
       },
@@ -113,7 +116,8 @@ export abstract class DualPointerGesture extends Gesture {
         distance: [null, null], // px
         isMoving: null,
         centerMovement: [null, null],
-        distanceChange: [null, null], // change in distance between 2 pointers
+        absoluteDistanceChange: [null, null],
+        relativeDistanceChange: [null, null],
         rotationAngle: [null, null],
         vectorAngle: [null, null],
       }
