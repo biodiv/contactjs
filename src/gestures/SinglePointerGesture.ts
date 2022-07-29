@@ -3,6 +3,10 @@ import {
   GestureOptions,
   MinMaxInterval,
   BooleanParameter,
+  GestureParameterValue,
+  LiveGestureEventData,
+  GlobalGestureEventData,
+  GestureEventData,
 } from "./Gesture";
 
 import {
@@ -10,10 +14,11 @@ import {
   PointerManagerState,
 } from "../input-consts";
 
+import { PointerGlobalParameters } from "../Pointer";
+import { TimedParameters } from "../interfaces";
+
 import { Point } from "../geometry/Point";
 import { Vector } from "../geometry/Vector";
-import { PointerManager } from "../PointerManager";
-import { Pointer } from "../Pointer";
 import { SinglePointerInput } from "../SinglePointerInput";
 
 /**
@@ -38,44 +43,10 @@ interface SinglePointerGestureLiveParameters {
   isMoving: BooleanParameter,
 }
 
-interface SinglePointerGestureParameters {
+export interface SinglePointerGestureParameters extends TimedParameters {
   global: SinglePointerGestureGlobalParameters,
   live: SinglePointerGestureLiveParameters,
 }
-
-interface GlobalSinglePointerEventData {
-  deltaX: number;
-  deltaY: number;
-  distance: number;
-  speedX: number;
-  speedY: number;
-  speed: number;
-  direction: string;
-  scale: number;
-  rotation: number;
-  srcEvent: PointerEvent;
-}
-
-interface LiveSinglePointerEventData {
-  deltaX: number;
-  deltaY: number;
-  distance: number;
-  speedX: number;
-  speedY: number;
-  speed: number;
-  direction: string;
-  scale: number;
-  rotation: number;
-  center: Point;
-  srcEvent: PointerEvent;
-}
-
-interface SinglePointerGestureEventData {
-  recognizer: Gesture,
-  global: GlobalSinglePointerEventData,
-  live: LiveSinglePointerEventData,
-}
-
 
 export abstract class SinglePointerGesture extends Gesture {
 
@@ -112,90 +83,20 @@ export abstract class SinglePointerGesture extends Gesture {
 
   }
 
-  validateBooleanParameter(gestureParameter: boolean | null, pointerInputValue: boolean) {
-    if (gestureParameter == null || gestureParameter == pointerInputValue) {
-
-      if (this.DEBUG == true) {
-        console.log(
-          `validated: required value: ${gestureParameter}, current value: ${pointerInputValue}`
-        );
-      }
-
-      return true;
-    }
-
-    if (this.DEBUG == true) {
-      console.log(
-        `dismissing ${this.eventBaseName}: required value: ${gestureParameter}, current value: ${pointerInputValue}`
-      );
-    }
-
-    return false;
+  getPointerInputGlobalValue(
+    pointerInput: SinglePointerInput,
+    parameterName: keyof SinglePointerGestureGlobalParameters
+  ): GestureParameterValue {
+    const pointerInputValue = pointerInput.parameters.global[parameterName];
+    return pointerInputValue;
   }
 
-  validateMinMaxParameter(interval: [number | null, number | null], value: number | null): boolean {
-
-    const minValue = interval[0];
-    const maxValue = interval[1];
-
-    if (minValue != null && value != null && value < minValue) {
-      if (this.DEBUG == true) {
-        console.log(
-          `dismissing min${this.eventBaseName}: ${minValue}, current value: ${value}`
-        );
-      }
-
-      return false;
-    }
-
-    if (maxValue != null && value != null && value > maxValue) {
-      if (this.DEBUG == true) {
-        console.log(
-          `dismissing max${this.eventBaseName}: ${maxValue}, current value: ${value}`
-        );
-      }
-
-      return false;
-    }
-
-    if (this.DEBUG == true) {
-      console.log(
-        `validated: minMax: [${minValue}, ${maxValue}] - current value: ${value}`
-      );
-    }
-
-    return true;
-  }
-
-  validateGestureParameter(gestureParameter: MinMaxInterval | BooleanParameter, pointerInputValue: number | boolean | null) {
-
-    let isValid = true;
-
-    if (typeof gestureParameter == "boolean" || gestureParameter == null) {
-
-      if (typeof pointerInputValue != "boolean") {
-        return false;
-      }
-
-      isValid = this.validateBooleanParameter(gestureParameter, pointerInputValue);
-
-    } else {
-
-      const interval = gestureParameter;
-
-      if (typeof pointerInputValue == "boolean") {
-        return false;
-      }
-
-      isValid = this.validateMinMaxParameter(
-        interval,
-        pointerInputValue
-      );
-
-    }
-
-    return isValid;
-
+  getPointerInputLiveValue(
+    pointerInput: SinglePointerInput,
+    parameterName: keyof SinglePointerGestureLiveParameters
+  ): GestureParameterValue {
+    const pointerInputValue = pointerInput.parameters.live[parameterName];
+    return pointerInputValue;
   }
 
   validateGestureParameters(pointerInput: SinglePointerInput): boolean {
@@ -217,43 +118,38 @@ export abstract class SinglePointerGesture extends Gesture {
       gestureParameters = this.initialParameters;
     }
 
-    // maybe somehow combine global and live into one loop - how?
-    let globalParameterName: keyof SinglePointerGestureGlobalParameters;
-    for (globalParameterName in gestureParameters.global) {
+    let timespan: keyof TimedParameters;
+    for (timespan in gestureParameters){
+      const timedGestureParameters = gestureParameters[timespan]; // .global or .live
+      let parameterName: keyof typeof timedGestureParameters;
+      for (parameterName in timedGestureParameters){
 
-      if (this.DEBUG == true) {
-        console.log(
-          `[${this.eventBaseName}] validating global parameter ${globalParameterName}:`
-        );
-      }
+        if (this.DEBUG == true) {
+          console.log(
+            `[${this.eventBaseName}] validating ${timespan} parameter ${parameterName}:`
+          );
+        }
 
-      const gestureParameter = gestureParameters.global[globalParameterName];
-      const pointerInputValue = pointerInput.parameters.global[globalParameterName];
+        const gestureParameter = timedGestureParameters[parameterName];
 
-      isValid = this.validateGestureParameter(gestureParameter, pointerInputValue);
+        var pointerInputValue: GestureParameterValue;
 
-      if (isValid == false) {
-        return false;
-      }
+        if (timespan == "global"){
+          pointerInputValue = this.getPointerInputGlobalValue(pointerInput, parameterName);
+          isValid = this.validateGestureParameter(gestureParameter, pointerInputValue);
+        }
+        else if (timespan == "live"){
+          pointerInputValue = this.getPointerInputLiveValue(pointerInput, parameterName);
+          isValid = this.validateGestureParameter(gestureParameter, pointerInputValue);
+        }
+        else {
+          isValid = false;
+        }
 
-    }
-
-    let liveParameterName: keyof SinglePointerGestureLiveParameters;
-    for (liveParameterName in gestureParameters.live) {
-
-      if (this.DEBUG == true) {
-        console.log(
-          `validating live parameter ${liveParameterName}:`
-        );
-      }
-
-      const gestureParameter = gestureParameters.live[liveParameterName];
-      const pointerInputValue = pointerInput.parameters.live[liveParameterName];
-
-      isValid = this.validateGestureParameter(gestureParameter, pointerInputValue);
-
-      if (isValid == false) {
-        return false;
+        if (isValid == false){
+          return false;
+        }
+        
       }
     }
 
@@ -261,163 +157,12 @@ export abstract class SinglePointerGesture extends Gesture {
 
   }
 
-  validateDirection(singlePointerInput: SinglePointerInput): boolean {
-    // check direction
-    const hasSupportedDirections = !!this.options.supportedDirections;
-    if (
-      hasSupportedDirections &&
-      !this.options.supportedDirections!.includes(
-        singlePointerInput.parameters.live.vector!.direction
-      )
-    ) {
-      if (this.DEBUG == true) {
-        console.log(
-          `[Gestures] dismissing ${this.eventBaseName}: supported directions: ${this.options.supportedDirections}, current direction: ${singlePointerInput.parameters.live.vector!.direction}`
-        );
-      }
-
-      return false;
-    }
-
-    return true;
-  }
-
-  validate(pointerManager: PointerManager): boolean {
-    var isValid = super.validate(pointerManager);
-
-    if (isValid === true) {
-
-      var pointerInput = pointerManager.activePointerInput; // cannot be a DualPointerInput
-
-      if (pointerInput instanceof SinglePointerInput) {
-
-        isValid = this.validateDirection(pointerInput);
-
-        if (isValid == true){
-          isValid = this.validateGestureParameters(pointerInput)
-        }
-
-      }
-      else {
-        isValid = false;
-      }
-
-    }
-
-    return isValid;
-  }
-
-  // recognize depends on PointerInput
-  recognize(pointerManager: PointerManager): void {
-
-    const isValid = this.validate(pointerManager);
-
-    const singlePointerInput = this.getPointerInput(pointerManager);
-
-    if (singlePointerInput instanceof SinglePointerInput) {
-      if (
-        isValid == true &&
-        this.state == GestureState.Inactive
-      ) {
-
-        this.onStart(pointerManager);
-
-      }
-
-      if (
-        isValid == true &&
-        this.state == GestureState.Active
-      ) {
-
-        if (this.initialPointerEvent == null) {
-          this.setInitialPointerEvent(pointerManager);
-        }
-
-        this.emit(pointerManager);
-
-      } else if (this.state == GestureState.Active && isValid == false) {
-
-        this.onEnd(pointerManager);
-
-      }
-    }
-    else {
-      console.log(`not firing event ${this.eventBaseName}. No SinglePointerInput found`);
-    }
-
-  }
-
-  emit(pointerManager: PointerManager, eventName?: string): void {
-
-    // fire general event like "tap", "press", "pan"
-    eventName = eventName || this.eventBaseName;
-
-    if (this.DEBUG === true) {
-      console.log(`[Gestures] detected and firing event ${eventName}`);
-    }
-
-    const singlePointerInput = this.getPointerInput(pointerManager);
-
-    if (singlePointerInput instanceof SinglePointerInput) {
-
-      const target = singlePointerInput.getTarget();
-
-      if (target instanceof EventTarget) {
-
-        const eventData = this.getEventData(singlePointerInput);
-
-        const eventOptions = {
-          detail: eventData,
-          bubbles: this.options.bubbles,
-        };
-
-        const event = new CustomEvent(eventName, eventOptions);
-
-        if (eventOptions.bubbles == true) {
-          target.dispatchEvent(event);
-        } else {
-          this.domElement.dispatchEvent(event);
-        }
-
-        // fire direction specific events
-        const currentDirection = eventData.live!.direction;
-
-        const hasSupportedDirections = !!this.options.supportedDirections;
-        // do not fire events like "panendleft"
-        // only fire directional events if eventName == this.eventBaseName 
-        if (hasSupportedDirections == true && eventName == this.eventBaseName) {
-          for (let d = 0; d < this.options.supportedDirections!.length; d++) {
-            const direction = this.options.supportedDirections![d];
-
-            if (direction == currentDirection) {
-              const directionEventName = eventName + direction;
-
-              if (this.DEBUG == true) {
-                console.log(
-                  `[Gestures] detected and firing event ${directionEventName}`
-                );
-              }
-
-              const directionEvent = new CustomEvent(
-                directionEventName,
-                eventOptions
-              );
-
-              if (eventOptions.bubbles == true) {
-                target.dispatchEvent(directionEvent);
-              } else {
-                this.domElement.dispatchEvent(directionEvent);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  getEventData(singlePointerInput: SinglePointerInput): SinglePointerGestureEventData {
+  getEventData(singlePointerInput: SinglePointerInput): GestureEventData {
     // provide short-cuts to the values collected in the Contact object
     // match this to the event used by hammer.js
+
+    const globalParameters = singlePointerInput.parameters.global;
+    const liveParameters = singlePointerInput.parameters.live;
 
     // gesture specific - dependant on the beginning of the gesture (when the gesture has initially been recognized)
     const globalStartPoint = new Point(
@@ -434,7 +179,7 @@ export abstract class SinglePointerGesture extends Gesture {
       this.initialPointerEvent!.timeStamp;
 
     // global: global for this recognizer, not the Contact object
-    const globalEventData: GlobalSinglePointerEventData = {
+    const globalGestureEventData: GlobalGestureEventData = {
       deltaX: globalVector.x,
       deltaY: globalVector.y,
       distance: globalVector.vectorLength,
@@ -447,21 +192,21 @@ export abstract class SinglePointerGesture extends Gesture {
       srcEvent: singlePointerInput.pointer.currentPointerEvent,
     };
 
-    const liveEventData: LiveSinglePointerEventData = {
-      deltaX: singlePointerInput.parameters.live.vector!.x,
-      deltaY: singlePointerInput.parameters.live.vector!.y,
-      distance: singlePointerInput.parameters.live.vector!.vectorLength,
+    const liveGestureEventData: LiveGestureEventData = {
+      deltaX: liveParameters.vector.x,
+      deltaY: liveParameters.vector.y,
+      distance: liveParameters.vector.vectorLength,
       speedX:
-        singlePointerInput.parameters.live.vector!.x / singlePointerInput.pointer.vectorTimespan,
+        liveParameters.vector.x / singlePointerInput.pointer.vectorTimespan,
       speedY:
-        singlePointerInput.parameters.live.vector!.y / singlePointerInput.pointer.vectorTimespan,
-      speed: singlePointerInput.parameters.live.speed,
-      direction: singlePointerInput.parameters.live.vector!.direction,
+        liveParameters.vector.y / singlePointerInput.pointer.vectorTimespan,
+      speed: liveParameters.speed,
+      direction: liveParameters.vector.direction,
       scale: 1,
       rotation: 0,
       center: {
-        x: singlePointerInput.parameters.live.vector!.endPoint.x,
-        y: singlePointerInput.parameters.live.vector!.endPoint.y,
+        x: liveParameters.vector.endPoint.x,
+        y: liveParameters.vector.endPoint.y,
       },
       srcEvent: singlePointerInput.pointer.currentPointerEvent /*,
       target : primaryPointerInput.touch.target,
@@ -472,40 +217,13 @@ export abstract class SinglePointerGesture extends Gesture {
       pointers : ,*/,
     };
 
-    const eventData: SinglePointerGestureEventData = {
+    const eventData: GestureEventData = {
       recognizer: this,
-      global: globalEventData,
-      live: liveEventData,
+      global: globalGestureEventData,
+      live: liveGestureEventData,
     }
 
     return eventData;
-  }
-
-  setInitialPointerEvent(pointerManager: PointerManager): void {
-    const singlePointerInput = this.getPointerInput(pointerManager);
-    if (singlePointerInput instanceof SinglePointerInput) {
-      const pointerEvent: PointerEvent = singlePointerInput.pointer.currentPointerEvent;
-      this.initialPointerEvent = pointerEvent;
-    }
-  }
-
-
-  /*
-   * The PointerInput for recognition has to be pointerManager.lastRemovedPointer if there is no active pointer left
-   */
-  getPointerInput(pointerManager: PointerManager): SinglePointerInput | null {
-
-    if (pointerManager.hasPointersOnSurface() == true && pointerManager && pointerManager.activePointerInput instanceof SinglePointerInput) {
-      return pointerManager.activePointerInput;
-    }
-    else if (pointerManager.lastRemovedPointer instanceof Pointer) {
-      const pointerInput = pointerManager.getlastRemovedPointerInput();
-      if (pointerInput instanceof SinglePointerInput){
-        return pointerInput;
-      }
-    }
-
-    return null;
   }
 
 }

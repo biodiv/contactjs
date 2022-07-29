@@ -12,10 +12,6 @@ export { PointerListener } from "./PointerListener";
 export { Tap } from "./gestures/Tap";
 export { Press } from "./gestures/Press";
 export { Pan } from "./gestures/Pan";
-/*
-    Press,
-    Pan,
-    Pinch,
-    Rotate,
-    TwoFingerPan
-} from "./gestures";*/
+export { TwoFingerPan } from "./gestures/TwoFingerPan";
+export { Pinch } from "./gestures/Pinch";
+export { Rotate } from "./gestures/Rotate";

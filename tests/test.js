@@ -1,5 +1,5 @@
 "use strict";
-import { PointerListener, Tap, Press, Pan } from '../dist/module.js';
+import { PointerListener, Tap, Press, Pan, TwoFingerPan, Pinch, Rotate } from '../dist/module.js';
 
 var animationFrameId = null;
 
@@ -46,7 +46,7 @@ function loadContact (){
 	
 	var pointerListener = new PointerListener(rectangle, {
 		"DEBUG_POINTERMANAGER" : true,
-		supportedGestures : [Pan, Tap, Press],//[pinch, twoFingerPan],
+		supportedGestures : [Pinch], //, Pan, Tap, Press],//[pinch, twoFingerPan],
 		//supportedGestures : [TwoFingerPan, Pinch],
 		pointerup: function (event, pointerListener){
 			if(pointerListener.pointerManager.hasPointersOnSurface() == false && TAP_ACTIVE == false && PRESS_ACTIVE == false){
@@ -174,15 +174,12 @@ function loadContact (){
 	// TWOFINGERPAN
 	rectangle.addEventListener("twofingerpanstart", function(event){
 		TWOFINGERPANACTIVE = true;
-		
 		showOutput(event);
 	});
 	
 	
 	rectangle.addEventListener("twofingerpan", function(event){
-	
 		onTwoFingerPan(event);
-		
 		showOutput(event);
 	});
 	
@@ -204,9 +201,9 @@ function loadContact (){
 
 function onEnd (event){
 
-	//if (event.detail.contact.isActive == false){
+	if (TWOFINGERPANACTIVE == false && ROTATIONACTIVE == false){
 		resetElementTransform();
-	//}
+	}
 }
 
 
@@ -333,16 +330,14 @@ function onTwoFingerPan (event) {
 
 	rectangle.className = '';
 
-	var contact = event.detail.contact;
-
-	var deltaX = contact.multipointer.globalParameters.centerMovementVector.x;
-	var deltaY = contact.multipointer.globalParameters.centerMovementVector.y;
+	var deltaX = event.detail.global.deltaX;
+	var deltaY = event.detail.global.deltaY;
 	
 	transform.translate = {
 		x : deltaX,
 		y : deltaY
 	};
-	
+
 	requestElementUpdate();
 
 }
@@ -377,10 +372,8 @@ function onPress (event) {
 function onPinch (event){
 
 	rectangle.className = "";
-
-	var contact = event.detail.contact;
 	
-	var relativeDistanceChange = contact.multipointer.globalParameters.relativeDistanceChange;
+	var relativeDistanceChange = event.detail.global.scale;
 	
 	// touchend has no coordinates
 	if (relativeDistanceChange != null){
@@ -403,13 +396,12 @@ function onRotation (event) {
 
 	rectangle.className = "";
 
-	var contact = event.detail.contact;
 
 	transform.rotate = {
 		x : 0,
 		y : 0,
 		z : 1,
-		angle: contact.multipointer.globalParameters.rotationAngle 
+		angle: event.detail.global.rotation 
 	};
 	
 	console.log(transform)

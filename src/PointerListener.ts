@@ -87,7 +87,7 @@ export class PointerListener {
       ...options
     };
 
-    this.DEBUG = this.options.DEBUG;
+    this.DEBUG = true; //this.options.DEBUG;
 
     const supportedGestures = options.supportedGestures ?? ALL_GESTURE_CLASSES;
 
@@ -138,38 +138,48 @@ export class PointerListener {
     const onPointerDown = this.onPointerDown.bind(this);
     const onPointerMove = this.onPointerMove.bind(this);
     const onPointerUp = this.onPointerUp.bind(this);
-    const onPointerLeave = this.onPointerLeave.bind(this);
+    //const onPointerLeave = this.onPointerLeave.bind(this);
+    //const onPointerOut = this.onPointerOut.bind(this);
     const onPointerCancel = this.onPointerCancel.bind(this);
 
     domElement.addEventListener("pointerdown", onPointerDown, { passive: true });
     domElement.addEventListener("pointermove", onPointerMove, { passive: true });
     domElement.addEventListener("pointerup", onPointerUp, { passive: true });
-    domElement.addEventListener("pointerleave", onPointerLeave, { passive: true });
+    /*
+     * case: user presses mouse button and moves element. while moving, the cursor leaves the element (fires pointerout)
+     *		while outside the element, the mouse button is released. pointerup is not fired.
+     *		during pan, pan should not end if the pointer leaves the element.
+     * MDN: Pointer capture allows events for a particular pointer event (PointerEvent) to be re-targeted to a particular element instead of the normal (or hit test) target at a pointer's location. This can be used to ensure that an element continues to receive pointer events even if the pointer device's contact moves off the element (such as by scrolling or panning).
+     *  this problem is solved by using setPointerCapture()
+     */
+    //domElement.addEventListener("pointerleave", onPointerLeave, { passive: true });
+    //domElement.addEventListener("pointerout", onPointerOut, { passive: true });
     domElement.addEventListener("pointercancel", onPointerCancel, { passive: true });
 
     this.pointerEventHandlers = {
       pointerdown: onPointerDown,
       pointermove: onPointerMove,
       pointerup: onPointerUp,
-      pointerleave: onPointerLeave,
+      //pointerleave: onPointerLeave,
+      //pointerout: onPointerOut,
       pointercancel: onPointerCancel,
     };
 
   }
 
   // there may be more than one pointer. Each new pointer fires onPointerDown
-  private onPointerDown(event: PointerEvent) {
+  private onPointerDown(pointerdownEvent: PointerEvent) {
     if (this.DEBUG == true) {
       console.log(`[PointerListener] pointerdown event detected`);
     }
 
     // re-target all pointerevents to the current element
     // see https://developer.mozilla.org/en-US/docs/Web/API/Element/setPointerCapture
-    this.domElement.setPointerCapture(event.pointerId);
+    this.domElement.setPointerCapture(pointerdownEvent.pointerId);
 
-    this.pointerManager.addPointer(event);
+    this.pointerManager.addPointer(pointerdownEvent);
 
-    this.options.pointerdown?.(event, this);
+    this.options.pointerdown?.(pointerdownEvent, this);
 
     // before starting a new interval, make sure the old one is stopped if present
     if (this.idleRecognitionIntervalId != null) {
@@ -181,39 +191,39 @@ export class PointerListener {
     }, 100);
   }
 
-  private onPointerMove(event: PointerEvent) {
+  private onPointerMove(pointermoveEvent: PointerEvent) {
     // pointermove is also firing if the mouse button is not pressed
 
     if (this.pointerManager.hasPointersOnSurface() == true) {
       // this would disable vertical scrolling - which should only be disabled if a panup/down or swipeup/down listener has been triggered
       // event.preventDefault();
 
-      this.pointerManager.onPointerMove(event);
+      this.pointerManager.onPointerMove(pointermoveEvent);
       this.recognizeGestures();
 
-      this.options.pointermove?.(event, this);
+      this.options.pointermove?.(pointermoveEvent, this);
     }
   }
 
-  private onPointerUp(event: PointerEvent) {
+  private onPointerUp(pointerupEvent: PointerEvent) {
     if (this.DEBUG == true) {
       console.log("[PointerListener] pointerup event detected");
     }
 
-    this.domElement.releasePointerCapture(event.pointerId);
+    this.domElement.releasePointerCapture(pointerupEvent.pointerId);
 
     if (this.pointerManager.hasPointersOnSurface() == true) {
 
-      this.pointerManager.onPointerUp(event);
+      this.pointerManager.onPointerUp(pointerupEvent);
       this.recognizeGestures();
 
-      this.options.pointerup?.(event, this);
+      this.options.pointerup?.(pointerupEvent, this);
     }
 
     this.clearIdleRecognitionInterval();
   }
 
-  private onPointerLeave(event: PointerEvent) {
+  /*private onPointerLeave(event: PointerEvent) {
     if (this.DEBUG == true) {
       console.log("[PointerListener] pointerleave detected");
     }
@@ -226,19 +236,32 @@ export class PointerListener {
     this.clearIdleRecognitionInterval();
   }
 
-  private onPointerCancel(event: PointerEvent) {
-    this.domElement.releasePointerCapture(event.pointerId);
+  private onPointerOut(pointeroutEvent: PointerEvent) {
+    if (this.DEBUG == true) {
+      console.log("[PointerListener] pointerout detected");
+    }
+
+    if (this.pointerManager.hasPointersOnSurface() == true) {
+      this.pointerManager.onPointerOut(pointeroutEvent);
+      this.recognizeGestures();
+    }
+
+    this.clearIdleRecognitionInterval();
+  }*/
+
+  private onPointerCancel(pointercancelEvent: PointerEvent) {
+    this.domElement.releasePointerCapture(pointercancelEvent.pointerId);
 
     if (this.DEBUG == true) {
       console.log("[PointerListener] pointercancel detected");
     }
 
-    this.pointerManager.onPointerCancel(event);
+    this.pointerManager.onPointerCancel(pointercancelEvent);
     this.recognizeGestures();
 
     this.clearIdleRecognitionInterval();
 
-    this.options.pointercancel?.(event, this);
+    this.options.pointercancel?.(pointercancelEvent, this);
   }
 
   public removePointerEventListeners(): void {

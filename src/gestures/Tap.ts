@@ -29,7 +29,11 @@ export class Tap extends SinglePointerGesture {
 
   validate(pointerManager: PointerManager): boolean {
 
-    let isValid: boolean = Gesture.prototype.validate.call(this, pointerManager);
+    let isValid = this.validateGestureState();
+
+    if (isValid == true){
+      isValid = this.validatePointerManagerState(pointerManager);
+    }
 
     if (isValid === true) {
 

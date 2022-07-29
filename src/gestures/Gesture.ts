@@ -1,27 +1,71 @@
 import { PointerManager } from "../PointerManager";
 import { SinglePointerInput } from "../SinglePointerInput";
 import { DualPointerInput } from "../DualPointerInput";
+import { Pointer } from "../Pointer";
+import { Point } from "../geometry/Point";
+
+import { TimedParameters } from "../interfaces";
 
 import {
   GestureState,
   PointerManagerState,
 } from "../input-consts";
+import { SinglePointerGestureParameters } from "./SinglePointerGesture";
+import { DualPointerGestureParameters } from "./DualPointerGesture";
 
-export type MinMaxInterval = [number | null, number | null];
+
+export type MinMaxValue = number | null;
+export type MinMaxInterval = [MinMaxValue, MinMaxValue];
 export type BooleanParameter = boolean | null;
+export type GestureParameterValue = MinMaxValue | BooleanParameter;
 
+type SinglePointerInputConstructor = new (...args: ConstructorParameters<typeof SinglePointerInput>) => SinglePointerInput;
+type DualPointerInputConstructor = new (...args: ConstructorParameters<typeof DualPointerInput>) => DualPointerInput;
 
 export interface GestureOptions {
   DEBUG: boolean;
   blocks: Gesture[];
   bubbles: boolean;
-  supportedDirections?: string[];
+  supportedDirections: string[];
 }
 
+export interface GlobalGestureEventData {
+  deltaX: number;
+  deltaY: number;
+  distance: number;
+  speedX: number;
+  speedY: number;
+  speed: number;
+  direction: string;
+  scale: number;
+  rotation: number;
+  srcEvent: PointerEvent;
+}
+
+export interface LiveGestureEventData {
+  deltaX: number;
+  deltaY: number;
+  distance: number;
+  speedX: number;
+  speedY: number;
+  speed: number;
+  direction: string;
+  scale: number;
+  rotation: number;
+  center: Point;
+  srcEvent: PointerEvent;
+}
+
+export interface GestureEventData extends TimedParameters {
+  recognizer: Gesture,
+  global: GlobalGestureEventData,
+  live: LiveGestureEventData,
+}
 
 export abstract class Gesture {
 
   validPointerManagerState: PointerManagerState | null;
+  validPointerInputConstructor: SinglePointerInputConstructor | DualPointerInputConstructor;
 
   options: GestureOptions;
   DEBUG: boolean;
@@ -39,6 +83,7 @@ export abstract class Gesture {
     this.state = GestureState.Inactive;
 
     this.validPointerManagerState = null;
+    this.validPointerInputConstructor = SinglePointerInput;
 
     this.domElement = domElement;
 
@@ -47,6 +92,7 @@ export abstract class Gesture {
     this.options = {
       bubbles: true,
       blocks: [],
+      supportedDirections: [],
       DEBUG: false,
       ...options
     };
@@ -55,18 +101,68 @@ export abstract class Gesture {
 
   }
 
-  // validate pointerCount and GestureState.Blocked
-  validate(pointerManager: PointerManager): boolean {
+  validateGestureParameters(pointerInput: SinglePointerInput | DualPointerInput): boolean {
+    throw new Error("not implemented");
+  }
 
-    if (this.state == GestureState.Blocked) {
-      return false;
-    }
-
-    if (pointerManager.state != this.validPointerManagerState) {
+  validateBooleanParameter(gestureParameter: boolean | null, pointerInputValue: boolean) {
+    if (gestureParameter == null){
+      return true;
+    } else if (gestureParameter == pointerInputValue) {
 
       if (this.DEBUG == true) {
         console.log(
-          `[Gesture] PointerManagerState invalidated: ${pointerManager.state}`
+          `validated: required value: ${gestureParameter}, current value: ${pointerInputValue}`
+        );
+      }
+
+      return true;
+    }
+
+    if (this.DEBUG == true) {
+      console.log(
+        `dismissing ${this.eventBaseName}: required value: ${gestureParameter}, current value: ${pointerInputValue}`
+      );
+    }
+
+    return false;
+  }
+
+  validateMinMaxParameter(interval: MinMaxInterval, value: MinMaxValue): boolean {
+
+    const minValue: MinMaxValue = interval[0];
+    const maxValue: MinMaxValue = interval[1];
+
+    if (
+      minValue == null &&
+      maxValue == null
+    ){
+      return true;
+    }
+
+    if (
+      minValue != null &&
+      value != null &&
+      value < minValue
+    ) {
+
+      if (this.DEBUG == true) {
+        console.log(
+          `dismissing min${this.eventBaseName}: ${minValue}, current value: ${value}`
+        );
+      }
+
+      return false;
+    }
+
+    if (
+      maxValue != null &&
+      value != null &&
+      value > maxValue
+    ) {
+      if (this.DEBUG == true) {
+        console.log(
+          `dismissing max${this.eventBaseName}: ${maxValue}, current value: ${value}`
         );
       }
 
@@ -75,28 +171,259 @@ export abstract class Gesture {
 
     if (this.DEBUG == true) {
       console.log(
-        `[Gesture] PointerManagerState validated: ${pointerManager.state}`
+        `validated: minMax: [${minValue}, ${maxValue}] - current value: ${value}`
       );
     }
 
     return true;
   }
 
-  // implementation differs for SinglePointerGesture and DualPointerGesture
-  getPointerInput(pointerManager: PointerManager): SinglePointerInput | DualPointerInput | null {
-    throw new Error("[Gesture] Gesture subclasses require a .getPointerInput() method");
+  validateGestureParameter(gestureParameter: MinMaxInterval | BooleanParameter, pointerInputValue: number | boolean | null) {
+
+    let isValid = true;
+
+    if (typeof gestureParameter == "boolean" || gestureParameter == null) {
+
+      if (typeof pointerInputValue != "boolean") {
+        return false;
+      }
+
+      isValid = this.validateBooleanParameter(gestureParameter, pointerInputValue);
+
+    } else {
+
+      const interval: MinMaxInterval = gestureParameter;
+
+      if (typeof pointerInputValue == "boolean") {
+        return false;
+      }
+
+      isValid = this.validateMinMaxParameter(
+        interval,
+        pointerInputValue
+      );
+
+    }
+
+    return isValid;
+
+  }
+
+  validateDirection(pointerInput: SinglePointerInput | DualPointerInput): boolean {
+
+    const currentDirection = pointerInput.getCurrentDirection();
+
+    if (
+      this.options.supportedDirections.length &&
+      !this.options.supportedDirections.includes(
+        currentDirection
+      )
+    ) {
+      if (this.DEBUG == true) {
+        console.log(
+          `[Gestures] dismissing ${this.eventBaseName}: supported directions: ${this.options.supportedDirections}, current direction: ${currentDirection}`
+        );
+      }
+
+      return false;
+    }
+
+    return true;
+  }
+
+  validateGestureState(): boolean {
+    if (this.state == GestureState.Blocked) {
+      return false;
+    }
+    return true;
+  }
+
+  validatePointerManagerState(pointerManager: PointerManager): boolean {
+    if (pointerManager.state == this.validPointerManagerState) {
+      return true;
+    }
+
+    if (this.DEBUG == true) {
+      console.log(
+        `[Gesture] PointerManagerState invalidated: ${pointerManager.state}`
+      );
+    }
+
+    return false;
+  }
+
+  validatePointerInputConstructor(pointerInput: SinglePointerInput | DualPointerInput): boolean {
+    if (pointerInput instanceof this.validPointerInputConstructor) {
+      return true;
+    }
+
+    if (this.DEBUG == true) {
+      console.log(
+        `[Gesture] PointerInputConstructor invalidated: ${this.validPointerInputConstructor}`
+      );
+    }
+
+    return false;
+  }
+
+  // validate pointerCount and GestureState.Blocked
+  validate(pointerManager: PointerManager): boolean {
+
+    let isValid = this.validateGestureState();
+
+    if (isValid == true){
+      isValid = this.validatePointerManagerState(pointerManager);
+    }
+
+    var pointerInput = pointerManager.activePointerInput;
+
+    if (
+      isValid == true &&
+      pointerInput != null
+    ) {
+      isValid = this.validatePointerInputConstructor(pointerInput);
+
+      if (isValid == true){
+        isValid = this.validateDirection(pointerInput);
+      }
+
+      if (isValid == true) {
+        isValid = this.validateGestureParameters(pointerInput)
+      }
+    }
+
+    return isValid;
   }
 
   recognize(pointerManager: PointerManager): void {
-    throw new Error("[Gesture] Gesture subclasses require a .recognize() method");
+    const isValid = this.validate(pointerManager);
+
+    if (
+      isValid == true &&
+      this.state == GestureState.Inactive
+    ) {
+      this.onStart(pointerManager);
+    }
+
+    if (
+      isValid == true &&
+      this.state == GestureState.Active
+    ) {
+
+      if (this.initialPointerEvent == null) {
+        this.setInitialPointerEvent(pointerManager);
+      }
+
+      this.emit(pointerManager);
+
+    } else if (this.state == GestureState.Active && isValid == false) {
+
+      this.onEnd(pointerManager);
+
+
+    }
+    else {
+      if (this.DEBUG == true) {
+        console.log(
+          `not firing event ${this.eventBaseName}. No SinglePointerInput found`
+        );
+      }
+    }
   }
 
-  emit(pointerManager: PointerManager, eventName?: string): void {
-    throw new Error("[Gesture] Gesture subclasses require a .emit() method");
+  /*
+   * The PointerInput for recognition has to be pointerManager.lastRemovedPointer if there is no active pointer left
+   */
+  getPointerInput(pointerManager: PointerManager): SinglePointerInput | DualPointerInput | null {
+
+    if (pointerManager.hasPointersOnSurface() == true && pointerManager.activePointerInput instanceof this.validPointerInputConstructor) {
+      return pointerManager.activePointerInput;
+    }
+    else if (pointerManager.lastRemovedPointer instanceof Pointer) {
+      const pointerInput = pointerManager.getlastRemovedPointerInput();
+      if (pointerInput instanceof this.validPointerInputConstructor){
+        return pointerInput;
+      }
+    }
+
+    return null;
   }
 
   setInitialPointerEvent(pointerManager: PointerManager): void {
-    throw new Error("[Gesture] Gesture subclasses require a .setInitialPointerEvent() method");
+    const pointerInput = this.getPointerInput(pointerManager);
+    if (pointerInput instanceof this.validPointerInputConstructor) {
+      const pointerEvent: PointerEvent = pointerInput.getCurrentPointerEvent();
+      this.initialPointerEvent = pointerEvent;
+    }
+  }
+
+  emit(pointerManager: PointerManager, eventName?: string): void {
+
+    // fire general event like "tap", "press", "pan"
+    eventName = eventName || this.eventBaseName;
+
+    if (this.DEBUG === true) {
+      console.log(`[Gestures] detected and firing event ${eventName}`);
+    }
+
+    const pointerInput = this.getPointerInput(pointerManager);
+
+    if (pointerInput != null){
+
+      const target = pointerInput.getTarget();
+
+      if (target instanceof EventTarget) {
+
+        const eventData = this.getEventData(pointerInput);
+
+        const eventOptions = {
+          detail: eventData,
+          bubbles: this.options.bubbles,
+        };
+
+        const event = new CustomEvent(eventName, eventOptions);
+
+        if (eventOptions.bubbles == true) {
+          target.dispatchEvent(event);
+        } else {
+          this.domElement.dispatchEvent(event);
+        }
+
+        // fire direction specific events
+        const currentDirection = eventData.live!.direction;
+
+        const hasSupportedDirections = !!this.options.supportedDirections;
+        // do not fire events like "panendleft"
+        // only fire directional events if eventName == this.eventBaseName 
+        if (hasSupportedDirections == true && eventName == this.eventBaseName) {
+          for (let d = 0; d < this.options.supportedDirections!.length; d++) {
+            const direction = this.options.supportedDirections![d];
+
+            if (direction == currentDirection) {
+              const directionEventName = eventName + direction;
+
+              if (this.DEBUG == true) {
+                console.log(
+                  `[Gestures] detected and firing event ${directionEventName}`
+                );
+              }
+
+              const directionEvent = new CustomEvent(
+                directionEventName,
+                eventOptions
+              );
+
+              if (eventOptions.bubbles == true) {
+                target.dispatchEvent(directionEvent);
+              } else {
+                this.domElement.dispatchEvent(directionEvent);
+              }
+            }
+          }
+        }
+      }
+    }
+    
   }
 
   onStart(pointerManager: PointerManager): void {
@@ -142,7 +469,9 @@ export abstract class Gesture {
       const gesture = this.options.blocks[g];
       if (gesture.state == GestureState.Inactive) {
         if (this.DEBUG == false) {
-          console.log(`[Gesture] blocking ${gesture.eventBaseName}`);
+          console.log(
+            `[Gesture] blocking ${gesture.eventBaseName}`
+          );
         }
         gesture.state = GestureState.Blocked;
       }
@@ -155,4 +484,9 @@ export abstract class Gesture {
       gesture.state = GestureState.Inactive;
     }
   }
+
+  getEventData(pointerInput: SinglePointerInput | DualPointerInput): GestureEventData {
+    throw new Error("Gesture subclasses require a getEventData method()")
+  }
+
 }

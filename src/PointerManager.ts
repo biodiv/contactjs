@@ -59,8 +59,8 @@ export class PointerManager {
     if (this.activePointerInput == null) {
       this.setActiveSinglePointerInput(pointer);
     }
-    else if (this.activePointerInput instanceof Pointer) {
-      this.setActiveDualPointerInput(this.activePointerInput, pointer);
+    else if (this.activePointerInput instanceof SinglePointerInput) {
+      this.setActiveDualPointerInput(this.activePointerInput.pointer, pointer);
     }
     else if (this.activePointerInput instanceof DualPointerInput) {
       this.unusedPointers[pointer.pointerId] = pointer;
@@ -79,7 +79,8 @@ export class PointerManager {
   removePointer(pointerId: number): void {
 
     if (this.DEBUG == true) {
-      console.log(`[PointerManager] removing Pointer #${pointerId}`);
+      console.log(`[PointerManager] starting to remove Pointer #${pointerId}`);
+      console.log(`[PointerManager] state: ${this.state}`); 
     }
 
     const pointer: Pointer = this.onSurfacePointers[pointerId];
@@ -96,7 +97,11 @@ export class PointerManager {
     // DualPointerInput -> SinglePointerInput
     // OR DualPointerInput -> new DualPointerInput
     if (this.activePointerInput instanceof DualPointerInput) {
-      if (pointerId in this.activePointerInput.pointerIds) {
+
+      if (this.activePointerInput.pointerIds.has(pointerId)) {
+        if (this.DEBUG == true) {
+          console.log(`[PointerManager] removing Pointer #${pointerId} from DualPointerInput`);
+        }
         const remainingPointer = this.activePointerInput.removePointer(pointerId);
         this.activePointerInput = null;
 
@@ -114,6 +119,11 @@ export class PointerManager {
         // a 3rd pointer which has not been part of DualPointerInput has been removed
       }
     } else if (this.activePointerInput instanceof SinglePointerInput) {
+
+      if (this.DEBUG == true) {
+        console.log(`[PointerManager] removing Pointer #${pointerId} from SinglePointerInput`);
+      }
+
       this.activePointerInput = null;
       this.state = PointerManagerState.NoPointer;
       // this should not be necessary
@@ -225,6 +235,9 @@ export class PointerManager {
   }
 
   onPointerUp(pointerupEvent: PointerEvent): void {
+    if (this.DEBUG == true) {
+      console.log(`[PointerManager] pointerup detected`);
+    }
     const pointer = this.getPointerFromId(pointerupEvent.pointerId);
     if (pointer instanceof Pointer) {
       pointer.onPointerUp(pointerupEvent);
@@ -237,7 +250,10 @@ export class PointerManager {
 
   }
 
-  onPointerLeave(pointerleaveEvent: PointerEvent): void {
+  /*onPointerLeave(pointerleaveEvent: PointerEvent): void {
+    if (this.DEBUG == true) {
+      console.log(`[PointerManager] pointerLeave detected`);
+    }
     const pointer = this.getPointerFromId(pointerleaveEvent.pointerId);
     if (pointer instanceof Pointer) {
       pointer.onPointerLeave(pointerleaveEvent);
@@ -247,7 +263,25 @@ export class PointerManager {
     // the pointer left the bound element
     this.removePointer(pointerleaveEvent.pointerId);
   }
+
+  onPointerOut(pointeroutEvent: PointerEvent): void {
+    if (this.DEBUG == true) {
+      console.log(`[PointerManager] pointerout detected`);
+    }
+    const pointer = this.getPointerFromId(pointeroutEvent.pointerId);
+    if (pointer instanceof Pointer) {
+      pointer.onPointerLeave(pointeroutEvent);
+    }
+    this.activePointerInput?.onPointerLeave(pointeroutEvent);
+    // pointerleave does not mean th pointer left the surface
+    // the pointer left the bound element
+    this.removePointer(pointeroutEvent.pointerId);
+  }*/
+
   onPointerCancel(pointercancelEvent: PointerEvent): void {
+    if (this.DEBUG == true) {
+      console.log(`[PointerManager] pointercancel detected`);
+    }
     const pointer = this.getPointerFromId(pointercancelEvent.pointerId);
     if (pointer instanceof Pointer) {
       pointer.onPointerCancel(pointercancelEvent);

@@ -17,7 +17,7 @@ import { Vector } from "./geometry/Vector";
 ********************************************************************************************************************/
 
 // parameters for recognizing the gesture
-interface PointerGlobalParameters {
+export interface PointerGlobalParameters {
   duration: number, // ms
   currentSpeed: number, // px/s
   averageSpeed: number, // px/s
@@ -39,7 +39,7 @@ interface PointerGlobalParameters {
   hasBeenMoved: boolean,
 }
 
-interface PointerLiveParameters {
+export interface PointerLiveParameters {
   duration: number, // ms
   speed: number,
   vector: Vector,
@@ -47,7 +47,12 @@ interface PointerLiveParameters {
   isMoving: boolean,
 }
 
-export interface PointerParameters {
+export interface PointerParametersBase {
+  live: {},
+  global: {},
+}
+
+export interface PointerParameters extends PointerParametersBase{
   live: PointerLiveParameters,
   global: PointerGlobalParameters,
 }

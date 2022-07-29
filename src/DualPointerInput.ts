@@ -1,31 +1,40 @@
 import { Geometry } from "./geometry/Geometry";
 import { Point } from "./geometry/Point";
 import { Vector } from "./geometry/Vector";
-import { Pointer } from "./Pointer";
+import { 
+  Pointer,
+  PointerParametersBase,
+} from "./Pointer";
 
 
 interface DualPointerInputGlobalParameters {
-  center: Point,
-  centerMovement: number, // px
-  centerMovementVector: Vector,
-  absoluteDistanceChange: number, // px
-  relativeDistanceChange: number, // %
-  rotationAngle: number,
-  vectorAngle: number,
   duration: number,
+  center: Point,
+  centerHasBeenMoved: boolean,
+  centerMovementDistance: number,
+  centerMovementVector: Vector,
+  absolutePointerDistanceChange: number, // px
+  relativePointerDistanceChange: number, // %
+  rotationAngle: number,
+  absoluteRotationAngle: number,
+  vectorAngle: number,
+  absoluteVectorAngle: number,
 }
 
 interface DualPointerInputLiveParameters {
   center: Point,
-  centerMovement: number,
+  centerIsMoving: boolean,
+  centerMovementDistance: number,
   centerMovementVector: Vector,
-  absoluteDistanceChange: number,
-  relativeDistanceChange: number,
+  absolutePointerDistanceChange: number,
+  relativePointerDistanceChange: number,
   rotationAngle: number,
+  absoluteRotationAngle: number,
   vectorAngle: number,
+  absoluteVectorAngle: number,
 }
 
-interface DualPointerInputParameters {
+interface DualPointerInputParameters extends PointerParametersBase {
   global: DualPointerInputGlobalParameters,
   live: DualPointerInputLiveParameters,
 }
@@ -46,6 +55,7 @@ export class DualPointerInput {
   readonly parameters: DualPointerInputParameters;
 
   readonly initialPointerEvent: PointerEvent;
+  currentPointerEvent: PointerEvent;
 
   readonly startTimestamp: number;
 
@@ -63,6 +73,7 @@ export class DualPointerInput {
     this.pointer_2 = pointer_2;
 
     this.initialPointerEvent = pointer_1.initialPointerEvent;
+    this.currentPointerEvent = pointer_1.initialPointerEvent;
 
     const globalVector_1 = this.pointer_1.parameters.global.vector;
     const globalVector_2 = this.pointer_2.parameters.global.vector;
@@ -70,14 +81,17 @@ export class DualPointerInput {
     const globalCenterMovementVector = Geometry.getCenterMovementVector(globalVector_1, globalVector_2);
 
     var globalParameters: DualPointerInputGlobalParameters = {
-      center: globalCenter,
-      centerMovement: 0,
-      centerMovementVector: globalCenterMovementVector,
-      absoluteDistanceChange: 0,
-      relativeDistanceChange: 0,
-      rotationAngle: 0,
-      vectorAngle: 0,
       duration: 0,
+      center: globalCenter,
+      centerHasBeenMoved: false,
+      centerMovementDistance: 0,
+      centerMovementVector: globalCenterMovementVector,
+      absolutePointerDistanceChange: 0,
+      relativePointerDistanceChange: 0,
+      rotationAngle: 0,
+      absoluteRotationAngle: 0,
+      vectorAngle: 0,
+      absoluteVectorAngle: 0,
     };
 
     const liveVector_1 = this.pointer_1.parameters.live.vector;
@@ -88,12 +102,15 @@ export class DualPointerInput {
 
     var liveParameters: DualPointerInputLiveParameters = {
       center: liveCenter,
-      centerMovement: 0,
+      centerIsMoving: false,
+      centerMovementDistance: 0,
       centerMovementVector: liveCenterMovementVector,
-      absoluteDistanceChange: 0,
-      relativeDistanceChange: 0,
+      absolutePointerDistanceChange: 0,
+      relativePointerDistanceChange: 0,
       rotationAngle: 0,
+      absoluteRotationAngle: 0,
       vectorAngle: 0,
+      absoluteVectorAngle: 0,
     };
 
     var parameters: DualPointerInputParameters = {
@@ -120,7 +137,11 @@ export class DualPointerInput {
     return this.initialPointerEvent.target;
   }
 
-  update (): void {
+  update (pointerEvent?: PointerEvent): void {
+
+    if (pointerEvent instanceof PointerEvent){
+      this.currentPointerEvent = pointerEvent;
+    }
 
     const now = new Date().getTime();
     this.parameters.global["duration"] = now - this.startTimestamp;
@@ -136,10 +157,13 @@ export class DualPointerInput {
 
     this.parameters.global["center"] = globalCenter;
     this.parameters.global["centerMovementVector"] = globalCenterMovementVector;
-    this.parameters.global["absoluteDistanceChange"] = globalAbsoluteDistanceChange;
-    this.parameters.global["relativeDistanceChange"] = globalRelativeDistanceChange;
+    this.parameters.global["centerMovementDistance"] = globalCenterMovementVector.vectorLength;
+    this.parameters.global["absolutePointerDistanceChange"] = globalAbsoluteDistanceChange;
+    this.parameters.global["relativePointerDistanceChange"] = globalRelativeDistanceChange;
     this.parameters.global["rotationAngle"] = globalRotationAngle;
+    this.parameters.global["absoluteRotationAngle"] = Math.abs(globalRotationAngle);
     this.parameters.global["vectorAngle"] = globalVectorAngle;
+    this.parameters.global["absoluteVectorAngle"] = Math.abs(globalVectorAngle);
 
     const liveVector_1 = this.pointer_1.parameters.live.vector;
     const liveVector_2 = this.pointer_2.parameters.live.vector;
@@ -151,32 +175,52 @@ export class DualPointerInput {
     const liveRotationAngle = Geometry.calculateRotationAngle(liveVector_1, liveVector_2);
     const liveVectorAngle = Geometry.calculateVectorAngle(liveVector_1, liveVector_2);
 
+    if (liveCenterMovementVector.vectorLength > 0){
+      this.parameters.live.centerIsMoving = true;
+      this.parameters.global.centerHasBeenMoved = true;
+    } 
+    else {
+      this.parameters.live.centerIsMoving = false;
+    }
+
     this.parameters.live["center"] = liveCenter;
+    this.parameters.live["centerMovementDistance"] = liveCenterMovementVector.vectorLength;
     this.parameters.live["centerMovementVector"] = liveCenterMovementVector;
-    this.parameters.live["absoluteDistanceChange"] = liveAbsoluteDistanceChange;
-    this.parameters.live["relativeDistanceChange"] = liveRelativeDistanceChange;
+    this.parameters.live["absolutePointerDistanceChange"] = liveAbsoluteDistanceChange;
+    this.parameters.live["relativePointerDistanceChange"] = liveRelativeDistanceChange;
     this.parameters.live["rotationAngle"] = liveRotationAngle;
+    this.parameters.live["absoluteRotationAngle"] = Math.abs(liveRotationAngle);
     this.parameters.live["vectorAngle"] = liveVectorAngle;
+    this.parameters.live["absoluteVectorAngle"] = Math.abs(liveVectorAngle);
   }
 
   onPointerMove(pointermoveEvent: PointerEvent): void {
-    this.update();
+    this.update(pointermoveEvent);
   }
 
   onPointerUp(pointerupEvent: PointerEvent): void {
-    this.update();
+    this.update(pointerupEvent);
   }
 
   onPointerLeave(pointerleaveEvent: PointerEvent): void {
-    this.update();
+    this.update(pointerleaveEvent);
   }
 
   onPointerCancel(pointercancelEvent: PointerEvent): void {
-    this.update();
+    this.update(pointercancelEvent);
   }
 
   onIdle(): void {
     this.update();
+  }
+
+  // string is not good, it should be Direction
+  getCurrentDirection() : string {
+    return this.parameters.live.centerMovementVector.direction;
+  }
+
+  getCurrentPointerEvent(): PointerEvent {
+    return this.currentPointerEvent;
   }
 
 }

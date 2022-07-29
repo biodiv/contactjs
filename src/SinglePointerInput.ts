@@ -1,6 +1,5 @@
 import { Pointer, PointerParameters } from "./Pointer";
 
-
 export class SinglePointerInput {
 
   pointer: Pointer;
@@ -13,6 +12,15 @@ export class SinglePointerInput {
 
   getTarget(): EventTarget | null {
     return this.pointer.initialPointerEvent.target;
+  }
+
+  getCurrentPointerEvent(): PointerEvent {
+    return this.pointer.currentPointerEvent;
+  }
+
+  // string is not good, it should be Direction
+  getCurrentDirection() : string {
+    return this.parameters.live.vector.direction;
   }
 
   onIdle(): void { }
