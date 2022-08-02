@@ -12,6 +12,7 @@ import {
 } from "../input-consts";
 
 import {
+  DualPointerGestureParameters,
   SinglePointerGestureParameters,
 } from "../interfaces";
 
@@ -31,87 +32,11 @@ export abstract class SinglePointerGesture extends Gesture {
     this.initialPointerEvent = null;
     this.validPointerManagerState = PointerManagerState.SinglePointer;
 
-    var nullRecognitionParameters: SinglePointerGestureParameters = {
-      global: {
-        min: {},
-        max: {},
-        boolean: {},
-      },
-
-      live: {
-        min: {},
-        max: {},
-        boolean: {},
-      }
-    };
+    let nullRecognitionParameters = this.getEmptyGestureParameters() as SinglePointerGestureParameters;    
 
     this.initialParameters = { ...nullRecognitionParameters };
     // a deep copy of the parameters is needed as they can have different values
     this.activeStateParameters = JSON.parse(JSON.stringify({ ...nullRecognitionParameters }));
-
-  }
-
-  validateGestureParameters(pointerInput: SinglePointerInput): boolean {
-
-    var gestureParameters: SinglePointerGestureParameters;
-
-    let isValid: boolean = true;
-
-    if (this.state == GestureState.Active) {
-      gestureParameters = this.activeStateParameters;
-      if (this.DEBUG == true) {
-        console.log(
-          `[${this.eventBaseName}] validating using activeStateParameters`
-        );
-        console.log(gestureParameters);
-      }
-    } else {
-      if (this.DEBUG == true) {
-        console.log(
-          `[${this.eventBaseName}] validating using initialParameters`
-        );
-      }
-      gestureParameters = this.initialParameters;
-    }
-
-
-    let timespan:keyof typeof gestureParameters;
-    for (timespan in gestureParameters){
-      const timedParameters = gestureParameters[timespan];
-      let minOrMaxOrBoolean: keyof typeof timedParameters;
-      for (minOrMaxOrBoolean in timedParameters){
-        const evaluationParameters = timedParameters[minOrMaxOrBoolean];
-        let gestureParameterName: keyof typeof evaluationParameters;
-        for (gestureParameterName in evaluationParameters){
-          const gestureParameter = evaluationParameters[gestureParameterName];
-          const pointerInputValue = pointerInput.parameters[timespan][gestureParameterName];
-
-          if (this.DEBUG == true) {
-            console.log(
-              `[${this.eventBaseName}] validating ${timespan} ${minOrMaxOrBoolean}: required: ${gestureParameter}, pointer: ${pointerInputValue}`
-            );
-          }
-
-          if (typeof gestureParameter == "boolean" && typeof pointerInputValue == "boolean"){
-            isValid = this.validateBooleanParameter(gestureParameter, pointerInputValue);
-          }
-          else if (typeof gestureParameter == "number" && typeof pointerInputValue == "number"){
-            isValid = this.validateMinMaxParameter(gestureParameter, pointerInputValue, minOrMaxOrBoolean);
-          }
-
-          if (isValid == false){
-            if (this.DEBUG == true) {
-              console.log(`[${this.eventBaseName}] invalidated `);
-            }
-            return false;
-          }
-
-        }
-      }
-    }
-
-    return true;
-
   }
 
   getEventData(singlePointerInput: SinglePointerInput): GestureEventData {

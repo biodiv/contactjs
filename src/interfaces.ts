@@ -6,14 +6,15 @@ export interface TimedParameters {
   live: {},
 }
 
-export interface MinMaxInterval {
+export interface MinMaxIntervalBool {
   min: {},
   max: {},
+  boolean: {},
 }
 
 export interface TimedMinMaxParameters extends TimedParameters {
-  global: MinMaxInterval,
-  live: MinMaxInterval,
+  global: MinMaxIntervalBool,
+  live: MinMaxIntervalBool,
 }
 
 export interface PointerGlobalParameters {

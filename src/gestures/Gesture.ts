@@ -3,18 +3,22 @@ import { SinglePointerInput } from "../SinglePointerInput";
 import { DualPointerInput } from "../DualPointerInput";
 import { Pointer } from "../Pointer";
 import { Point } from "../geometry/Point";
+import { Vector } from "../geometry/Vector";
 
-import { TimedParameters } from "../interfaces";
+import { 
+  TimedParameters,
+  TimedMinMaxParameters,
+  SinglePointerGestureParameters,
+  DualPointerGestureParameters,
+} from "../interfaces";
 
 import {
   GestureState,
   PointerManagerState,
 } from "../input-consts";
 
-export type MinMaxValue = number | null;
-export type MinMaxInterval = [MinMaxValue, MinMaxValue];
-export type BooleanParameter = boolean | null;
-export type GestureParameterValue = MinMaxValue | BooleanParameter;
+
+type GestureParameterValue = number | boolean | null | Vector;
 
 type SinglePointerInputConstructor = new (...args: ConstructorParameters<typeof SinglePointerInput>) => SinglePointerInput;
 type DualPointerInputConstructor = new (...args: ConstructorParameters<typeof DualPointerInput>) => DualPointerInput;
@@ -73,6 +77,9 @@ export abstract class Gesture {
 
   initialPointerEvent: PointerEvent | null;
 
+  initialParameters: SinglePointerGestureParameters | DualPointerGestureParameters | null;
+  activeStateParameters: SinglePointerGestureParameters | DualPointerGestureParameters | null;
+
   state: GestureState;
 
   constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
@@ -86,6 +93,9 @@ export abstract class Gesture {
 
     this.initialPointerEvent = null;
 
+    this.initialParameters = null;
+    this.activeStateParameters = null;
+
     this.options = {
       bubbles: true,
       blocks: [],
@@ -98,8 +108,98 @@ export abstract class Gesture {
 
   }
 
+  getEmptyGestureParameters(): TimedMinMaxParameters{
+    var nullRecognitionParameters: TimedMinMaxParameters = {
+      global: {
+        min: {},
+        max: {},
+        boolean: {},
+      },
+
+      live: {
+        min: {},
+        max: {},
+        boolean: {},
+      }
+    };
+
+    return nullRecognitionParameters
+  }
+
+  getGestureParameters(): SinglePointerGestureParameters | DualPointerGestureParameters {
+    let gestureParameters;
+
+    if (this.state == GestureState.Active) {
+      gestureParameters = this.activeStateParameters;
+      if (this.DEBUG == true) {
+        console.log(
+          `[${this.eventBaseName}] validating using activeStateParameters`
+        );
+        console.log(gestureParameters);
+      }
+    } else {
+      if (this.DEBUG == true) {
+        console.log(
+          `[${this.eventBaseName}] validating using initialParameters`
+        );
+      }
+      gestureParameters = this.initialParameters;
+    }
+
+    if (gestureParameters == null){
+      throw new Error("[Gesture] no gesture parameters found. Do not call .getGestureParameters on abstract class Gesture");
+    }
+
+    return gestureParameters;
+  }
+
   validateGestureParameters(pointerInput: SinglePointerInput | DualPointerInput): boolean {
-    throw new Error("not implemented");
+    
+    const gestureParameters = this.getGestureParameters();
+
+    let isValid: boolean = true;
+    let timespan:keyof typeof gestureParameters;
+    for (timespan in gestureParameters){
+
+      const timedGestureParameters = gestureParameters[timespan];
+      const timedPointerInputValues = pointerInput.parameters[timespan] as Record<string, any>;
+
+      let minOrMaxOrBoolean: keyof typeof timedGestureParameters;
+
+      for (minOrMaxOrBoolean in timedGestureParameters){
+        const evaluationParameters = timedGestureParameters[minOrMaxOrBoolean] as Record<string, GestureParameterValue>;
+        let gestureParameterName: string;
+        for (gestureParameterName in evaluationParameters){
+          const gestureParameter = evaluationParameters[gestureParameterName];
+          
+          
+          const pointerInputValue = timedPointerInputValues[gestureParameterName];
+
+          if (this.DEBUG == true) {
+            console.log(
+              `[${this.eventBaseName}] validating ${timespan} ${minOrMaxOrBoolean}: required: ${gestureParameter}, pointer: ${pointerInputValue}`
+            );
+          }
+
+          if (typeof gestureParameter == "boolean" && typeof pointerInputValue == "boolean"){
+            isValid = this.validateBooleanParameter(gestureParameter, pointerInputValue);
+          }
+          else if (typeof gestureParameter == "number" && typeof pointerInputValue == "number"){
+            isValid = this.validateMinMaxParameter(gestureParameter, pointerInputValue, minOrMaxOrBoolean);
+          }
+
+          if (isValid == false){
+            if (this.DEBUG == true) {
+              console.log(`[${this.eventBaseName}] invalidated `);
+            }
+            return false;
+          }
+
+        }
+      }
+    }
+
+    return true;
   }
 
   validateBooleanParameter(gestureParameter: boolean, pointerInputValue: boolean) {
