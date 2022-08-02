@@ -15,9 +15,10 @@ export class Pinch extends DualPointerGesture {
 
     this.eventBaseName = "pinch";
 
-    this.initialParameters.live["centerMovementDistance"] = [0, 50]; //px
-    this.initialParameters.live["absolutePointerDistanceChange"] = [5, null]; // distance between 2 fingers
-    this.initialParameters.live["absoluteRotationAngle"] = [null, 20];
-    this.initialParameters.live["absoluteVectorAngle"] = [10, null];
+    this.initialParameters.live.min["centerMovementDistance"] = 0;
+    this.initialParameters.live.max["centerMovementDistance"] = 50; //px
+    this.initialParameters.live.min["absolutePointerDistanceChange"] = 5; // distance between 2 fingers
+    this.initialParameters.live.max["absoluteRotationAngle"] = 20;
+    this.initialParameters.live.min["absoluteVectorAngle"] = 10;
   }
 }

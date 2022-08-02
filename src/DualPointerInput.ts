@@ -1,43 +1,12 @@
 import { Geometry } from "./geometry/Geometry";
-import { Point } from "./geometry/Point";
-import { Vector } from "./geometry/Vector";
 import { 
   Pointer,
-  PointerParametersBase,
 } from "./Pointer";
-
-
-interface DualPointerInputGlobalParameters {
-  duration: number,
-  center: Point,
-  centerHasBeenMoved: boolean,
-  centerMovementDistance: number,
-  centerMovementVector: Vector,
-  absolutePointerDistanceChange: number, // px
-  relativePointerDistanceChange: number, // %
-  rotationAngle: number,
-  absoluteRotationAngle: number,
-  vectorAngle: number,
-  absoluteVectorAngle: number,
-}
-
-interface DualPointerInputLiveParameters {
-  center: Point,
-  centerIsMoving: boolean,
-  centerMovementDistance: number,
-  centerMovementVector: Vector,
-  absolutePointerDistanceChange: number,
-  relativePointerDistanceChange: number,
-  rotationAngle: number,
-  absoluteRotationAngle: number,
-  vectorAngle: number,
-  absoluteVectorAngle: number,
-}
-
-interface DualPointerInputParameters extends PointerParametersBase {
-  global: DualPointerInputGlobalParameters,
-  live: DualPointerInputLiveParameters,
-}
+import {
+  DualPointerInputGlobalParameters,
+  DualPointerInputLiveParameters,
+  DualPointerInputParameters,
+} from "./interfaces";
 
 /**
  * DualPointerInput

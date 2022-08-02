@@ -10,9 +10,6 @@ import {
   GestureState,
   PointerManagerState,
 } from "../input-consts";
-import { SinglePointerGestureParameters } from "./SinglePointerGesture";
-import { DualPointerGestureParameters } from "./DualPointerGesture";
-
 
 export type MinMaxValue = number | null;
 export type MinMaxInterval = [MinMaxValue, MinMaxValue];
@@ -97,7 +94,7 @@ export abstract class Gesture {
       ...options
     };
 
-    this.DEBUG = true; //this.options.DEBUG;
+    this.DEBUG = false; //this.options.DEBUG;
 
   }
 
@@ -105,8 +102,8 @@ export abstract class Gesture {
     throw new Error("not implemented");
   }
 
-  validateBooleanParameter(gestureParameter: boolean | null, pointerInputValue: boolean) {
-    if (gestureParameter == null){
+  validateBooleanParameter(gestureParameter: boolean, pointerInputValue: boolean) {
+    if (gestureParameter == null) {
       return true;
     } else if (gestureParameter == pointerInputValue) {
 
@@ -128,85 +125,19 @@ export abstract class Gesture {
     return false;
   }
 
-  validateMinMaxParameter(interval: MinMaxInterval, value: MinMaxValue): boolean {
-
-    const minValue: MinMaxValue = interval[0];
-    const maxValue: MinMaxValue = interval[1];
-
-    if (
-      minValue == null &&
-      maxValue == null
-    ){
-      return true;
-    }
-
-    if (
-      minValue != null &&
-      value != null &&
-      value < minValue
-    ) {
-
-      if (this.DEBUG == true) {
-        console.log(
-          `dismissing min${this.eventBaseName}: ${minValue}, current value: ${value}`
-        );
+  validateMinMaxParameter(gestureParameter: number, pointerInputValue: number, minOrMax: string): boolean {
+    if (minOrMax == "min"){
+      if (pointerInputValue >= gestureParameter) {
+        return true;
       }
-
-      return false;
     }
-
-    if (
-      maxValue != null &&
-      value != null &&
-      value > maxValue
-    ) {
-      if (this.DEBUG == true) {
-        console.log(
-          `dismissing max${this.eventBaseName}: ${maxValue}, current value: ${value}`
-        );
+    else if (minOrMax == "max"){
+      if (pointerInputValue <= gestureParameter) {
+        return true;
       }
-
-      return false;
     }
 
-    if (this.DEBUG == true) {
-      console.log(
-        `validated: minMax: [${minValue}, ${maxValue}] - current value: ${value}`
-      );
-    }
-
-    return true;
-  }
-
-  validateGestureParameter(gestureParameter: MinMaxInterval | BooleanParameter, pointerInputValue: number | boolean | null) {
-
-    let isValid = true;
-
-    if (typeof gestureParameter == "boolean" || gestureParameter == null) {
-
-      if (typeof pointerInputValue != "boolean") {
-        return false;
-      }
-
-      isValid = this.validateBooleanParameter(gestureParameter, pointerInputValue);
-
-    } else {
-
-      const interval: MinMaxInterval = gestureParameter;
-
-      if (typeof pointerInputValue == "boolean") {
-        return false;
-      }
-
-      isValid = this.validateMinMaxParameter(
-        interval,
-        pointerInputValue
-      );
-
-    }
-
-    return isValid;
-
+    return false;
   }
 
   validateDirection(pointerInput: SinglePointerInput | DualPointerInput): boolean {
@@ -271,7 +202,7 @@ export abstract class Gesture {
 
     let isValid = this.validateGestureState();
 
-    if (isValid == true){
+    if (isValid == true) {
       isValid = this.validatePointerManagerState(pointerManager);
     }
 
@@ -283,7 +214,7 @@ export abstract class Gesture {
     ) {
       isValid = this.validatePointerInputConstructor(pointerInput);
 
-      if (isValid == true){
+      if (isValid == true) {
         isValid = this.validateDirection(pointerInput);
       }
 
@@ -320,7 +251,6 @@ export abstract class Gesture {
 
       this.onEnd(pointerManager);
 
-
     }
     else {
       if (this.DEBUG == true) {
@@ -341,7 +271,7 @@ export abstract class Gesture {
     }
     else if (pointerManager.lastRemovedPointer instanceof Pointer) {
       const pointerInput = pointerManager.getlastRemovedPointerInput();
-      if (pointerInput instanceof this.validPointerInputConstructor){
+      if (pointerInput instanceof this.validPointerInputConstructor) {
         return pointerInput;
       }
     }
@@ -368,7 +298,7 @@ export abstract class Gesture {
 
     const pointerInput = this.getPointerInput(pointerManager);
 
-    if (pointerInput != null){
+    if (pointerInput != null) {
 
       const target = pointerInput.getTarget();
 
@@ -423,7 +353,7 @@ export abstract class Gesture {
         }
       }
     }
-    
+
   }
 
   onStart(pointerManager: PointerManager): void {

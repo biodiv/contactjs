@@ -1,9 +1,6 @@
 import {
   Gesture,
   GestureOptions,
-  MinMaxInterval,
-  BooleanParameter,
-  GestureParameterValue,
   LiveGestureEventData,
   GlobalGestureEventData,
   GestureEventData,
@@ -14,39 +11,13 @@ import {
   PointerManagerState,
 } from "../input-consts";
 
-import { PointerGlobalParameters } from "../Pointer";
-import { TimedParameters } from "../interfaces";
+import {
+  SinglePointerGestureParameters,
+} from "../interfaces";
 
 import { Point } from "../geometry/Point";
 import { Vector } from "../geometry/Vector";
 import { SinglePointerInput } from "../SinglePointerInput";
-
-/**
- * GestureParameters are the PointerParameters a gesture is valid for
- * Keys match those of SinglePointerInput.parameters.global
- */
-interface SinglePointerGestureGlobalParameters {
-  duration: MinMaxInterval,
-  distance: MinMaxInterval,
-  maximumDistance: MinMaxInterval,
-  averageSpeed: MinMaxInterval,
-  finalSpeed: MinMaxInterval,
-  hasBeenMoved: BooleanParameter,
-}
-
-/**
- * keys match those of SinglePointerInput.parameters.live
- */
-interface SinglePointerGestureLiveParameters {
-  speed: MinMaxInterval,
-  distance: MinMaxInterval,
-  isMoving: BooleanParameter,
-}
-
-export interface SinglePointerGestureParameters extends TimedParameters {
-  global: SinglePointerGestureGlobalParameters,
-  live: SinglePointerGestureLiveParameters,
-}
 
 export abstract class SinglePointerGesture extends Gesture {
 
@@ -62,18 +33,15 @@ export abstract class SinglePointerGesture extends Gesture {
 
     var nullRecognitionParameters: SinglePointerGestureParameters = {
       global: {
-        duration: [null, null], // ms
-        distance: [null, null],
-        maximumDistance: [null, null],
-        averageSpeed: [null, null], // px/s
-        finalSpeed: [null, null], // px/s
-        hasBeenMoved: null,
+        min: {},
+        max: {},
+        boolean: {},
       },
 
       live: {
-        speed: [null, null], // px/s
-        distance: [null, null], // px
-        isMoving: null,
+        min: {},
+        max: {},
+        boolean: {},
       }
     };
 
@@ -81,22 +49,6 @@ export abstract class SinglePointerGesture extends Gesture {
     // a deep copy of the parameters is needed as they can have different values
     this.activeStateParameters = JSON.parse(JSON.stringify({ ...nullRecognitionParameters }));
 
-  }
-
-  getPointerInputGlobalValue(
-    pointerInput: SinglePointerInput,
-    parameterName: keyof SinglePointerGestureGlobalParameters
-  ): GestureParameterValue {
-    const pointerInputValue = pointerInput.parameters.global[parameterName];
-    return pointerInputValue;
-  }
-
-  getPointerInputLiveValue(
-    pointerInput: SinglePointerInput,
-    parameterName: keyof SinglePointerGestureLiveParameters
-  ): GestureParameterValue {
-    const pointerInputValue = pointerInput.parameters.live[parameterName];
-    return pointerInputValue;
   }
 
   validateGestureParameters(pointerInput: SinglePointerInput): boolean {
@@ -108,48 +60,53 @@ export abstract class SinglePointerGesture extends Gesture {
     if (this.state == GestureState.Active) {
       gestureParameters = this.activeStateParameters;
       if (this.DEBUG == true) {
-        console.log(`[${this.eventBaseName}] validating using activeStateParameters`);
+        console.log(
+          `[${this.eventBaseName}] validating using activeStateParameters`
+        );
         console.log(gestureParameters);
       }
     } else {
       if (this.DEBUG == true) {
-        console.log(`[${this.eventBaseName}] validating using initialParameters`);
+        console.log(
+          `[${this.eventBaseName}] validating using initialParameters`
+        );
       }
       gestureParameters = this.initialParameters;
     }
 
-    let timespan: keyof TimedParameters;
+
+    let timespan:keyof typeof gestureParameters;
     for (timespan in gestureParameters){
-      const timedGestureParameters = gestureParameters[timespan]; // .global or .live
-      let parameterName: keyof typeof timedGestureParameters;
-      for (parameterName in timedGestureParameters){
+      const timedParameters = gestureParameters[timespan];
+      let minOrMaxOrBoolean: keyof typeof timedParameters;
+      for (minOrMaxOrBoolean in timedParameters){
+        const evaluationParameters = timedParameters[minOrMaxOrBoolean];
+        let gestureParameterName: keyof typeof evaluationParameters;
+        for (gestureParameterName in evaluationParameters){
+          const gestureParameter = evaluationParameters[gestureParameterName];
+          const pointerInputValue = pointerInput.parameters[timespan][gestureParameterName];
 
-        if (this.DEBUG == true) {
-          console.log(
-            `[${this.eventBaseName}] validating ${timespan} parameter ${parameterName}:`
-          );
-        }
+          if (this.DEBUG == true) {
+            console.log(
+              `[${this.eventBaseName}] validating ${timespan} ${minOrMaxOrBoolean}: required: ${gestureParameter}, pointer: ${pointerInputValue}`
+            );
+          }
 
-        const gestureParameter = timedGestureParameters[parameterName];
+          if (typeof gestureParameter == "boolean" && typeof pointerInputValue == "boolean"){
+            isValid = this.validateBooleanParameter(gestureParameter, pointerInputValue);
+          }
+          else if (typeof gestureParameter == "number" && typeof pointerInputValue == "number"){
+            isValid = this.validateMinMaxParameter(gestureParameter, pointerInputValue, minOrMaxOrBoolean);
+          }
 
-        var pointerInputValue: GestureParameterValue;
+          if (isValid == false){
+            if (this.DEBUG == true) {
+              console.log(`[${this.eventBaseName}] invalidated `);
+            }
+            return false;
+          }
 
-        if (timespan == "global"){
-          pointerInputValue = this.getPointerInputGlobalValue(pointerInput, parameterName);
-          isValid = this.validateGestureParameter(gestureParameter, pointerInputValue);
         }
-        else if (timespan == "live"){
-          pointerInputValue = this.getPointerInputLiveValue(pointerInput, parameterName);
-          isValid = this.validateGestureParameter(gestureParameter, pointerInputValue);
-        }
-        else {
-          isValid = false;
-        }
-
-        if (isValid == false){
-          return false;
-        }
-        
       }
     }
 

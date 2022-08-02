@@ -17,10 +17,10 @@ export class Press extends SinglePointerGesture {
 
     this.eventBaseName = "press";
 
-    this.initialParameters.global["duration"] = [600, null]; // milliseconds. after a certain touch duration, it is not a TAP anymore
+    this.initialParameters.global.min["duration"] = 600; // milliseconds. after a certain touch duration, it is not a TAP anymore
 
-    this.initialParameters.global["distance"] = [null, 10]; // if the pointer moved a certain distance, Press becomes impossible
-    this.initialParameters.global["maximumDistance"] = [null, 20];
+    this.initialParameters.global.max["distance"] = 10; // if the pointer moved a certain distance, Press becomes impossible
+    this.initialParameters.global.max["maximumDistance"] = 20;
     // only Press has this parameter
     this.hasBeenEmitted = false;
 
@@ -48,7 +48,7 @@ export class Press extends SinglePointerGesture {
 
         if (
           this.hasBeenEmitted == true &&
-          duration <= this.initialParameters.global["duration"][0]!
+          duration <= this.initialParameters.global.min["duration"]!
         ) {
           this.hasBeenEmitted = false;
         }

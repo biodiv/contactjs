@@ -1,5 +1,9 @@
 import { Geometry } from "./geometry/Geometry";
-import { Vector } from "./geometry/Vector";
+import {
+  PointerGlobalParameters,
+  PointerLiveParameters,
+  PointerParameters,
+} from "./interfaces";
 
 /*********************************************************************************************************************
   PointerInput
@@ -15,49 +19,6 @@ import { Vector } from "./geometry/Vector";
   - start and end timestamps
   - speeds and distances
 ********************************************************************************************************************/
-
-// parameters for recognizing the gesture
-export interface PointerGlobalParameters {
-  duration: number, // ms
-  currentSpeed: number, // px/s
-  averageSpeed: number, // px/s
-  finalSpeed: number, // px/s
-  distance: number, // px
-  maximumDistance: number, //px
-  // additional parameters for the GestureEvent
-  startX: number,
-  startY: number,
-  vector: Vector,
-  deltaX: number,
-  deltaY: number,
-  startTimestampUTC: number,
-  startTimestamp: number,
-  currentTimestamp: number,
-  endTimestamp: number | null,
-  maximumSpeed: number,
-  traveledDistance: number,
-  hasBeenMoved: boolean,
-}
-
-export interface PointerLiveParameters {
-  duration: number, // ms
-  speed: number,
-  vector: Vector,
-  distance: number,
-  isMoving: boolean,
-}
-
-export interface PointerParametersBase {
-  live: {},
-  global: {},
-}
-
-export interface PointerParameters extends PointerParametersBase{
-  live: PointerLiveParameters,
-  global: PointerGlobalParameters,
-}
-
-
 
 interface PointerOptions {
   DEBUG: boolean;

@@ -20,10 +20,10 @@ export class Tap extends SinglePointerGesture {
 
     this.eventBaseName = "tap";
 
-    this.initialParameters.global["duration"] = [0, 200]; // milliseconds. after a certain touch duration, it is not a TAP anymore
+    this.initialParameters.global.max["duration"] = 200; // milliseconds. after a certain touch duration, it is not a TAP anymore
 
-    this.initialParameters.live["distance"] = [null, 30]; // if a certain distance is detected, TAP becomes impossible
-    this.initialParameters.global["distance"] = [null, 30]; // if a certain distance is detected, TAP becomes impossible
+    this.initialParameters.live.max["distance"] = 30; // if a certain distance is detected, TAP becomes impossible
+    this.initialParameters.global.max["distance"] = 30; // if a certain distance is detected, TAP becomes impossible
 
   }
 

@@ -1,4 +1,5 @@
-import { Pointer, PointerParameters } from "./Pointer";
+import { Pointer } from "./Pointer";
+import { PointerParameters } from "./interfaces";
 
 export class SinglePointerInput {
 

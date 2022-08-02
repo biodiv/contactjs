@@ -11,12 +11,11 @@ export class TwoFingerPan extends DualPointerGesture {
 
     this.eventBaseName = "twofingerpan";
 
-    this.initialParameters.live["centerMovementDistance"] = [10, null];
-    this.initialParameters.live["absolutePointerDistanceChange"] = [null, 50];
-    this.initialParameters.live["rotationAngle"] = [null, null];
-    this.initialParameters.live["absoluteVectorAngle"] = [null, 150];
+    this.initialParameters.live.min["centerMovementDistance"] = 10;
+    this.initialParameters.live.max["absolutePointerDistanceChange"] = 50;
+    this.initialParameters.live.max["absoluteVectorAngle"] = 150;
 
-    this.activeStateParameters.live["centerMovementDistance"] = [0, null];
+    this.activeStateParameters.live.min["centerMovementDistance"] = 0;
     
   }
 }

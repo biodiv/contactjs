@@ -32,9 +32,9 @@ export class Pan extends SinglePointerGesture {
 
     this.eventBaseName = "pan";
 
-    this.initialParameters.global["duration"] = [0, null];
-    this.initialParameters.live["distance"] = [10, null];
-    this.initialParameters.global["hasBeenMoved"] = true;
+    this.initialParameters.global.min["duration"] = 0;
+    this.initialParameters.live.min["distance"] = 10;
+    this.initialParameters.global.boolean["hasBeenMoved"] = true;
 
     this.swipeFinalSpeed = 600;
 
@@ -63,12 +63,15 @@ export class Pan extends SinglePointerGesture {
 
   // check if it was a swipe
   onEnd(pointerManager: PointerManager): void {
-    const singlePointerInput = pointerManager.activePointerInput;
+    
+    const singlePointerInput = pointerManager.getlastRemovedPointerInput();
 
     if (singlePointerInput instanceof SinglePointerInput) {
+      
       if (
         this.swipeFinalSpeed < singlePointerInput.parameters.global.finalSpeed!
       ) {
+        
         this.isSwipe = true;
         this.emit(pointerManager, "swipe");
       }
