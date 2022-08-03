@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Contact Test</title>
 		
-		<link rel="stylesheet" href="test.css">
+		<link rel="stylesheet" href="../gestures/test.css">
 		
 	</head>
 	<body>
@@ -14,7 +14,9 @@
 			<button id="destroyPointerListener" type="button">PointerListener.destroy</button>
 			<button id="panOff" type="button">.off("pan panend")</button>
 		</div>
-		<div class="container recognition-output">
+
+		<div class="container recognition-output" style="background:ivory">
+			<article></article>
 			<div>
 				Tap: <span id="tap-output"></span>
 			</div>
@@ -24,8 +26,12 @@
 			<div>
 				Pan: <span id="pan-output"></span>
 			</div>
+			<div>
+				Swipe: <span id="swipe-output"></span>
+			</div>
 		</div>
-		<div class="container recognition-output">
+		<div class="container recognition-output" style="background:lemonchiffon">
+			<article></article>
 			<div>
 				Twofingerpan: <span id="twofingerpan-output"></span>
 			</div>
@@ -36,6 +42,30 @@
 				Pinch: <span id="pinch-output"></span>
 			</div>
 		</div>
+		<div class="container recognition-output" style="background:blanchedalmond">
+			<article style="padding-right:4rem;">Global values</article>
+			<div>
+				∆X: <span id="deltaX-global"></span>
+			</div>
+			<div>
+				∆Y: <span id="deltaY-global"></span>
+			</div>
+			<div>
+				direction: <span id="direction-global"></span>
+			</div>
+		</div>
+		<div class="container recognition-output" style="background:bisque">
+			<article style="padding-right:4rem;">Live values</article>
+			<div>
+				∆X: <span id="deltaX-live"></span>
+			</div>
+			<div>
+				∆Y: <span id="deltaY-live"></span>
+			</div>
+			<div>
+				direction: <span id="direction-live"></span>
+			</div>
+		</div>
 		<div class="container h-80">
 			<div class="screen">
 				
@@ -43,14 +73,7 @@
 			</div>
 		</div>
 		
-		<script type="module" src="../dist/module.js"></script>
 		<script type="module" src="test-handler-management.js"></script>
-		
-		<script type="module">
-			import { PointerListener } from '../dist/module.js';
-
-			
-		</script>
 		
 	</body>
 </html>

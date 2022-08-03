@@ -2,6 +2,7 @@ import { GestureOptions } from "./Gesture";
 import { SinglePointerGesture } from "./SinglePointerGesture";
 import { PointerManager } from "../PointerManager";
 import { SinglePointerInput } from "../SinglePointerInput";
+import { GestureState } from "../input-consts";
 
 /*
  * press should only be fired once
@@ -43,6 +44,13 @@ export class Press extends SinglePointerGesture {
         this.emit(pointerManager);
 
         this.hasBeenEmitted = true;
+        this.state = GestureState.Active;
+        this.blockGestures();
+        
+      } else if (isValid == false && this.hasBeenEmitted == true) {
+        this.onEnd(pointerManager);
+        this.state = GestureState.Inactive;
+        this.hasBeenEmitted = false;
       } else {
         const duration = singlePointerInput.parameters.global.duration;
 

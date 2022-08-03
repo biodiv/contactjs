@@ -16,6 +16,10 @@ import { DualPointerInput } from "./DualPointerInput";
 *	- decides if the current gesture is SinglePointerInput or DualPointerInput
 *		becomes activeSinglePointerInput
 */
+interface PointerManagerOptions {
+  DEBUG: boolean,
+}
+
 export class PointerManager {
 
   DEBUG: boolean;
@@ -33,8 +37,18 @@ export class PointerManager {
 
   state: PointerManagerState;
 
-  constructor() {
-    this.DEBUG = true;
+  options: PointerManagerOptions;
+
+  constructor(options?: Partial<PointerManagerOptions>) {
+
+    options = options || {};
+
+    this.options = {
+      DEBUG: false,
+      ...options
+    };
+
+    this.DEBUG = this.options.DEBUG;;
 
     this.state = PointerManagerState.NoPointer;
     this.activePointerInput = null;
@@ -52,7 +66,10 @@ export class PointerManager {
       console.log(`[PointerManager] adding Pointer #${pointerdownEvent.pointerId.toString()}`);
     }
 
-    const pointer = new Pointer(pointerdownEvent);
+    const pointerOptions = {
+      DEBUG: this.DEBUG,
+    };
+    const pointer = new Pointer(pointerdownEvent, pointerOptions);
 
     this.onSurfacePointers[pointer.pointerId] = pointer;
 

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Contact Block interface Test</title>
+
+	<link rel="stylesheet" href="test-block.css">
+
+</head>
+
+<body>
+	<div class="container">
+		<h2>Test block interface</h2>
+	</div>
+	<div class="container">
+		<div class="screen">
+
+			<div>
+				<h4>Pan the rectangle. It should be pannable. Then perfrom a press and pan while still pressing. Pan should be
+					blocked.</h4>
+			</div>
+
+			<div> Press:
+				<div id="press-indicator">inactive</div>
+			</div>
+
+			<div id="rectangle"></div>
+
+		</div>
+	</div>
+
+	<script type="module" src="test-block.js"></script>
+</body>
+
+</html>

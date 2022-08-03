@@ -1,5 +1,5 @@
 "use strict";
-import { PointerListener, Tap, Press, Pan, TwoFingerPan, Pinch, Rotate } from '../dist/module.js';
+import { PointerListener, Tap, Press, Pan, TwoFingerPan, Pinch, Rotate } from '../../dist/module.js';
 
 var animationFrameId = null;
 
@@ -44,7 +44,7 @@ function loadContact() {
   pinch.block(twoFingerPan);
   twoFingerPan.block(pinch);*/
 
-  var pointerListener = new PointerListener(rectangle, {
+  pointerListener = new PointerListener(rectangle, {
     "DEBUG_POINTERMANAGER": true,
     supportedGestures: [Pan, Tap, Press],//[pinch, twoFingerPan],
     //supportedGestures : [TwoFingerPan, Pinch],
@@ -55,23 +55,11 @@ function loadContact() {
     }
   });
 
-  rectangle.addEventListener("pan", function (event) {
-    onPan(event);
-    showOutput(event)
-  });
+  pointerListener.on("pan", onPan);
 
-  rectangle.addEventListener("panend", function (event) {
+  pointerListener.on("panend", onPanEnd);
 
-    showOutput(event)
-
-    setTimeout(function () {
-      clearOutput(event);
-    }, 1000);
-
-    onEnd(event);
-  });
-
-  rectangle.addEventListener("swipe", function (event) {
+  pointerListener.on("swipe", function (event) {
     onPan(event);
     showOutput(event);
 
@@ -81,7 +69,7 @@ function loadContact() {
 
   });
 
-  rectangle.addEventListener("tap", function (event) {
+  pointerListener.on("tap", function (event) {
 
     TAP_ACTIVE = true;
     onTap(event);
@@ -100,7 +88,7 @@ function loadContact() {
   });
 
 
-  rectangle.addEventListener("press", function (event) {
+  pointerListener.on("press", function (event) {
 
     PRESS_ACTIVE = true;
     onPress(event);
@@ -333,7 +321,20 @@ function onPan(event) {
 
   requestElementUpdate();
 
+  showOutput(event)
 
+}
+
+
+function onPanEnd(event) {
+
+  showOutput(event)
+
+  setTimeout(function () {
+    clearOutput(event);
+  }, 1000);
+
+  onEnd(event);
 }
 
 
@@ -421,4 +422,32 @@ function onRotation(event) {
 }
 
 
-loadContact();
+var pointerListener = null;
+
+var attachButton = document.getElementById("attachPointerListener");
+var destroyButton = document.getElementById("destroyPointerListener");
+var panOffButton = document.getElementById("panOff");
+
+attachButton.addEventListener("click", function(event){
+	if (pointerListener == null){
+		loadContact();
+	}
+});
+
+destroyButton.addEventListener("click", function(event){
+	if (pointerListener != null){
+		pointerListener.destroy();
+		pointerListener = null;
+	}
+});
+
+panOffButton.addEventListener("click", function(event){
+	if (pointerListener != null){
+		pointerListener.off("pan", onPan);
+		pointerListener.off("panend", onPanEnd);
+    console.log("Pan turned off");
+	}
+  else {
+    throw new Error("no pointerListener found");
+  }
+});

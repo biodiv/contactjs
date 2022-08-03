@@ -1,12 +1,12 @@
-import {
-  Gesture
-} from "./gestures/Gesture";
-
+import { Gesture } from "./gestures/Gesture";
 import { Tap } from "./gestures/Tap";
 import { Press } from "./gestures/Press";
 import { Pan } from "./gestures/Pan";
-
 import { PointerManager } from "./PointerManager";
+import {
+  PointerListenerState,
+  GestureState,
+} from "./input-consts";
 
 /*
  * PointerListener class
@@ -38,6 +38,8 @@ interface PointerListenerOptions {
 
   bubbles: boolean;
   handleTouchEvents: boolean;
+  consecutiveGestures: boolean,
+  simultaneousGestures: boolean,
   supportedGestures: Gesture[];
 
   // Hooks
@@ -65,7 +67,18 @@ export class PointerListener {
 
   private supportedGestures: Gesture[];
 
+  state: PointerListenerState;
+
+  activeGestures: Gesture[];
+  private hadActiveGestureDuringCurrentContact: boolean;
+
   constructor(domElement: HTMLElement, options?: Partial<PointerListenerOptions>) {
+
+    this.state = PointerListenerState.NoActiveGesture;
+    this.activeGestures = [];
+
+    this.hadActiveGestureDuringCurrentContact = false;
+
     // registry for events like "pan", "rotate", which have to be removed on this.destroy();
     this.gestureEventHandlers = {};
 
@@ -83,11 +96,13 @@ export class PointerListener {
       DEBUG_POINTERMANAGER: false,
       bubbles: true,
       handleTouchEvents: true,
+      consecutiveGestures: true,
+      simultaneousGestures: true,
       supportedGestures: [],
       ...options
     };
 
-    this.DEBUG = true; //this.options.DEBUG;
+    this.DEBUG = this.options.DEBUG;
 
     const supportedGestures = options.supportedGestures ?? ALL_GESTURE_CLASSES;
 
@@ -114,7 +129,10 @@ export class PointerListener {
 
     this.domElement = domElement;
 
-    this.pointerManager = new PointerManager();
+    const pointerManagerOptions = {
+      DEBUG: this.options.DEBUG_POINTERMANAGER,
+    }
+    this.pointerManager = new PointerManager(pointerManagerOptions);
 
     // disable context menu on long taps - this kills pointermove
     /*domElement.addEventListener("contextmenu", (event) => {
@@ -343,17 +361,75 @@ export class PointerListener {
     }
   }
 
-  // recognize gestures only for the matching active pointer count
-  //
+
+  /**
+   * respect the options "consecutiveGestures" and "simultaneousGestures"
+   */
   private recognizeGestures(): void {
 
     this.lastRecognitionTimestamp = new Date().getTime();
 
-    for (let g = 0; g < this.supportedGestures.length; g++) {
-      const gesture = this.supportedGestures[g];
+    let gesturesForRecognition: Gesture[] = this.supportedGestures;
 
-      gesture.recognize(this.pointerManager!);
+    if ( this.options.simultaneousGestures == false && this.state == PointerListenerState.ActiveGesture){
+      gesturesForRecognition = [this.activeGestures[0]];
     }
+    else if ( this.options.consecutiveGestures == false && this.state == PointerListenerState.ActiveGesture) {
+      gesturesForRecognition = [this.activeGestures[0]];
+    }
+    else if (this.options.consecutiveGestures == false && this.state == PointerListenerState.NoActiveGesture) {
+      if (this.hadActiveGestureDuringCurrentContact == true && this.pointerManager.hasPointersOnSurface() == true){
+        gesturesForRecognition = [];
+      }
+    }
+
+    for (let g = 0; g < gesturesForRecognition.length; g++) {
+      const gesture = gesturesForRecognition[g];
+
+      gesture.recognize(this.pointerManager);
+
+      this.updateActiveGestures(gesture);
+
+      if (this.options.simultaneousGestures == false && this.state == PointerListenerState.ActiveGesture){
+        break;
+      }
+    }
+
+    if (this.DEBUG == true){
+      console.log(
+        `[PointerListener] hadActiveGestureDuringCurrentContact: ${this.hadActiveGestureDuringCurrentContact}`
+      );
+    }
+
+    if (this.pointerManager.hasPointersOnSurface() == false){
+      this.hadActiveGestureDuringCurrentContact = false;
+    }
+    
+  }
+
+  updateActiveGestures(gesture: Gesture): void {
+    if (gesture.state == GestureState.Active) {
+
+      this.hadActiveGestureDuringCurrentContact = true;
+
+      if (this.activeGestures.indexOf(gesture) < 0) {
+        this.activeGestures.push(gesture);
+      }
+    }
+    else {
+      // remove from active gestures
+      let index = this.activeGestures.indexOf(gesture);
+      if (index >= 0) {
+        this.activeGestures.splice(index, 1);
+      }
+    }
+
+    if (this.activeGestures.length > 0) {
+      this.state = PointerListenerState.ActiveGesture;
+    } else {
+      this.state = PointerListenerState.NoActiveGesture;
+    }
+
   }
 
   /*
@@ -385,20 +461,34 @@ export class PointerListener {
   }
 
   off(eventsString: string, handlerReference: EventListenerOrEventListenerObject): void {
+
     const eventTypes = this.parseEventsString(eventsString);
+
+    if (this.DEBUG == true) {
+      console.log(
+        `[PointerListener] turning off events: ${eventsString}`
+      );
+      console.log(this.gestureEventHandlers);
+    }
 
     for (let e = 0; e < eventTypes.length; e++) {
       const eventType = eventTypes[e];
 
       if (eventType in this.gestureEventHandlers) {
-        const handlerReferences = this.gestureEventHandlers[eventType];
 
-        const index = handlerReferences.indexOf(handlerReference);
+        const handlerList = this.gestureEventHandlers[eventType];
+        const index = handlerList.indexOf(handlerReference);
+
+        if (this.DEBUG == true) {
+          console.log(
+            `[PointerListener] turning off ${eventType}. Index on handlerList: ${index}`
+          );
+        }
 
         if (index >= 0) {
-          handlerReferences.splice(index, 1);
+          handlerList.splice(index, 1);
 
-          this.gestureEventHandlers[eventType] = handlerReferences;
+          this.gestureEventHandlers[eventType] = handlerList;
         }
 
         this.domElement.removeEventListener(eventType, handlerReference, false);
@@ -407,15 +497,15 @@ export class PointerListener {
   }
 
   destroy(): void {
-    // remove all EventListeners from self.domElement
-    for (const event in this.gestureEventHandlers) {
-      const handlerList = this.gestureEventHandlers[event];
+    // remove all EventListeners from this.domElement
+    for (const eventType in this.gestureEventHandlers) {
+      const handlerList = this.gestureEventHandlers[eventType];
       for (let h = 0; h < handlerList.length; h++) {
         const handler = handlerList[h];
-        this.domElement.removeEventListener(event, handler);
+        this.domElement.removeEventListener(eventType, handler);
       }
 
-      delete this.gestureEventHandlers[event];
+      delete this.gestureEventHandlers[eventType];
     }
 
     this.removePointerEventListeners();

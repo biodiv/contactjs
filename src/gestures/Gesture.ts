@@ -104,7 +104,7 @@ export abstract class Gesture {
       ...options
     };
 
-    this.DEBUG = false; //this.options.DEBUG;
+    this.DEBUG = this.options.DEBUG;
 
   }
 
@@ -171,7 +171,6 @@ export abstract class Gesture {
         let gestureParameterName: string;
         for (gestureParameterName in evaluationParameters){
           const gestureParameter = evaluationParameters[gestureParameterName];
-          
           
           const pointerInputValue = timedPointerInputValues[gestureParameterName];
 
@@ -457,6 +456,8 @@ export abstract class Gesture {
   }
 
   onStart(pointerManager: PointerManager): void {
+    this.blockGestures();
+
     this.state = GestureState.Active;
     this.setInitialPointerEvent(pointerManager);
     const eventName: string = `${this.eventBaseName}start`;
@@ -464,6 +465,8 @@ export abstract class Gesture {
   }
 
   onEnd(pointerManager: PointerManager): void {
+    this.unblockGestures();
+
     if (this.DEBUG == true) {
       console.log(`[${this.eventBaseName}] ended. Setting ${this.eventBaseName}.state = ${GestureState.Inactive}`);
     }

@@ -1,5 +1,5 @@
 "use strict";
-import { PointerListener, Tap } from '../dist/module.js';
+import { PointerListener, Tap } from '../../dist/module.js';
 
 var animationFrameId = null;
 
@@ -40,7 +40,7 @@ function loadContact (){
 	var pointerListenerBubble = new PointerListener(rectangle, {
 		supportedGestures : [Tap],
 		pointerup: function (event, pointerListener){
-			if(pointerListener.contact.isActive == false && TAP_ACTIVE == false){
+			if(pointerListener.pointerManager.hasPointersOnSurface() == false && TAP_ACTIVE == false){
 				resetElementTransform();
 			};
 		}
@@ -65,7 +65,7 @@ function loadContact (){
 		supportedGestures : [Tap],
 		bubbles : false,
 		pointerup: function (event, pointerListener){
-			if(pointerListener.contact.isActive == false && TAP_ACTIVE == false){
+			if(pointerListener.pointerManager.hasPointersOnSurface() == false && TAP_ACTIVE == false){
 				resetElementTransform();
 			};
 		}
