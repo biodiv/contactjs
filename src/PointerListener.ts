@@ -297,19 +297,19 @@ export class PointerListener {
 
       const onTouchMove = this.onTouchMove.bind(this);
 
-      this.domElement.addEventListener("touchmove", onTouchMove);
+      this.domElement.addEventListener("touchmove", onTouchMove, { passive: true });
 
       this.touchEventHandlers["touchmove"] = onTouchMove;
 
       /*this.domElement.addEventListener("touchstart", (event) => {
 
-      });*/
+      }, { passive: true });*/
 
       /*this.domElement.addEventListener("touchend", (event) => {
-      });
+      }, { passive: true });
 
       this.domElement.addEventListener("touchcancel", (event) => {
-      });*/
+      }, { passive: true });*/
     }
   }
 
@@ -456,7 +456,7 @@ export class PointerListener {
         this.gestureEventHandlers[eventType].push(handlerReference);
       }
 
-      this.domElement.addEventListener(eventType, handlerReference, false);
+      this.domElement.addEventListener(eventType, handlerReference, { capture: false, passive: true });
     }
   }
 
