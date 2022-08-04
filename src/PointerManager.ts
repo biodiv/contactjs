@@ -48,7 +48,7 @@ export class PointerManager {
       ...options
     };
 
-    this.DEBUG = this.options.DEBUG;;
+    this.DEBUG = this.options.DEBUG;
 
     this.state = PointerManagerState.NoPointer;
     this.activePointerInput = null;
@@ -194,7 +194,7 @@ export class PointerManager {
     }
   }
 
-  hasPointersOnSurface(): Boolean {
+  hasPointersOnSurface(): boolean {
     if (Object.keys(this.onSurfacePointers).length > 0) {
       return true;
     }
@@ -211,7 +211,7 @@ export class PointerManager {
       const pointer: Pointer = Object.values(this.unusedPointers)[0];
       return pointer;
     }
-    return null
+    return null;
   }
 
   getPointerFromId(pointerId: number): Pointer | null {
@@ -232,7 +232,7 @@ export class PointerManager {
     for (const pointerId in this.onSurfacePointers) {
       const pointer: Pointer = this.onSurfacePointers[pointerId];
       pointer.onIdle();
-    };
+    }
 
     this.activePointerInput?.onIdle();
 
@@ -253,7 +253,7 @@ export class PointerManager {
 
   onPointerUp(pointerupEvent: PointerEvent): void {
     if (this.DEBUG == true) {
-      console.log(`[PointerManager] pointerup detected`);
+      console.log("[PointerManager] pointerup detected");
     }
     const pointer = this.getPointerFromId(pointerupEvent.pointerId);
     if (pointer instanceof Pointer) {
@@ -263,11 +263,11 @@ export class PointerManager {
     this.removePointer(pointerupEvent.pointerId);
   }
 
-  onPointerOver(pointeroverEvent: PointerEvent): void {
+  /*onPointerOver(pointeroverEvent: PointerEvent): void {
 
   }
 
-  /*onPointerLeave(pointerleaveEvent: PointerEvent): void {
+  onPointerLeave(pointerleaveEvent: PointerEvent): void {
     if (this.DEBUG == true) {
       console.log(`[PointerManager] pointerLeave detected`);
     }
@@ -297,7 +297,7 @@ export class PointerManager {
 
   onPointerCancel(pointercancelEvent: PointerEvent): void {
     if (this.DEBUG == true) {
-      console.log(`[PointerManager] pointercancel detected`);
+      console.log("[PointerManager] pointercancel detected");
     }
     const pointer = this.getPointerFromId(pointercancelEvent.pointerId);
     if (pointer instanceof Pointer) {

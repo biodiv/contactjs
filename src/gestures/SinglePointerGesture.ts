@@ -6,16 +6,8 @@ import {
   GestureEventData,
 } from "./Gesture";
 
-import {
-  GestureState,
-  PointerManagerState,
-} from "../input-consts";
-
-import {
-  DualPointerGestureParameters,
-  SinglePointerGestureParameters,
-} from "../interfaces";
-
+import { PointerManagerState } from "../input-consts";
+import { SinglePointerGestureParameters } from "../interfaces";
 import { Point } from "../geometry/Point";
 import { Vector } from "../geometry/Vector";
 import { SinglePointerInput } from "../SinglePointerInput";
@@ -32,7 +24,7 @@ export abstract class SinglePointerGesture extends Gesture {
     this.initialPointerEvent = null;
     this.validPointerManagerState = PointerManagerState.SinglePointer;
 
-    let nullRecognitionParameters = this.getEmptyGestureParameters() as SinglePointerGestureParameters;    
+    const nullRecognitionParameters = this.getEmptyGestureParameters() as SinglePointerGestureParameters;    
 
     this.initialParameters = { ...nullRecognitionParameters };
     // a deep copy of the parameters is needed as they can have different values
@@ -43,22 +35,27 @@ export abstract class SinglePointerGesture extends Gesture {
     // provide short-cuts to the values collected in the Contact object
     // match this to the event used by hammer.js
 
-    const globalParameters = singlePointerInput.parameters.global;
+    const globalParameters = singlePointerInput.parameters.live;
     const liveParameters = singlePointerInput.parameters.live;
 
+    let globalVector: Vector = globalParameters.vector;
+    let globalDuration: number = globalParameters.duration;
+
     // gesture specific - dependant on the beginning of the gesture (when the gesture has initially been recognized)
-    const globalStartPoint = new Point(
-      this.initialPointerEvent!.clientX,
-      this.initialPointerEvent!.clientY
-    );
-    const globalEndPoint = new Point(
-      singlePointerInput.pointer.currentPointerEvent.clientX,
-      singlePointerInput.pointer.currentPointerEvent.clientY
-    );
-    const globalVector = new Vector(globalStartPoint, globalEndPoint);
-    const globalDuration =
-      singlePointerInput.pointer.currentPointerEvent.timeStamp -
-      this.initialPointerEvent!.timeStamp;
+    if (this.initialPointerEvent != null) {
+      const globalStartPoint = new Point(
+        this.initialPointerEvent.clientX,
+        this.initialPointerEvent.clientY
+      );
+      const globalEndPoint = new Point(
+        singlePointerInput.pointer.currentPointerEvent.clientX,
+        singlePointerInput.pointer.currentPointerEvent.clientY
+      );
+      globalVector = new Vector(globalStartPoint, globalEndPoint);
+      globalDuration =
+        singlePointerInput.pointer.currentPointerEvent.timeStamp -
+        this.initialPointerEvent.timeStamp;
+    }
 
     // global: global for this recognizer, not the Contact object
     const globalGestureEventData: GlobalGestureEventData = {
@@ -103,7 +100,7 @@ export abstract class SinglePointerGesture extends Gesture {
       recognizer: this,
       global: globalGestureEventData,
       live: liveGestureEventData,
-    }
+    };
 
     return eventData;
   }

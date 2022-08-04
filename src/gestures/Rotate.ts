@@ -13,7 +13,7 @@ export class Rotate extends DualPointerGesture {
 
     this.eventBaseName = "rotate";
 
-    this.initialParameters.live.min["centerMovementDistance"] = 0
+    this.initialParameters.live.min["centerMovementDistance"] = 0;
     this.initialParameters.live.max["centerMovementDistance"] = 50;
     this.initialParameters.live.max["absolutePointerDistanceChange"] = 50;
     this.initialParameters.live.min["absoluteRotationAngle"] = 5;

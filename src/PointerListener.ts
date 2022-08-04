@@ -131,7 +131,7 @@ export class PointerListener {
 
     const pointerManagerOptions = {
       DEBUG: this.options.DEBUG_POINTERMANAGER,
-    }
+    };
     this.pointerManager = new PointerManager(pointerManagerOptions);
 
     // disable context menu on long taps - this kills pointermove
@@ -188,7 +188,7 @@ export class PointerListener {
   // there may be more than one pointer. Each new pointer fires onPointerDown
   private onPointerDown(pointerdownEvent: PointerEvent) {
     if (this.DEBUG == true) {
-      console.log(`[PointerListener] pointerdown event detected`);
+      console.log("[PointerListener] pointerdown event detected");
     }
 
     // re-target all pointerevents to the current element
@@ -418,7 +418,7 @@ export class PointerListener {
     }
     else {
       // remove from active gestures
-      let index = this.activeGestures.indexOf(gesture);
+      const index = this.activeGestures.indexOf(gesture);
       if (index >= 0) {
         this.activeGestures.splice(index, 1);
       }
@@ -511,6 +511,5 @@ export class PointerListener {
     this.removePointerEventListeners();
     this.removeTouchEventListeners();
   }
-
 
 }

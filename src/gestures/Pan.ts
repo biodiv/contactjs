@@ -69,7 +69,7 @@ export class Pan extends SinglePointerGesture {
     if (singlePointerInput instanceof SinglePointerInput) {
       
       if (
-        this.swipeFinalSpeed < singlePointerInput.parameters.global.finalSpeed!
+        this.swipeFinalSpeed < singlePointerInput.parameters.global.finalSpeed
       ) {
         
         this.isSwipe = true;

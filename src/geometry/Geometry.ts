@@ -15,7 +15,7 @@ export class Geometry {
 			endPointerEvent.clientY
 		);
 
-		var vector = new Vector(startPoint, endPoint);
+		const vector = new Vector(startPoint, endPoint);
 
 		return vector;
 	}

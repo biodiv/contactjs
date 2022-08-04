@@ -1,4 +1,4 @@
-import { Gesture, GestureOptions } from "./Gesture";
+import { GestureOptions } from "./Gesture";
 import { SinglePointerGesture } from "./SinglePointerGesture";
 import { PointerManager } from "../PointerManager";
 import { SinglePointerInput } from "../SinglePointerInput";
@@ -42,7 +42,7 @@ export class Tap extends SinglePointerGesture {
       }
       else {
 
-        var singlePointerInput = pointerManager.getlastRemovedPointerInput();
+        const singlePointerInput = pointerManager.getlastRemovedPointerInput();
 
         if (singlePointerInput instanceof SinglePointerInput) {
 

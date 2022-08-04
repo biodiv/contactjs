@@ -13,6 +13,8 @@ import { GestureState } from "../input-consts";
 export class Press extends SinglePointerGesture {
   hasBeenEmitted: boolean;
 
+  private static minDuration = 600;
+
   constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
     super(domElement, options);
 
@@ -31,6 +33,9 @@ export class Press extends SinglePointerGesture {
     const isValid = this.validate(pointerManager);
 
     const singlePointerInput = this.getPointerInput(pointerManager);
+
+    // is this line really necessary? ESLint complains if it is not present, although its value is set in the constructor
+    const minDuration = this.initialParameters.global.min["duration"] || Press.minDuration;
 
     if (singlePointerInput instanceof SinglePointerInput) {
 
@@ -56,7 +61,7 @@ export class Press extends SinglePointerGesture {
 
         if (
           this.hasBeenEmitted == true &&
-          duration <= this.initialParameters.global.min["duration"]!
+          duration <= minDuration
         ) {
           this.hasBeenEmitted = false;
         }

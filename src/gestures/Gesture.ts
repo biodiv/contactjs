@@ -5,7 +5,7 @@ import { Pointer } from "../Pointer";
 import { Point } from "../geometry/Point";
 import { Vector } from "../geometry/Vector";
 
-import { 
+import {
   TimedParameters,
   TimedMinMaxParameters,
   SinglePointerGestureParameters,
@@ -108,8 +108,8 @@ export abstract class Gesture {
 
   }
 
-  getEmptyGestureParameters(): TimedMinMaxParameters{
-    var nullRecognitionParameters: TimedMinMaxParameters = {
+  getEmptyGestureParameters(): TimedMinMaxParameters {
+    const nullRecognitionParameters: TimedMinMaxParameters = {
       global: {
         min: {},
         max: {},
@@ -123,7 +123,7 @@ export abstract class Gesture {
       }
     };
 
-    return nullRecognitionParameters
+    return nullRecognitionParameters;
   }
 
   getGestureParameters(): SinglePointerGestureParameters | DualPointerGestureParameters {
@@ -146,7 +146,7 @@ export abstract class Gesture {
       gestureParameters = this.initialParameters;
     }
 
-    if (gestureParameters == null){
+    if (gestureParameters == null) {
       throw new Error("[Gesture] no gesture parameters found. Do not call .getGestureParameters on abstract class Gesture");
     }
 
@@ -154,24 +154,24 @@ export abstract class Gesture {
   }
 
   validateGestureParameters(pointerInput: SinglePointerInput | DualPointerInput): boolean {
-    
+
     const gestureParameters = this.getGestureParameters();
 
-    let isValid: boolean = true;
-    let timespan:keyof typeof gestureParameters;
-    for (timespan in gestureParameters){
+    let isValid = true;
+    let timespan: keyof typeof gestureParameters;
+    for (timespan in gestureParameters) {
 
       const timedGestureParameters = gestureParameters[timespan];
       const timedPointerInputValues = pointerInput.parameters[timespan] as Record<string, any>;
 
       let minOrMaxOrBoolean: keyof typeof timedGestureParameters;
 
-      for (minOrMaxOrBoolean in timedGestureParameters){
+      for (minOrMaxOrBoolean in timedGestureParameters) {
         const evaluationParameters = timedGestureParameters[minOrMaxOrBoolean] as Record<string, GestureParameterValue>;
         let gestureParameterName: string;
-        for (gestureParameterName in evaluationParameters){
+        for (gestureParameterName in evaluationParameters) {
           const gestureParameter = evaluationParameters[gestureParameterName];
-          
+
           const pointerInputValue = timedPointerInputValues[gestureParameterName];
 
           if (this.DEBUG == true) {
@@ -180,14 +180,14 @@ export abstract class Gesture {
             );
           }
 
-          if (typeof gestureParameter == "boolean" && typeof pointerInputValue == "boolean"){
+          if (typeof gestureParameter == "boolean" && typeof pointerInputValue == "boolean") {
             isValid = this.validateBooleanParameter(gestureParameter, pointerInputValue);
           }
-          else if (typeof gestureParameter == "number" && typeof pointerInputValue == "number"){
+          else if (typeof gestureParameter == "number" && typeof pointerInputValue == "number") {
             isValid = this.validateMinMaxParameter(gestureParameter, pointerInputValue, minOrMaxOrBoolean);
           }
 
-          if (isValid == false){
+          if (isValid == false) {
             if (this.DEBUG == true) {
               console.log(`[${this.eventBaseName}] invalidated `);
             }
@@ -201,7 +201,7 @@ export abstract class Gesture {
     return true;
   }
 
-  validateBooleanParameter(gestureParameter: boolean, pointerInputValue: boolean) {
+  validateBooleanParameter(gestureParameter: boolean, pointerInputValue: boolean): boolean {
     if (gestureParameter == null) {
       return true;
     } else if (gestureParameter == pointerInputValue) {
@@ -225,12 +225,12 @@ export abstract class Gesture {
   }
 
   validateMinMaxParameter(gestureParameter: number, pointerInputValue: number, minOrMax: string): boolean {
-    if (minOrMax == "min"){
+    if (minOrMax == "min") {
       if (pointerInputValue >= gestureParameter) {
         return true;
       }
     }
-    else if (minOrMax == "max"){
+    else if (minOrMax == "max") {
       if (pointerInputValue <= gestureParameter) {
         return true;
       }
@@ -305,7 +305,7 @@ export abstract class Gesture {
       isValid = this.validatePointerManagerState(pointerManager);
     }
 
-    var pointerInput = pointerManager.activePointerInput;
+    const pointerInput = pointerManager.activePointerInput;
 
     if (
       isValid == true &&
@@ -318,7 +318,7 @@ export abstract class Gesture {
       }
 
       if (isValid == true) {
-        isValid = this.validateGestureParameters(pointerInput)
+        isValid = this.validateGestureParameters(pointerInput);
       }
     }
 
@@ -419,14 +419,14 @@ export abstract class Gesture {
         }
 
         // fire direction specific events
-        const currentDirection = eventData.live!.direction;
+        const currentDirection = eventData.live.direction;
 
         const hasSupportedDirections = !!this.options.supportedDirections;
         // do not fire events like "panendleft"
         // only fire directional events if eventName == this.eventBaseName 
         if (hasSupportedDirections == true && eventName == this.eventBaseName) {
-          for (let d = 0; d < this.options.supportedDirections!.length; d++) {
-            const direction = this.options.supportedDirections![d];
+          for (let d = 0; d < this.options.supportedDirections.length; d++) {
+            const direction = this.options.supportedDirections[d];
 
             if (direction == currentDirection) {
               const directionEventName = eventName + direction;
@@ -460,7 +460,7 @@ export abstract class Gesture {
 
     this.state = GestureState.Active;
     this.setInitialPointerEvent(pointerManager);
-    const eventName: string = `${this.eventBaseName}start`;
+    const eventName = `${this.eventBaseName}start`;
     this.emit(pointerManager, eventName);
   }
 
@@ -472,7 +472,7 @@ export abstract class Gesture {
     }
     this.state = GestureState.Inactive;
 
-    const eventName: string = `${this.eventBaseName}end`;
+    const eventName = `${this.eventBaseName}end`;
     this.emit(pointerManager, eventName);
 
   }
@@ -519,7 +519,7 @@ export abstract class Gesture {
   }
 
   getEventData(pointerInput: SinglePointerInput | DualPointerInput): GestureEventData {
-    throw new Error("Gesture subclasses require a getEventData method()")
+    throw new Error("Gesture subclasses require a getEventData method()");
   }
 
 }

@@ -69,7 +69,7 @@ export class Pointer {
 
     const nullVector = Geometry.getVector(pointerEvent, pointerEvent);
 
-    var globalParameters: PointerGlobalParameters = {
+    const globalParameters: PointerGlobalParameters = {
       startX: this.initialPointerEvent.clientX,
       startY: this.initialPointerEvent.clientY,
       vector: nullVector,
@@ -90,7 +90,7 @@ export class Pointer {
       duration: 0,
     };
 
-    var liveParameters: PointerLiveParameters = {
+    const liveParameters: PointerLiveParameters = {
       duration: 0, // ms
       speed: 0,
       vector: nullVector,
@@ -98,7 +98,7 @@ export class Pointer {
       isMoving: false,
     };
 
-    var parameters: PointerParameters = {
+    const parameters: PointerParameters = {
       global: globalParameters,
       live: liveParameters,
     };
@@ -161,7 +161,7 @@ export class Pointer {
 
     this.parameters.live.speed = 0;
 
-    this.state = PointerState.Canceled
+    this.state = PointerState.Canceled;
 
     this.parameters.live.isMoving = false;
 
@@ -194,7 +194,7 @@ export class Pointer {
       liveVector,
       timedPointerEvents[0].timeStamp,
       timedPointerEvents[1].timeStamp
-    )
+    );
 
     // update global parameters
     if (this.parameters.live.speed > this.parameters.global.maximumSpeed) {

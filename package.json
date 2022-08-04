@@ -17,7 +17,8 @@
     "watch:parcel": "parcel watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "lint:strict": "eslint . --max-warnings=0"
   },
   "repository": {
     "type": "git",

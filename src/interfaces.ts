@@ -2,14 +2,14 @@ import { Vector } from "./geometry/Vector";
 import { Point } from "./geometry/Point";
 
 export interface TimedParameters {
-  global: {},
-  live: {},
+  global: Record<string, any>,
+  live: Record<string, any>,
 }
 
 export interface MinMaxIntervalBool {
-  min: {},
-  max: {},
-  boolean: {},
+  min: Record<string, any>,
+  max: Record<string, any>,
+  boolean: Record<string, any>,
 }
 
 export interface TimedMinMaxParameters extends TimedParameters {
@@ -17,7 +17,7 @@ export interface TimedMinMaxParameters extends TimedParameters {
   live: MinMaxIntervalBool,
 }
 
-export interface PointerGlobalParameters {
+export interface PointerGlobalNumberParameters {
   duration: number, // ms
   currentSpeed: number, // px/s
   averageSpeed: number, // px/s
@@ -27,7 +27,41 @@ export interface PointerGlobalParameters {
   // additional parameters for the GestureEvent
   startX: number,
   startY: number,
+  deltaX: number,
+  deltaY: number,
+  startTimestampUTC: number,
+  startTimestamp: number,
+  currentTimestamp: number,
+  endTimestamp: number | null,
+  maximumSpeed: number,
+  traveledDistance: number,
+}
+
+export interface GeometricParameters {
   vector: Vector,
+}
+
+export interface PointerGlobalBooleanParameters {
+  hasBeenMoved: boolean,
+}
+
+export interface PointerGlobalParameters extends
+  PointerGlobalNumberParameters,
+  GeometricParameters,
+  PointerGlobalBooleanParameters {}
+
+/*
+export interface PointerGlobalParameters {
+  vector: Vector,
+  duration: number, // ms
+  currentSpeed: number, // px/s
+  averageSpeed: number, // px/s
+  finalSpeed: number, // px/s
+  distance: number, // px
+  maximumDistance: number, //px
+  // additional parameters for the GestureEvent
+  startX: number,
+  startY: number,
   deltaX: number,
   deltaY: number,
   startTimestampUTC: number,
@@ -38,14 +72,32 @@ export interface PointerGlobalParameters {
   traveledDistance: number,
   hasBeenMoved: boolean,
 }
+*/
 
+export interface PointerLiveNumberParameters {
+  duration: number, // ms
+  speed: number,
+  distance: number,
+}
+
+export interface PointerLiveBooleanParameters {
+  isMoving: boolean,
+}
+
+
+export interface PointerLiveParameters extends 
+  PointerLiveNumberParameters,
+  GeometricParameters,
+  PointerLiveBooleanParameters {}
+
+/*
 export interface PointerLiveParameters {
   duration: number, // ms
   speed: number,
-  vector: Vector,
   distance: number,
+  vector: Vector,
   isMoving: boolean,
-}
+}*/
 
 export interface PointerParameters extends TimedParameters {
   global: PointerGlobalParameters,
@@ -57,23 +109,25 @@ export interface PointerParameters extends TimedParameters {
  */
 export interface SinglePointerGestureParameters extends TimedMinMaxParameters {
   global: {
-    min: Partial<PointerGlobalParameters>,
-    max: Partial<PointerGlobalParameters>,
-    boolean: Partial<PointerGlobalParameters>,
+    min: Partial<PointerGlobalNumberParameters>,
+    max: Partial<PointerGlobalNumberParameters>,
+    boolean: PointerGlobalBooleanParameters,
   },
   live: {
-    min: Partial<PointerLiveParameters>,
-    max: Partial<PointerLiveParameters>,
-    boolean: Partial<PointerLiveParameters>,
+    min: Partial<PointerLiveNumberParameters>,
+    max: Partial<PointerLiveNumberParameters>,
+    boolean: Partial<PointerLiveBooleanParameters>,
   }
 }
 
-export interface DualPointerInputGlobalParameters {
+
+
+/**
+ * Dual Pointer interfaces
+ */
+export interface DualPointerInputGlobalNumberParameters {
   duration: number,
-  center: Point,
-  centerHasBeenMoved: boolean,
   centerMovementDistance: number,
-  centerMovementVector: Vector,
   absolutePointerDistanceChange: number, // px
   relativePointerDistanceChange: number, // %
   rotationAngle: number,
@@ -82,9 +136,36 @@ export interface DualPointerInputGlobalParameters {
   absoluteVectorAngle: number,
 }
 
-export interface DualPointerInputLiveParameters {
+export interface DualPointerInputGlobalBooleanParameters {
+  centerHasBeenMoved: boolean,
+}
+
+export interface DualPointerInputGeometricParameters {
+  centerMovementVector: Vector,
   center: Point,
-  centerIsMoving: boolean,
+}
+
+export interface DualPointerInputGlobalParameters extends 
+  DualPointerInputGlobalNumberParameters,
+  DualPointerInputGlobalBooleanParameters,
+  DualPointerInputGeometricParameters {}
+
+
+/*export interface DualPointerInputGlobalParameters {
+  duration: number,
+  centerMovementDistance: number,
+  absolutePointerDistanceChange: number, // px
+  relativePointerDistanceChange: number, // %
+  rotationAngle: number,
+  absoluteRotationAngle: number,
+  vectorAngle: number,
+  absoluteVectorAngle: number,
+  centerMovementVector: Vector,
+  center: Point,
+  centerHasBeenMoved: boolean,
+}*/
+
+export interface DualPointerInputLiveNumberParameters {
   centerMovementDistance: number,
   centerMovementVector: Vector,
   absolutePointerDistanceChange: number,
@@ -94,6 +175,29 @@ export interface DualPointerInputLiveParameters {
   vectorAngle: number,
   absoluteVectorAngle: number,
 }
+
+export interface DualPointerInputLiveBooleanParameters {
+  centerIsMoving: boolean,
+}
+
+export interface DualPointerInputLiveParameters extends
+  DualPointerInputLiveNumberParameters,
+  DualPointerInputLiveBooleanParameters,
+  DualPointerInputGeometricParameters {}
+
+/*
+export interface DualPointerInputLiveParameters {
+  centerMovementDistance: number,
+  absolutePointerDistanceChange: number,
+  relativePointerDistanceChange: number,
+  rotationAngle: number,
+  absoluteRotationAngle: number,
+  vectorAngle: number,
+  absoluteVectorAngle: number,
+  centerMovementVector: Vector,
+  center: Point,
+  centerIsMoving: boolean,
+}*/
 
 export interface DualPointerInputParameters extends TimedParameters {
   global: DualPointerInputGlobalParameters,
@@ -105,13 +209,13 @@ export interface DualPointerInputParameters extends TimedParameters {
  */
 export interface DualPointerGestureParameters extends TimedMinMaxParameters{
   global: {
-    min: Partial<DualPointerInputGlobalParameters>,
-    max: Partial<DualPointerInputGlobalParameters>,
-    boolean: Partial<DualPointerInputGlobalParameters>,
+    min: Partial<DualPointerInputGlobalNumberParameters>,
+    max: Partial<DualPointerInputGlobalNumberParameters>,
+    boolean: Partial<DualPointerInputGlobalBooleanParameters>,
   }
   live: {
-    min: Partial<DualPointerInputLiveParameters>,
-    max: Partial<DualPointerInputLiveParameters>,
-    boolean: Partial<DualPointerInputLiveParameters>,
+    min: Partial<DualPointerInputLiveNumberParameters>,
+    max: Partial<DualPointerInputLiveNumberParameters>,
+    boolean: Partial<DualPointerInputLiveBooleanParameters>,
   }
 }

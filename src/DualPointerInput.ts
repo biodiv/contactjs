@@ -49,7 +49,7 @@ export class DualPointerInput {
     const globalCenter = Geometry.getCenter(globalVector_1.startPoint, globalVector_2.startPoint);
     const globalCenterMovementVector = Geometry.getCenterMovementVector(globalVector_1, globalVector_2);
 
-    var globalParameters: DualPointerInputGlobalParameters = {
+    const globalParameters: DualPointerInputGlobalParameters = {
       duration: 0,
       center: globalCenter,
       centerHasBeenMoved: false,
@@ -69,7 +69,7 @@ export class DualPointerInput {
     const liveCenterMovementVector = Geometry.getCenterMovementVector(liveVector_1, liveVector_2);
 
 
-    var liveParameters: DualPointerInputLiveParameters = {
+    const liveParameters: DualPointerInputLiveParameters = {
       center: liveCenter,
       centerIsMoving: false,
       centerMovementDistance: 0,
@@ -82,7 +82,7 @@ export class DualPointerInput {
       absoluteVectorAngle: 0,
     };
 
-    var parameters: DualPointerInputParameters = {
+    const parameters: DualPointerInputParameters = {
       global: globalParameters,
       live: liveParameters,
     };
