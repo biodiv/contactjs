@@ -3,7 +3,7 @@
   "version": "1.4.1",
   "description": "Pointer gestures for your webapp",
   "main": "dist/index.js",
-  "module": "dist/module.js",
+  "module": "dist/contact.module.js",
   "types": "dist/index.d.ts",
   "source": "src/index.ts",
   "directories": {

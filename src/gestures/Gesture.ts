@@ -15,6 +15,7 @@ import {
 import {
   GestureState,
   PointerManagerState,
+  Direction,
 } from "../input-consts";
 
 
@@ -37,7 +38,7 @@ export interface GlobalGestureEventData {
   speedX: number;
   speedY: number;
   speed: number;
-  direction: string;
+  direction: Direction;
   scale: number;
   rotation: number;
   srcEvent: PointerEvent;
@@ -50,7 +51,7 @@ export interface LiveGestureEventData {
   speedX: number;
   speedY: number;
   speed: number;
-  direction: string;
+  direction: Direction;
   scale: number;
   rotation: number;
   center: Point;

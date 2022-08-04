@@ -35,6 +35,7 @@ export class Press extends SinglePointerGesture {
     const singlePointerInput = this.getPointerInput(pointerManager);
 
     // is this line really necessary? ESLint complains if it is not present, although its value is set in the constructor
+    // adding Object.freeze(this.initialParameters) in the constructor did not resolve the ESLint error
     const minDuration = this.initialParameters.global.min["duration"] || Press.minDuration;
 
     if (singlePointerInput instanceof SinglePointerInput) {
