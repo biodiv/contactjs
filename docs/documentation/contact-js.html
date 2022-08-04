@@ -37,6 +37,8 @@ var pointerListener = new PointerListener(domElement, options);
 var options = {
 	supportedGestures : [Tap, Pan, Pinch, Rotate, TwoFingerPan],
 	bubbles : false, // defaults to true
+	consecutiveGestures : true, // defaults to true
+	simultaneousGestures : true, // defaults to true
 	handleTouchEvents : false, // defaults to true
 	pointerDown : function(event, pointerListener){},
 	pointerMove : function(event, pointerListener){},
@@ -79,6 +81,26 @@ var pointerListener = new PointerListener(domElement, options);
 								</td>
 								<td>
 									Turn event bubbling on or off.
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">consecutiveGestures</th>
+								<td>
+									<i>Boolean</i> <br>
+									<i>true</i> or <i>false</i>
+								</td>
+								<td>
+									Allow several gestures after one another without lifting the pointer.
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">simultaneousGestures</th>
+								<td>
+									<i>Boolean</i> <br>
+									<i>true</i> or <i>false</i>
+								</td>
+								<td>
+									Allow two or more gestures at the same time. For example: pinching while rotating.
 								</td>
 							</tr>
 							<tr>
@@ -155,6 +177,11 @@ domElement.addEventListener(EVENTNAME, function(event){
 								<td>fired if pointerDown stays at the same position for a longer time</td>
 							</tr>
 							<tr>
+								<th scope="row">pressend</th>
+								<td>Press</td>
+								<td>fired when the pointer is relesaed after a press has been detected</td>
+							</tr>
+							<tr>
 								<th scope="row">panstart</th>
 								<td>Pan</td>
 								<td>fired after pointerDown</td>
@@ -226,7 +253,7 @@ domElement.addEventListener(EVENTNAME, function(event){
 {% highlight javascript %}
 {
 	detail : {
-		contact : contactInstance,
+		pointerManager : PointerManager instance,
 		gesture : gestureInstance, // instance of Tap, Pan recognizer etc
 		global : { 		// global covers data spanning the whole pointer contact duration
 			deltaX : Number, // traveled distance along the x-axis in px, whole contact duration
