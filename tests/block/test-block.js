@@ -1,5 +1,5 @@
 "use strict";
-import { PointerListener, Press, Pan } from '../../dist/module.js';
+import { PointerListener, Press, Pan } from '../../dist/contact.module.js';
 
 var animationFrameId = null;
 

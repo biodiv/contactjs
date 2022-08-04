@@ -1,5 +1,5 @@
 "use strict";
-import { PointerListener, Tap } from '../../dist/module.js';
+import { PointerListener, Tap } from '../../dist/contact.module.js';
 
 var animationFrameId = null;
 

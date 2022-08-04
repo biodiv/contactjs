@@ -1,5 +1,5 @@
 "use strict";
-import { PointerListener, Tap, Press, Pan, TwoFingerPan, Pinch, Rotate } from '../../dist/module.js';
+import { PointerListener, Tap, Press, Pan, TwoFingerPan, Pinch, Rotate } from '../../dist/contact.module.js';
 
 var animationFrameId = null;
 
