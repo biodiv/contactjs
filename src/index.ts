@@ -1,7 +1,6 @@
 export {
     Direction,
     Directions,
-
     GestureState
 } from "./input-consts";
 
