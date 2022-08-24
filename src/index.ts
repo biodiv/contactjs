@@ -4,21 +4,13 @@ export {
     GestureState
 } from "./input-consts";
 
-export {
-    deg2rad,
-    rad2deg,
-    calcAngleDegrees,
-    calcAngleRad,
-} from "./contact";
+export { Geometry } from "./geometry/Geometry";
 
-export { PointerListener } from "./pointer-listener";
+export { PointerListener } from "./PointerListener";
 
-export {
-    Tap,
-    Press,
-    Pan,
-    Pinch,
-    Rotate,
-    TwoFingerPan,
-    GestureEvent
-} from "./gestures";
+export { Tap } from "./gestures/Tap";
+export { Press } from "./gestures/Press";
+export { Pan } from "./gestures/Pan";
+export { TwoFingerPan } from "./gestures/TwoFingerPan";
+export { Pinch } from "./gestures/Pinch";
+export { Rotate } from "./gestures/Rotate";

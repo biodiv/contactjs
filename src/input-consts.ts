@@ -1,5 +1,3 @@
-"use strict";
-
 export enum Direction {
   None = "0",
   Left = "left",
@@ -21,11 +19,23 @@ export const Directions = Object.freeze({
     Direction.Left,
     Direction.Right,
     Direction.Up,
-    Direction.Down
+    Direction.Down,
   ]
 });
 
 export enum GestureState {
-  Possible = "possible",
+  Inactive = "inactive",
+  Active = "active",
   Blocked = "blocked"
+}
+
+export enum PointerManagerState {
+  NoPointer = "nopointer",
+  SinglePointer = "singlepointer",
+  DualPointer = "dualpointer",
+}
+
+export enum PointerListenerState {
+  NoActiveGesture = "noactivegesture",
+  ActiveGesture = "activegesture",
 }
