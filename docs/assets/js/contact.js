@@ -824,13 +824,9 @@ class $7a0f7fd2f33d0212$export$f86166cd6057c2d1 extends (0, $e8978caba4d46d00$ex
     onTouchMove(event) {
         if (this.state == (0, $a2188ba8c266b376$export$a1d3109c03b1d511).Active) {
             if (this.DEBUG == true) console.log("[Pan] preventing touchmove default");
-            event.preventDefault();
-            event.stopPropagation();
         }
     }
 }
-
-
 
 
 
@@ -963,6 +959,109 @@ class $ba0aae203ff6b3f9$export$bdba51b3ce92d5f1 {
         return this.currentPointerEvent;
     }
 }
+
+
+
+class $a1a4c2869495e604$export$f9d89efe4b7795e7 extends (0, $f752273e736c5336$export$61ce360501d38a6f) {
+    constructor(domElement, options){
+        super(domElement, options);
+        this.initialPointerEvent_1 = null;
+        this.initialPointerEvent_2 = null;
+        this.validPointerManagerState = (0, $a2188ba8c266b376$export$b8339a9622c147c0).DualPointer;
+        this.validPointerInputConstructor = (0, $ba0aae203ff6b3f9$export$bdba51b3ce92d5f1);
+        const nullRecognitionParameters = this.getEmptyGestureParameters();
+        this.initialParameters = {
+            ...nullRecognitionParameters
+        };
+        this.activeStateParameters = JSON.parse(JSON.stringify({
+            ...nullRecognitionParameters
+        }));
+    }
+    getEventData(dualPointerInput) {
+        // provide short-cuts to the values collected in the Contact object
+        // match this to the event used by hammer.js
+        const globalParameters = dualPointerInput.parameters.global;
+        const liveParameters = dualPointerInput.parameters.live;
+        const globalGestureEventData = {
+            deltaX: globalParameters.centerMovementVector.x,
+            deltaY: globalParameters.centerMovementVector.y,
+            distance: globalParameters.centerMovementDistance,
+            speedX: globalParameters.centerMovementVector.x / globalParameters.duration,
+            speedY: globalParameters.centerMovementVector.y / globalParameters.duration,
+            speed: globalParameters.centerMovementVector.vectorLength / globalParameters.duration,
+            direction: globalParameters.centerMovementVector.direction,
+            scale: globalParameters.relativePointerDistanceChange,
+            rotation: globalParameters.rotationAngle,
+            srcEvent: dualPointerInput.currentPointerEvent
+        };
+        const liveGestureEventData = {
+            deltaX: liveParameters.centerMovementVector.x,
+            deltaY: liveParameters.centerMovementVector.y,
+            distance: liveParameters.centerMovementDistance,
+            speedX: liveParameters.centerMovementVector.x / globalParameters.duration,
+            speedY: liveParameters.centerMovementVector.y / globalParameters.duration,
+            speed: liveParameters.centerMovementVector.vectorLength / globalParameters.duration,
+            direction: liveParameters.centerMovementVector.direction,
+            scale: liveParameters.relativePointerDistanceChange,
+            rotation: liveParameters.rotationAngle,
+            center: {
+                x: liveParameters.centerMovementVector.startPoint.x,
+                y: liveParameters.centerMovementVector.startPoint.y
+            },
+            srcEvent: dualPointerInput.currentPointerEvent
+        };
+        const gestureEventData = {
+            recognizer: this,
+            global: globalGestureEventData,
+            live: liveGestureEventData
+        };
+        return gestureEventData;
+    }
+}
+
+
+class $ed7931f1d96d5294$export$826ae541ddf1527b extends (0, $a1a4c2869495e604$export$f9d89efe4b7795e7) {
+    constructor(domElement, options){
+        super(domElement, options);
+        this.eventBaseName = "pinch";
+        this.initialParameters.live.min["centerMovementDistance"] = 0;
+        this.initialParameters.live.max["centerMovementDistance"] = 50; //px
+        this.initialParameters.live.min["absolutePointerDistanceChange"] = 5; // distance between 2 fingers
+        this.initialParameters.live.max["absoluteRotationAngle"] = 20;
+        this.initialParameters.live.min["absoluteVectorAngle"] = 10;
+    }
+}
+
+
+
+class $9fe2bb90b337f66c$export$152db69a76b6b79e extends (0, $a1a4c2869495e604$export$f9d89efe4b7795e7) {
+    constructor(domElement, options){
+        super(domElement, options);
+        this.eventBaseName = "rotate";
+        this.initialParameters.live.min["centerMovementDistance"] = 0;
+        this.initialParameters.live.max["centerMovementDistance"] = 50;
+        this.initialParameters.live.max["absolutePointerDistanceChange"] = 50;
+        this.initialParameters.live.min["absoluteRotationAngle"] = 5;
+        this.activeStateParameters.live.min["absoluteRotationAngle"] = 0;
+    }
+}
+
+
+
+class $59226122237c359c$export$8847187e02a498e8 extends (0, $a1a4c2869495e604$export$f9d89efe4b7795e7) {
+    constructor(domElement, options){
+        super(domElement, options);
+        this.eventBaseName = "twofingerpan";
+        this.initialParameters.live.min["centerMovementDistance"] = 10;
+        this.initialParameters.live.max["absolutePointerDistanceChange"] = 50;
+        this.initialParameters.live.max["absoluteVectorAngle"] = 150;
+        this.activeStateParameters.live.min["centerMovementDistance"] = 0;
+    }
+}
+
+
+
+
 
 
 class $4f5a7b355079efa2$export$af6d1be017a420a {
@@ -1148,8 +1247,11 @@ class $4f5a7b355079efa2$export$af6d1be017a420a {
 const $03c52e54621b9b86$var$ALL_GESTURE_CLASSES = [
     (0, $b6ec4e8a6d9d51ec$export$4451a18ddc7083b7),
     (0, $5653a1f5fdc2db30$export$90610caf6d8d0242),
-    (0, $7a0f7fd2f33d0212$export$f86166cd6057c2d1)
-]; //, Pinch, Rotate, TwoFingerPan];
+    (0, $7a0f7fd2f33d0212$export$f86166cd6057c2d1),
+    (0, $ed7931f1d96d5294$export$826ae541ddf1527b),
+    (0, $9fe2bb90b337f66c$export$152db69a76b6b79e),
+    (0, $59226122237c359c$export$8847187e02a498e8)
+];
 class $03c52e54621b9b86$export$9371bd96776f4e82 {
     constructor(domElement, options){
         this.state = (0, $a2188ba8c266b376$export$2fb579dd5dfdbea).NoActiveGesture;
@@ -1458,104 +1560,6 @@ class $03c52e54621b9b86$export$9371bd96776f4e82 {
 
 
 
-
-
-class $a1a4c2869495e604$export$f9d89efe4b7795e7 extends (0, $f752273e736c5336$export$61ce360501d38a6f) {
-    constructor(domElement, options){
-        super(domElement, options);
-        this.initialPointerEvent_1 = null;
-        this.initialPointerEvent_2 = null;
-        this.validPointerManagerState = (0, $a2188ba8c266b376$export$b8339a9622c147c0).DualPointer;
-        this.validPointerInputConstructor = (0, $ba0aae203ff6b3f9$export$bdba51b3ce92d5f1);
-        const nullRecognitionParameters = this.getEmptyGestureParameters();
-        this.initialParameters = {
-            ...nullRecognitionParameters
-        };
-        this.activeStateParameters = JSON.parse(JSON.stringify({
-            ...nullRecognitionParameters
-        }));
-    }
-    getEventData(dualPointerInput) {
-        // provide short-cuts to the values collected in the Contact object
-        // match this to the event used by hammer.js
-        const globalParameters = dualPointerInput.parameters.global;
-        const liveParameters = dualPointerInput.parameters.live;
-        const globalGestureEventData = {
-            deltaX: globalParameters.centerMovementVector.x,
-            deltaY: globalParameters.centerMovementVector.y,
-            distance: globalParameters.centerMovementDistance,
-            speedX: globalParameters.centerMovementVector.x / globalParameters.duration,
-            speedY: globalParameters.centerMovementVector.y / globalParameters.duration,
-            speed: globalParameters.centerMovementVector.vectorLength / globalParameters.duration,
-            direction: globalParameters.centerMovementVector.direction,
-            scale: globalParameters.relativePointerDistanceChange,
-            rotation: globalParameters.rotationAngle,
-            srcEvent: dualPointerInput.currentPointerEvent
-        };
-        const liveGestureEventData = {
-            deltaX: liveParameters.centerMovementVector.x,
-            deltaY: liveParameters.centerMovementVector.y,
-            distance: liveParameters.centerMovementDistance,
-            speedX: liveParameters.centerMovementVector.x / globalParameters.duration,
-            speedY: liveParameters.centerMovementVector.y / globalParameters.duration,
-            speed: liveParameters.centerMovementVector.vectorLength / globalParameters.duration,
-            direction: liveParameters.centerMovementVector.direction,
-            scale: liveParameters.relativePointerDistanceChange,
-            rotation: liveParameters.rotationAngle,
-            center: {
-                x: liveParameters.centerMovementVector.startPoint.x,
-                y: liveParameters.centerMovementVector.startPoint.y
-            },
-            srcEvent: dualPointerInput.currentPointerEvent
-        };
-        const gestureEventData = {
-            recognizer: this,
-            global: globalGestureEventData,
-            live: liveGestureEventData
-        };
-        return gestureEventData;
-    }
-}
-
-
-class $59226122237c359c$export$8847187e02a498e8 extends (0, $a1a4c2869495e604$export$f9d89efe4b7795e7) {
-    constructor(domElement, options){
-        super(domElement, options);
-        this.eventBaseName = "twofingerpan";
-        this.initialParameters.live.min["centerMovementDistance"] = 10;
-        this.initialParameters.live.max["absolutePointerDistanceChange"] = 50;
-        this.initialParameters.live.max["absoluteVectorAngle"] = 150;
-        this.activeStateParameters.live.min["centerMovementDistance"] = 0;
-    }
-}
-
-
-
-class $ed7931f1d96d5294$export$826ae541ddf1527b extends (0, $a1a4c2869495e604$export$f9d89efe4b7795e7) {
-    constructor(domElement, options){
-        super(domElement, options);
-        this.eventBaseName = "pinch";
-        this.initialParameters.live.min["centerMovementDistance"] = 0;
-        this.initialParameters.live.max["centerMovementDistance"] = 50; //px
-        this.initialParameters.live.min["absolutePointerDistanceChange"] = 5; // distance between 2 fingers
-        this.initialParameters.live.max["absoluteRotationAngle"] = 20;
-        this.initialParameters.live.min["absoluteVectorAngle"] = 10;
-    }
-}
-
-
-
-class $9fe2bb90b337f66c$export$152db69a76b6b79e extends (0, $a1a4c2869495e604$export$f9d89efe4b7795e7) {
-    constructor(domElement, options){
-        super(domElement, options);
-        this.eventBaseName = "rotate";
-        this.initialParameters.live.min["centerMovementDistance"] = 0;
-        this.initialParameters.live.max["centerMovementDistance"] = 50;
-        this.initialParameters.live.max["absolutePointerDistanceChange"] = 50;
-        this.initialParameters.live.min["absoluteRotationAngle"] = 5;
-        this.activeStateParameters.live.min["absoluteRotationAngle"] = 0;
-    }
-}
 
 
 
