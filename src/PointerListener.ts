@@ -2,6 +2,9 @@ import { Gesture } from "./gestures/Gesture";
 import { Tap } from "./gestures/Tap";
 import { Press } from "./gestures/Press";
 import { Pan } from "./gestures/Pan";
+import { Pinch } from "./gestures/Pinch";
+import { Rotate } from "./gestures/Rotate";
+import { TwoFingerPan } from "./gestures/TwoFingerPan";
 import { PointerManager } from "./PointerManager";
 import {
   PointerListenerState,
@@ -27,7 +30,7 @@ import {
 
 type GestureConstructor = new (...args: ConstructorParameters<typeof Gesture>) => Gesture;
 
-const ALL_GESTURE_CLASSES: GestureConstructor[] = [Tap, Press, Pan]; //, Pinch, Rotate, TwoFingerPan];
+const ALL_GESTURE_CLASSES: GestureConstructor[] = [Tap, Press, Pan, Pinch, Rotate, TwoFingerPan];
 
 type Timer = ReturnType<typeof setInterval>;
 

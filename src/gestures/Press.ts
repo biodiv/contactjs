@@ -4,6 +4,11 @@ import { PointerManager } from "../PointerManager";
 import { SinglePointerInput } from "../SinglePointerInput";
 import { GestureState } from "../input-consts";
 
+
+interface PressOptions extends GestureOptions {
+  minDuration: number,
+  maxDistance: number,
+}
 /*
  * press should only be fired once
  * if global duration is below Press.initialMinMaxParameters["duration"][0], set the Press to possible
@@ -15,15 +20,30 @@ export class Press extends SinglePointerGesture {
 
   private static minDuration = 600;
 
-  constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
+  constructor(domElement: HTMLElement, options?: Partial<PressOptions>) {
     super(domElement, options);
 
     this.eventBaseName = "press";
 
-    this.initialParameters.global.min["duration"] = 600; // milliseconds. after a certain touch duration, it is not a TAP anymore
+    let globalMinDuration = 600;
+    let globalMaxDistance = 10;
+    let globalMaxMaximumDistance = 20;
 
-    this.initialParameters.global.max["distance"] = 10; // if the pointer moved a certain distance, Press becomes impossible
-    this.initialParameters.global.max["maximumDistance"] = 20;
+    if (options){
+      if ("minDuration" in options){
+        globalMinDuration = options["minDuration"];
+      }
+
+      if ("maxDistance" in options){
+        globalMaxMaximumDistance = options["maxDistance"];
+        globalMaxDistance = options["maxDistance"];
+      }
+    }
+
+    this.initialParameters.global.min["duration"] = globalMinDuration; // milliseconds. after a certain touch duration, it is not a TAP anymore
+
+    this.initialParameters.global.max["distance"] = globalMaxDistance; // if the pointer moved a certain distance, Press becomes impossible
+    this.initialParameters.global.max["maximumDistance"] = globalMaxMaximumDistance;
     // only Press has this parameter
     this.hasBeenEmitted = false;
 

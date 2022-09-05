@@ -4,6 +4,12 @@ import { PointerManager } from "../PointerManager";
 import { SinglePointerInput } from "../SinglePointerInput";
 import { PointerManagerState } from "../input-consts";
 
+
+interface TapOptions extends GestureOptions {
+  maxDuration: number;
+  maxDistance: number;
+}
+
 /*
  * TAP DEFINITION
  * - user touches the screen with one finger or presses the mouse button down
@@ -13,17 +19,32 @@ import { PointerManagerState } from "../input-consts";
  */
 export class Tap extends SinglePointerGesture {
 
-  constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
+  constructor(domElement: HTMLElement, options?: Partial<TapOptions>) {
     super(domElement, options);
 
     this.validPointerManagerState = PointerManagerState.NoPointer;
 
     this.eventBaseName = "tap";
 
-    this.initialParameters.global.max["duration"] = 200; // milliseconds. after a certain touch duration, it is not a TAP anymore
+    let globalMaxDuration = 200;
+    let liveMaxDistance = 30;
+    let globalMaxDistance = 30;
 
-    this.initialParameters.live.max["distance"] = 30; // if a certain distance is detected, TAP becomes impossible
-    this.initialParameters.global.max["distance"] = 30; // if a certain distance is detected, TAP becomes impossible
+    if (options){
+      if ("maxDuration" in options){
+        globalMaxDuration = options["maxDuration"];
+      }
+
+      if ("maxDistance" in options){
+        liveMaxDistance = options["maxDistance"];
+        globalMaxDistance = options["maxDistance"];
+      }
+    }
+
+    this.initialParameters.global.max["duration"] = globalMaxDuration; // milliseconds. after a certain touch duration, it is not a TAP anymore
+
+    this.initialParameters.live.max["distance"] = liveMaxDistance; // if a certain distance is detected, TAP becomes impossible
+    this.initialParameters.global.max["distance"] = globalMaxDistance; // if a certain distance is detected, TAP becomes impossible
 
   }
 

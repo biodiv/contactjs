@@ -1,5 +1,5 @@
 "use strict";
-import { PointerListener, Press, Pan, TwoFingerPan, Pinch } from '../../dist/contact.module.js';
+import { PointerListener, Press, Pan, TwoFingerPan, Pinch } from "../../dist/contact.js";
 
 var animationFrameId = null;
 
@@ -46,7 +46,7 @@ function loadContact() {
     pointerup: function (event, pointerListener) {
       if (pointerListener.pointerManager.hasPointersOnSurface() == false) {
         resetElementTransform();
-      };
+      }
     }
   });
 
@@ -118,11 +118,11 @@ function resetElementTransform() {
       z: 0,
       angle: 0
     }
-  }
+  };
 
   if (ticking == true) {
     setTimeout(function () {
-      resetElementTransform(element)
+      resetElementTransform(element);
     }, 1000 / 60);
   }
   else {
@@ -133,12 +133,12 @@ function resetElementTransform() {
 
 function requestElementUpdate(wait) {
 
-  var wait = wait || false;
+  wait = wait || false;
 
   var transformValues = [
-    'translate3d(' + transform.translate.x + 'px, ' + transform.translate.y + 'px, 0)',
-    'scale3d(' + transform.scale.x + ', ' + transform.scale.y + ', ' + transform.scale.z + ')',
-    'rotate3d(' + transform.rotate.x + ',' + transform.rotate.y + ',' + transform.rotate.z + ',' + transform.rotate.angle + 'deg)'
+    "translate3d(" + transform.translate.x + "px, " + transform.translate.y + "px, 0)",
+    "scale3d(" + transform.scale.x + ", " + transform.scale.y + ", " + transform.scale.z + ")",
+    "rotate3d(" + transform.rotate.x + "," + transform.rotate.y + "," + transform.rotate.z + "," + transform.rotate.angle + "deg)"
   ];
 
   var transformString = transformValues.join(" ");
@@ -165,10 +165,10 @@ function requestElementUpdate(wait) {
 
 function onPan(event) {
 
-  element.className = '';
+  element.className = "";
 
   var deltaX = event.detail.global.deltaX;
-  var deltaY = event.detail.global.deltaY
+  var deltaY = event.detail.global.deltaY;
 
   transform.translate = {
     x: deltaX,
@@ -185,7 +185,9 @@ function onPanEnd(event) {
 
 function onTwoFingerPan(event) {
 
-  rectangle.className = '';
+  var rectangle = document.getElementById("rectangle");
+
+  rectangle.className = "";
 
   var deltaX = event.detail.global.deltaX;
   var deltaY = event.detail.global.deltaY;
@@ -203,6 +205,8 @@ function onTwoFingerPan(event) {
 
 function onPinch(event) {
 
+  var rectangle = document.getElementById("rectangle");
+
   rectangle.className = "";
 
   var relativeDistanceChange = event.detail.global.scale;
@@ -216,7 +220,7 @@ function onPinch(event) {
       z: 1
     };
 
-    console.log(transform)
+    console.log(transform);
 
     requestElementUpdate();
 

@@ -1,9 +1,9 @@
 {
   "name": "contactjs",
-  "version": "1.4.1",
+  "version": "2.0",
   "description": "Pointer gestures for your webapp",
   "main": "dist/index.js",
-  "module": "dist/contact.module.js",
+  "module": "dist/contact.js",
   "types": "dist/index.d.ts",
   "source": "src/index.ts",
   "directories": {

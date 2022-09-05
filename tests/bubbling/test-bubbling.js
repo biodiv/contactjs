@@ -1,5 +1,5 @@
 "use strict";
-import { PointerListener, Tap } from '../../dist/contact.module.js';
+import { PointerListener, Tap } from "../../dist/contact.js";
 
 var animationFrameId = null;
 
@@ -42,7 +42,7 @@ function loadContact (){
 		pointerup: function (event, pointerListener){
 			if(pointerListener.pointerManager.hasPointersOnSurface() == false && TAP_ACTIVE == false){
 				resetElementTransform();
-			};
+			}
 		}
 	});
 	
@@ -67,7 +67,7 @@ function loadContact (){
 		pointerup: function (event, pointerListener){
 			if(pointerListener.pointerManager.hasPointersOnSurface() == false && TAP_ACTIVE == false){
 				resetElementTransform();
-			};
+			}
 		}
 	});
 	
@@ -113,11 +113,11 @@ function resetElementTransform (element){
 			z : 0,
 			angle: 0
 		}
-	}
+	};
 	
 	if (ticking == true){
 		setTimeout(function(){
-			resetElementTransform(element)
+			resetElementTransform(element);
 		}, 1000/60);
 	}
 	else {
@@ -128,12 +128,12 @@ function resetElementTransform (element){
 
 function requestElementUpdate(element, wait) {
 
-	var wait = wait || false;
+	wait = wait || false;
 	
 	var transformValues = [
-		'translate3d(' + transform.translate.x + 'px, ' + transform.translate.y + 'px, 0)',
-		'scale3d(' + transform.scale.x + ', ' + transform.scale.y + ', ' + transform.scale.z  + ')',
-		'rotate3d('+ transform.rotate.x +','+ transform.rotate.y +','+ transform.rotate.z +','+  transform.rotate.angle + 'deg)'
+		"translate3d(" + transform.translate.x + "px, " + transform.translate.y + "px, 0)",
+		"scale3d(" + transform.scale.x + ", " + transform.scale.y + ", " + transform.scale.z  + ")",
+		"rotate3d(" + transform.rotate.x + "," + transform.rotate.y + "," + transform.rotate.z + "," +  transform.rotate.angle + "deg)"
 	];
 	
 	var transformString = transformValues.join(" ");
@@ -161,7 +161,7 @@ function requestElementUpdate(element, wait) {
 
 function onTap (event) {
 
-	let element = event.target
+	let element = event.target;
 
 	element.className = "animate";
 	

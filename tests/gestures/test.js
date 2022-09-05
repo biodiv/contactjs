@@ -1,5 +1,5 @@
 "use strict";
-import { PointerListener, Tap, Press, Pan, TwoFingerPan, Pinch, Rotate } from '../../dist/contact.module.js';
+import { PointerListener, Tap, Press, Pan, TwoFingerPan, Pinch, Rotate } from "../../dist/contact.js";
 
 var animationFrameId = null;
 
@@ -57,12 +57,12 @@ function loadContact() {
 
   rectangle.addEventListener("pan", function (event) {
     onPan(event);
-    showOutput(event)
+    showOutput(event);
   });
 
   rectangle.addEventListener("panend", function (event) {
 
-    showOutput(event)
+    showOutput(event);
 
     setTimeout(function () {
       clearOutput(event);
@@ -217,7 +217,7 @@ function showOutput(event) {
     elementId = "swipe-output";
   }
 
-  console.log(elementId)
+  console.log(elementId);
 
   var outputElement = document.getElementById(elementId);
   if (event.type.indexOf("start") != -1) {
@@ -237,12 +237,12 @@ function showOutput(event) {
   else {
     outputElement.textContent = "on";
   }
-  document.getElementById("deltaX-global").textContent = event.detail.global.deltaX
-  document.getElementById("deltaY-global").textContent = event.detail.global.deltaY
-  document.getElementById("direction-global").textContent = event.detail.global.direction
-  document.getElementById("deltaX-live").textContent = event.detail.live.deltaX
-  document.getElementById("deltaY-live").textContent = event.detail.live.deltaY
-  document.getElementById("direction-live").textContent = event.detail.live.direction
+  document.getElementById("deltaX-global").textContent = event.detail.global.deltaX;
+  document.getElementById("deltaY-global").textContent = event.detail.global.deltaY;
+  document.getElementById("direction-global").textContent = event.detail.global.direction;
+  document.getElementById("deltaX-live").textContent = event.detail.live.deltaX;
+  document.getElementById("deltaY-live").textContent = event.detail.live.deltaY;
+  document.getElementById("direction-live").textContent = event.detail.live.direction;
 }
 
 function clearOutput(event) {
@@ -276,7 +276,7 @@ function resetElementTransform() {
       z: 0,
       angle: 0
     }
-  }
+  };
 
   if (ticking == true) {
     setTimeout(resetElementTransform, 1000 / 60);
@@ -289,12 +289,12 @@ function resetElementTransform() {
 
 function requestElementUpdate(wait) {
 
-  var wait = wait || false;
+  wait = wait || false;
 
   var transformValues = [
-    'translate3d(' + transform.translate.x + 'px, ' + transform.translate.y + 'px, 0)',
-    'scale3d(' + transform.scale.x + ', ' + transform.scale.y + ', ' + transform.scale.z + ')',
-    'rotate3d(' + transform.rotate.x + ',' + transform.rotate.y + ',' + transform.rotate.z + ',' + transform.rotate.angle + 'deg)'
+    "translate3d(" + transform.translate.x + "px, " + transform.translate.y + "px, 0)",
+    "scale3d(" + transform.scale.x + ", " + transform.scale.y + ", " + transform.scale.z + ")",
+    "rotate3d(" + transform.rotate.x + "," + transform.rotate.y + "," + transform.rotate.z + "," + transform.rotate.angle + "deg)"
   ];
 
   var transformString = transformValues.join(" ");
@@ -321,10 +321,10 @@ function requestElementUpdate(wait) {
 
 function onPan(event) {
 
-  rectangle.className = '';
+  rectangle.className = "";
 
   var deltaX = event.detail.global.deltaX;
-  var deltaY = event.detail.global.deltaY
+  var deltaY = event.detail.global.deltaY;
 
   transform.translate = {
     x: deltaX,
@@ -339,7 +339,7 @@ function onPan(event) {
 
 function onTwoFingerPan(event) {
 
-  rectangle.className = '';
+  rectangle.className = "";
 
   var deltaX = event.detail.global.deltaX;
   var deltaY = event.detail.global.deltaY;
@@ -393,7 +393,7 @@ function onPinch(event) {
       z: 1
     };
 
-    console.log(transform)
+    console.log(transform);
 
     requestElementUpdate();
 
@@ -413,7 +413,7 @@ function onRotation(event) {
     angle: event.detail.global.rotation
   };
 
-  console.log(transform)
+  console.log(transform);
   requestElementUpdate();
 
 }
