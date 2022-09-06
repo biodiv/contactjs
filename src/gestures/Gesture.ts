@@ -425,7 +425,7 @@ export abstract class Gesture {
         const hasSupportedDirections = !!this.options.supportedDirections;
         // do not fire events like "panendleft"
         // only fire directional events if eventName == this.eventBaseName 
-        if (hasSupportedDirections == true && eventName == this.eventBaseName) {
+        if (hasSupportedDirections == true && (eventName == this.eventBaseName || eventName == "swipe")) {
           for (let d = 0; d < this.options.supportedDirections.length; d++) {
             const direction = this.options.supportedDirections[d];
 
