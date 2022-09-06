@@ -555,7 +555,7 @@ class $f752273e736c5336$export$61ce360501d38a6f {
                 const hasSupportedDirections = !!this.options.supportedDirections;
                 // do not fire events like "panendleft"
                 // only fire directional events if eventName == this.eventBaseName 
-                if (hasSupportedDirections == true && eventName == this.eventBaseName) for(let d = 0; d < this.options.supportedDirections.length; d++){
+                if (hasSupportedDirections == true && (eventName == this.eventBaseName || eventName == "swipe")) for(let d = 0; d < this.options.supportedDirections.length; d++){
                     const direction = this.options.supportedDirections[d];
                     if (direction == currentDirection) {
                         const directionEventName = eventName + direction;
