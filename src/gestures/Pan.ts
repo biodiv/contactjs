@@ -8,6 +8,7 @@ import {
   PointerManagerState,
   GestureState,
 } from "../input-consts";
+import { Direction } from "..";
 
 /*
  * PAN DEFINITION:
@@ -69,11 +70,21 @@ export class Pan extends SinglePointerGesture {
     if (singlePointerInput instanceof SinglePointerInput) {
       
       if (
-        this.swipeFinalSpeed < singlePointerInput.parameters.global.finalSpeed
+        this.swipeFinalSpeed < singlePointerInput.parameters.global.finalSpeed && singlePointerInput.parameters.live.vector.direction != Direction.None
       ) {
         
         this.isSwipe = true;
         this.emit(pointerManager, "swipe");
+      }
+      else {
+        if (this.DEBUG == true){
+          if (singlePointerInput.parameters.global.finalSpeed < this.swipeFinalSpeed){
+            console.log(`[Pan] dismissing swipe. Final speed: ${singlePointerInput.parameters.global.finalSpeed} < ${this.swipeFinalSpeed}`);
+          }
+          else {
+            console.log(`[Pan] dismissing swipe. Direction: ${singlePointerInput.parameters.live.vector.direction}`);
+          }
+        }
       }
     }
 

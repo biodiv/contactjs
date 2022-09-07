@@ -1,5 +1,4 @@
 "use strict";
-import { PointerListener, Tap, Press, Pan, TwoFingerPan, Pinch, Rotate } from "../../dist/contact.js";
 
 var animationFrameId = null;
 
@@ -45,7 +44,7 @@ function loadContact() {
   twoFingerPan.block(pinch);*/
 
   var pointerListener = new PointerListener(rectangle, {
-    //"DEBUG_POINTERMANAGER": true,
+    "DEBUG_POINTERMANAGER": true,
     "DEBUG_GESTURES" : true,
     supportedGestures: [Pan, Tap, Press, TwoFingerPan, Pinch, Rotate],
     //supportedGestures : [TwoFingerPan, Pinch],

@@ -20,6 +20,7 @@ export const Directions = Object.freeze({
     Direction.Right,
     Direction.Up,
     Direction.Down,
+    Direction.None,
   ]
 });
 

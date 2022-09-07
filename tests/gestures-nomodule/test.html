@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Contact Test</title>
+		
+		<link rel="stylesheet" href="test.css">
+		
+	</head>
+	<body>
+		<div class="container recognition-output" style="background:ivory">
+			<article></article>
+			<div>
+				Tap: <span id="tap-output"></span>
+			</div>
+			<div>
+				Press: <span id="press-output"></span>
+			</div>
+			<div>
+				Pan: <span id="pan-output"></span>
+			</div>
+			<div>
+				Swipe: <span id="swipe-output"></span>
+			</div>
+		</div>
+		<div class="container recognition-output" style="background:lemonchiffon">
+			<article></article>
+			<div>
+				Twofingerpan: <span id="twofingerpan-output"></span>
+			</div>
+			<div>
+				Rotate: <span id="rotate-output"></span>
+			</div>
+			<div>
+				Pinch: <span id="pinch-output"></span>
+			</div>
+		</div>
+		<div class="container recognition-output" style="background:blanchedalmond">
+			<article style="padding-right:4rem;">Global values</article>
+			<div>
+				∆X: <span id="deltaX-global"></span>
+			</div>
+			<div>
+				∆Y: <span id="deltaY-global"></span>
+			</div>
+			<div>
+				direction: <span id="direction-global"></span>
+			</div>
+		</div>
+		<div class="container recognition-output" style="background:bisque">
+			<article style="padding-right:4rem;">Live values</article>
+			<div>
+				∆X: <span id="deltaX-live"></span>
+			</div>
+			<div>
+				∆Y: <span id="deltaY-live"></span>
+			</div>
+			<div>
+				direction: <span id="direction-live"></span>
+			</div>
+		</div>
+		<div class="container h-80">
+			<div class="screen">
+				
+				<div id="rectangle"></div>
+			</div>
+		</div>
+		
+		<script src="../../dist/contact.nomodule.js"></script>
+		<script src="test.js"></script>
+	</body>
+</html>
+
