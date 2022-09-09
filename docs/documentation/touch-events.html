@@ -1,0 +1,87 @@
+---
+title: CONTACT.JS
+layout: default
+permalink: /documentation/touch-events/
+bg-color: bg-white
+---
+
+<div class="container">
+	<div class="row mt-5">
+		<div class="col-12 col-md-4 col-lg-2">
+			{% include_relative nav.html %}
+		</div>
+		<div class="col-12 col-md-8 col-lg-10">
+			<div class="row">
+				<div class="col-12">
+					<h2>Touch Events</h2>
+				</div>
+			</div>
+
+			<div class="row mt-5">
+				<div class="col-12">
+					<h5>Background</h5>
+					<div>
+						If page scrolling is detected, <kbd>pointercancelEvent</kbd> is fired by default by the browser, aborting all <strong>panning</strong> and <strong>swiping</strong> which was implemented using <kbd>PointerEvents</kbd>. <br>
+						Page Scrolling uses the <kbd>TouchEvent</kbd> interface.<br>
+						To prevent scrolling from blocking already recognized <kbd>Pan</kbd> events, <kbd>contact.js</kbd> uses <kbd>event.preventDefault()</kbd> to prevent <kbd>touchmove</kbd> events from blocking <kbd>PointerEvents</kbd>.
+					</div>
+					<div class="mt-3">
+						This will lead to a notification in the console that <kbd>TouchEvent</kbd> listeners should be <kbd>passive</kbd>.
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-5">
+				<div class="col-12">
+					<h5>Solution 1</h5>
+					<div>
+						Let <kbd>contact.js</kbd> handle <kbd>TouchEvents</kbd>.
+					</div>
+				</div>
+			</div>
+
+			<div class="row mt-5">
+				<div class="col-12">
+					<h5>Solution 2</h5>
+					<div>
+						If ou experience problems with scrolling, disable the TouchEvent handling of <kbd>contact.js</kbd> and control the behaviour by yourself using css.
+					</div>
+
+					<div class="my-3">
+						<strong>JS:</strong>
+						<div class="bg-light pt-3 pb-1 px-3 mt-3">
+{% highlight javascript %}
+let options = {
+	handleTouchEvents: false
+};
+
+var pointerListener = new PointerListener(domElement, options);
+{% endhighlight %}
+						</div>
+					</div>
+
+					<div class="my-3">
+						<strong>CS:</strong>
+						<div class="bg-light pt-3 pb-1 px-3 mt-3">
+{% highlight css %}
+.myPanningArea {
+	touch-events:none;
+}
+{% endhighlight %}
+<div class="my-2"><strong>OR</strong></div>
+{% highlight css %}
+.myPanningArea {
+	touch-events: pan-y;
+}
+{% endhighlight %}
+						</div>
+					</div>
+
+					depending on your needs.
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
