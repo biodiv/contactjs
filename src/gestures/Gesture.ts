@@ -24,6 +24,8 @@ type GestureParameterValue = number | boolean | null | Vector;
 type SinglePointerInputConstructor = new (...args: ConstructorParameters<typeof SinglePointerInput>) => SinglePointerInput;
 type DualPointerInputConstructor = new (...args: ConstructorParameters<typeof DualPointerInput>) => DualPointerInput;
 
+export const GestureEvent = CustomEvent<GestureEventData>;
+
 export interface GestureOptions {
   DEBUG: boolean;
   blocks: Gesture[];
@@ -411,7 +413,7 @@ export abstract class Gesture {
           bubbles: this.options.bubbles,
         };
 
-        const event = new CustomEvent(eventName, eventOptions);
+        const event = new GestureEvent(eventName, eventOptions);
 
         if (eventOptions.bubbles == true) {
           target.dispatchEvent(event);
@@ -424,7 +426,7 @@ export abstract class Gesture {
 
         const hasSupportedDirections = !!this.options.supportedDirections;
         // do not fire events like "panendleft"
-        // only fire directional events if eventName == this.eventBaseName 
+        // only fire directional events if eventName == this.eventBaseName
         if (hasSupportedDirections == true && currentDirection != Direction.None && (eventName == this.eventBaseName || eventName == "swipe")) {
           for (let d = 0; d < this.options.supportedDirections.length; d++) {
             const direction = this.options.supportedDirections[d];

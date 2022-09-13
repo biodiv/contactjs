@@ -8,6 +8,8 @@ export { Geometry } from "./geometry/Geometry";
 
 export { PointerListener } from "./PointerListener";
 
+export { GestureEvent } from "./gestures/Gesture";
+
 export { Tap } from "./gestures/Tap";
 export { Press } from "./gestures/Press";
 export { Pan } from "./gestures/Pan";
