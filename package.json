@@ -10,16 +10,6 @@
     "lib": "lib",
     "test": "test"
   },
-  "scripts": {
-    "build": "tsc",
-    "build:parcel": "parcel build",
-    "watch": "tsc --watch",
-    "watch:parcel": "parcel watch",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "lint:strict": "eslint . --max-warnings=0"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/biodiv/contactjs.git"
@@ -33,6 +23,16 @@
     "url": "https://github.com/biodiv/contactjs/issues"
   },
   "homepage": "https://biodiv.github.io/contactjs/",
+  "scripts": {
+    "build": "tsc",
+    "build:parcel": "parcel build",
+    "watch": "tsc --watch",
+    "watch:parcel": "parcel watch",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:strict": "eslint . --max-warnings=0"
+  },
   "devDependencies": {
     "@parcel/packager-ts": "^2.6.1",
     "@parcel/transformer-typescript-types": "^2.6.1",
