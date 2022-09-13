@@ -85,7 +85,7 @@ export interface PointerLiveBooleanParameters {
 }
 
 
-export interface PointerLiveParameters extends 
+export interface PointerLiveParameters extends
   PointerLiveNumberParameters,
   GeometricParameters,
   PointerLiveBooleanParameters {}
@@ -145,7 +145,7 @@ export interface DualPointerInputGeometricParameters {
   center: Point,
 }
 
-export interface DualPointerInputGlobalParameters extends 
+export interface DualPointerInputGlobalParameters extends
   DualPointerInputGlobalNumberParameters,
   DualPointerInputGlobalBooleanParameters,
   DualPointerInputGeometricParameters {}

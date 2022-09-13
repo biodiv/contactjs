@@ -64,15 +64,15 @@ export class Pan extends SinglePointerGesture {
 
   // check if it was a swipe
   onEnd(pointerManager: PointerManager): void {
-    
+
     const singlePointerInput = pointerManager.getlastRemovedPointerInput();
 
     if (singlePointerInput instanceof SinglePointerInput) {
-      
+
       if (
         this.swipeFinalSpeed < singlePointerInput.parameters.global.finalSpeed && singlePointerInput.parameters.live.vector.direction != Direction.None
       ) {
-        
+
         this.isSwipe = true;
         this.emit(pointerManager, "swipe");
       }

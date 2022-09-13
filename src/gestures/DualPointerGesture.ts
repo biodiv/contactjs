@@ -6,7 +6,7 @@ import {
   GestureEventData,
 } from "./Gesture";
 
-import { 
+import {
   DualPointerGestureParameters,
 } from "../interfaces";
 
@@ -31,7 +31,7 @@ export abstract class DualPointerGesture extends Gesture {
     this.validPointerManagerState = PointerManagerState.DualPointer;
     this.validPointerInputConstructor = DualPointerInput;
 
-    const nullRecognitionParameters = this.getEmptyGestureParameters() as DualPointerGestureParameters; 
+    const nullRecognitionParameters = this.getEmptyGestureParameters() as DualPointerGestureParameters;
 
     this.initialParameters = { ...nullRecognitionParameters };
     this.activeStateParameters = JSON.parse(JSON.stringify({ ...nullRecognitionParameters }));

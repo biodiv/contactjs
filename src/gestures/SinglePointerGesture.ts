@@ -24,7 +24,7 @@ export abstract class SinglePointerGesture extends Gesture {
     this.initialPointerEvent = null;
     this.validPointerManagerState = PointerManagerState.SinglePointer;
 
-    const nullRecognitionParameters = this.getEmptyGestureParameters() as SinglePointerGestureParameters;    
+    const nullRecognitionParameters = this.getEmptyGestureParameters() as SinglePointerGestureParameters;
 
     this.initialParameters = { ...nullRecognitionParameters };
     // a deep copy of the parameters is needed as they can have different values

@@ -97,7 +97,7 @@ export class PointerManager {
 
     if (this.DEBUG == true) {
       console.log(`[PointerManager] starting to remove Pointer #${pointerId}`);
-      console.log(`[PointerManager] state: ${this.state}`); 
+      console.log(`[PointerManager] state: ${this.state}`);
     }
 
     const pointer: Pointer = this.onSurfacePointers[pointerId];

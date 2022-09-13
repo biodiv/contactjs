@@ -1,5 +1,5 @@
 import { Geometry } from "./geometry/Geometry";
-import { 
+import {
   Pointer,
 } from "./Pointer";
 import {
@@ -147,7 +147,7 @@ export class DualPointerInput {
     if (liveCenterMovementVector.vectorLength > 0){
       this.parameters.live.centerIsMoving = true;
       this.parameters.global.centerHasBeenMoved = true;
-    } 
+    }
     else {
       this.parameters.live.centerIsMoving = false;
     }

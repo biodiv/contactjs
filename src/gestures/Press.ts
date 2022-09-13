@@ -72,7 +72,7 @@ export class Press extends SinglePointerGesture {
         this.hasBeenEmitted = true;
         this.state = GestureState.Active;
         this.blockGestures();
-        
+
       } else if (isValid == false && this.hasBeenEmitted == true) {
         this.onEnd(pointerManager);
         this.state = GestureState.Inactive;

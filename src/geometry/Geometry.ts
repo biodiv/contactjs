@@ -58,14 +58,14 @@ export class Geometry {
 
 		// translate the points of the vector, so that their startPoints are attached to (0,0)
 		/*
-	
+
 				  ^
 				 /
 				/
 			   /
 			  x
 			  0
-	
+
 		*/
 		const translationVector_1 = new Vector(angleVector_1.startPoint, origin);
 		const translatedEndPoint_1 = this.translatePoint(
@@ -85,10 +85,10 @@ export class Geometry {
 
 		// rotate the first angle vector so its y-coordinate becomes 0
 		/*
-	
+
 			x------->
 			0
-	
+
 		*/
 		const rotationAngle = this.calcAngleRad(translatedEndPoint_1) * -1;
 

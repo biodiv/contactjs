@@ -16,6 +16,6 @@ export class TwoFingerPan extends DualPointerGesture {
     this.initialParameters.live.max["absoluteVectorAngle"] = 150;
 
     this.activeStateParameters.live.min["centerMovementDistance"] = 0;
-    
+
   }
 }
