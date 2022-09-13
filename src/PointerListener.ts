@@ -43,7 +43,7 @@ interface PointerListenerOptions {
   handleTouchEvents: boolean;
   consecutiveGestures: boolean,
   simultaneousGestures: boolean,
-  supportedGestures: Gesture[];
+  supportedGestures: (Gesture | GestureConstructor)[];
 
   // Hooks
   pointerdown?: (event: PointerEvent, self: PointerListener) => void;
@@ -407,7 +407,7 @@ export class PointerListener {
     if (this.pointerManager.hasPointersOnSurface() == false){
       this.hadActiveGestureDuringCurrentContact = false;
     }
-    
+
   }
 
   updateActiveGestures(gesture: Gesture): void {
