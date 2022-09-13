@@ -39,10 +39,8 @@
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
     "eslint": "^8.17.0",
+    "parcel": "^2.6.1",
     "typescript": "^4.7.4"
-  },
-  "dependencies": {
-    "parcel": "^2.6.1"
   },
   "targets": {
     "main": {
