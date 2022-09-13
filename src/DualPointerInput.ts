@@ -98,7 +98,7 @@ export class DualPointerInput {
       return this.pointer_1;
     }
     else {
-      throw new Error("[DualPointerInput] cannot remove Pointer #${pointerId}. The pointer is not part of this DualPointerInput");
+      throw new Error(`[DualPointerInput] cannot remove Pointer #${pointerId}. The pointer is not part of this DualPointerInput`);
     }
   }
 
