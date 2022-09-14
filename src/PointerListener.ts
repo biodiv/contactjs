@@ -300,7 +300,9 @@ export class PointerListener {
 
       const onTouchMove = this.onTouchMove.bind(this);
 
-      this.domElement.addEventListener("touchmove", onTouchMove, { passive: true });
+      // do NOT make the touchmove listener passive, as this listener might block touch events from
+      // interfering with pan/swipe. Passive listeners make the promise not to block scrolling.
+      this.domElement.addEventListener("touchmove", onTouchMove);
 
       this.touchEventHandlers["touchmove"] = onTouchMove;
 

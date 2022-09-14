@@ -99,8 +99,8 @@ export class Pan extends SinglePointerGesture {
         console.log("[Pan] preventing touchmove default");
       }
 
-      //event.preventDefault();
-      //event.stopPropagation();
+      event.preventDefault();
+      event.stopPropagation();
     }
   }
 }
