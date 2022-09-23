@@ -197,6 +197,31 @@ domElement.addEventListener(EVENTNAME, function(event){
 								<td>fired after pointerUp, pointerOut or pointerCancel</td>
 							</tr>
 							<tr>
+								<th scope="row">swipe</th>
+								<td>Pan</td>
+								<td>fired <strong>after the pointer left the surface</strong>, if the user moved the pointer fast enough <strong>at the end of the motion</strong></td>
+							</tr>
+							<tr>
+								<th scope="row">swipeleft</th>
+								<td>Pan</td>
+								<td>Fired together with <strong>swipe</strong>, if the pointer was moved to the left at the end of the motion</td>
+							</tr>
+							<tr>
+								<th scope="row">swiperight</th>
+								<td>Pan</td>
+								<td>Fired together with <strong>swipe</strong>, if the pointer was moved to the right at the end of the motion</td>
+							</tr>
+							<tr>
+								<th scope="row">swipeup</th>
+								<td>Pan</td>
+								<td>Fired together with <strong>swipe</strong>, if the pointer was moved upwards at the end of the motion</td>
+							</tr>
+							<tr>
+								<th scope="row">swipedown</th>
+								<td>Pan</td>
+								<td>Fired together with <strong>swipe</strong>, if the pointer was moved downwards at the end of the motion</td>
+							</tr>
+							<tr>
 								<th scope="row">pinchstart</th>
 								<td>Pinch</td>
 								<td>fired if 2 active pointers (fingers) are present and the distance between those two changed</td>
