@@ -18,6 +18,7 @@ import {
   Direction,
 } from "../input-consts";
 
+import { CustomEvent } from "../polyfills/event";
 
 type GestureParameterValue = number | boolean | null | Vector;
 
