@@ -447,7 +447,7 @@ export abstract class Gesture {
                 );
               }
 
-              const directionEvent = new CustomEvent(
+              const directionEvent = new GestureEvent(
                 directionEventName,
                 eventOptions
               );
