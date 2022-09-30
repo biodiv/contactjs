@@ -290,6 +290,10 @@ domElement.addEventListener(EVENTNAME, function(event){
 			direction : DIRECTION, // matches the DIRECTION constants, direction from start to end of whole contact duration
 			scale : Number, // scaling if multi pointer, 1 if single pointer, whole contact duration
 			rotation : Number, // degrees if multi pointer, 0 if single pointer, whole contact duration
+			center : { // center between two pointers if multi pointer, last 100ms
+				x : Number,
+				y : Number
+			},
 			srcEvent : Event // original Event (pointerUp, pointerMove, ...)
 		},
 		live : {	// live covers data spanning the last 100ms
