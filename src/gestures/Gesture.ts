@@ -24,7 +24,8 @@ type GestureParameterValue = number | boolean | null | Vector;
 type SinglePointerInputConstructor = new (...args: ConstructorParameters<typeof SinglePointerInput>) => SinglePointerInput;
 type DualPointerInputConstructor = new (...args: ConstructorParameters<typeof DualPointerInput>) => DualPointerInput;
 
-export const GestureEvent = CustomEvent<GestureEventData>;
+export class GestureEvent extends CustomEvent<GestureEventData> {
+}
 
 export interface GestureOptions {
   DEBUG: boolean;
