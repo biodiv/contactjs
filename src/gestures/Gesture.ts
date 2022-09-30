@@ -43,6 +43,7 @@ export interface GlobalGestureEventData {
   direction: Direction;
   scale: number;
   rotation: number;
+  center: Point;
   srcEvent: PointerEvent;
 }
 
@@ -64,6 +65,7 @@ export interface GestureEventData extends TimedParameters {
   recognizer: Gesture,
   global: GlobalGestureEventData,
   live: LiveGestureEventData,
+  pointerManager: PointerManager,
 }
 
 export abstract class Gesture {
@@ -406,12 +408,16 @@ export abstract class Gesture {
 
       if (target instanceof EventTarget) {
 
-        const eventData = this.getEventData(pointerInput);
+        const eventData = this.getEventData(pointerInput, pointerManager);
 
         const eventOptions = {
           detail: eventData,
           bubbles: this.options.bubbles,
         };
+
+        if (this.DEBUG === true) {
+          console.log(eventOptions);
+        }
 
         const event = new GestureEvent(eventName, eventOptions);
 
@@ -521,7 +527,7 @@ export abstract class Gesture {
     }
   }
 
-  getEventData(pointerInput: SinglePointerInput | DualPointerInput): GestureEventData {
+  getEventData(pointerInput: SinglePointerInput | DualPointerInput, pointerManager: PointerManager): GestureEventData {
     throw new Error("Gesture subclasses require a getEventData method()");
   }
 

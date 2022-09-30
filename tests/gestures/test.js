@@ -45,8 +45,9 @@ function loadContact() {
   twoFingerPan.block(pinch);*/
 
   var pointerListener = new PointerListener(rectangle, {
-    //"DEBUG_POINTERMANAGER": true,
-    "DEBUG_GESTURES" : true,
+    //"DEBUG" : true, 
+    "DEBUG_POINTERMANAGER": true,
+    //"DEBUG_GESTURES" : true,
     supportedGestures: [Pan, Tap, Press, TwoFingerPan, Pinch, Rotate],
     //supportedGestures : [TwoFingerPan, Pinch],
     pointerup: function (event, pointerListener) {
@@ -57,6 +58,8 @@ function loadContact() {
   });
 
   rectangle.addEventListener("pan", function (event) {
+    //console.log("Current PointerManager");
+    console.log(event.detail.pointerManager.activePointerInput);
     onPan(event);
     showOutput(event);
   });
@@ -124,6 +127,10 @@ function loadContact() {
   });
 
   rectangle.addEventListener("pinch", function (event) {
+
+    console.log("PINCH event data");
+    console.log(event.detail.pointerManager.activePointerInput);
+    console.log(event);
 
     onPinch(event);
 

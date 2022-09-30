@@ -15,6 +15,7 @@ import { DualPointerInput } from "../DualPointerInput";
 import {
   PointerManagerState
 } from "../input-consts";
+import { PointerManager } from "../PointerManager";
 
 export abstract class DualPointerGesture extends Gesture {
 
@@ -37,7 +38,7 @@ export abstract class DualPointerGesture extends Gesture {
     this.activeStateParameters = JSON.parse(JSON.stringify({ ...nullRecognitionParameters }));
   }
 
-  getEventData(dualPointerInput: DualPointerInput): GestureEventData {
+  getEventData(dualPointerInput: DualPointerInput, pointerManager: PointerManager): GestureEventData {
     // provide short-cuts to the values collected in the Contact object
     // match this to the event used by hammer.js
 
@@ -55,6 +56,7 @@ export abstract class DualPointerGesture extends Gesture {
       direction: globalParameters.centerMovementVector.direction,
       scale: globalParameters.relativePointerDistanceChange,
       rotation: globalParameters.rotationAngle,
+      center: globalParameters.center,
       srcEvent: dualPointerInput.currentPointerEvent,
     };
 
@@ -78,7 +80,8 @@ export abstract class DualPointerGesture extends Gesture {
     const gestureEventData: GestureEventData = {
       recognizer: this,
       global: globalGestureEventData,
-      live: liveGestureEventData
+      live: liveGestureEventData,
+      pointerManager: pointerManager,
     };
 
     return gestureEventData;

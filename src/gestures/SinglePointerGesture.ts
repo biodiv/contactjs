@@ -11,6 +11,7 @@ import { SinglePointerGestureParameters } from "../interfaces";
 import { Point } from "../geometry/Point";
 import { Vector } from "../geometry/Vector";
 import { SinglePointerInput } from "../SinglePointerInput";
+import { PointerManager } from "../PointerManager";
 
 export abstract class SinglePointerGesture extends Gesture {
 
@@ -31,7 +32,7 @@ export abstract class SinglePointerGesture extends Gesture {
     this.activeStateParameters = JSON.parse(JSON.stringify({ ...nullRecognitionParameters }));
   }
 
-  getEventData(singlePointerInput: SinglePointerInput): GestureEventData {
+  getEventData(singlePointerInput: SinglePointerInput, pointerManager: PointerManager): GestureEventData {
     // provide short-cuts to the values collected in the Contact object
     // match this to the event used by hammer.js
 
@@ -68,6 +69,10 @@ export abstract class SinglePointerGesture extends Gesture {
       direction: globalVector.direction,
       scale: 1,
       rotation: 0,
+      center: {
+        x: globalParameters.vector.endPoint.x,
+        y: globalParameters.vector.endPoint.y,
+      },
       srcEvent: singlePointerInput.pointer.currentPointerEvent,
     };
 
@@ -100,6 +105,7 @@ export abstract class SinglePointerGesture extends Gesture {
       recognizer: this,
       global: globalGestureEventData,
       live: liveGestureEventData,
+      pointerManager: pointerManager,
     };
 
     return eventData;
