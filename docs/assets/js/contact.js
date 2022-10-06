@@ -1,10 +1,10 @@
 let $a2188ba8c266b376$export$cacd6541cfeeb6c1;
-(function(Direction1) {
-    Direction1["None"] = "0";
-    Direction1["Left"] = "left";
-    Direction1["Right"] = "right";
-    Direction1["Up"] = "up";
-    Direction1["Down"] = "down";
+(function(Direction) {
+    Direction["None"] = "0";
+    Direction["Left"] = "left";
+    Direction["Right"] = "right";
+    Direction["Up"] = "up";
+    Direction["Down"] = "down";
 })($a2188ba8c266b376$export$cacd6541cfeeb6c1 || ($a2188ba8c266b376$export$cacd6541cfeeb6c1 = {}));
 const $a2188ba8c266b376$export$86ae6e8ac17a67c6 = Object.freeze({
     Horizontal: [
@@ -19,25 +19,26 @@ const $a2188ba8c266b376$export$86ae6e8ac17a67c6 = Object.freeze({
         $a2188ba8c266b376$export$cacd6541cfeeb6c1.Left,
         $a2188ba8c266b376$export$cacd6541cfeeb6c1.Right,
         $a2188ba8c266b376$export$cacd6541cfeeb6c1.Up,
-        $a2188ba8c266b376$export$cacd6541cfeeb6c1.Down, 
+        $a2188ba8c266b376$export$cacd6541cfeeb6c1.Down,
+        $a2188ba8c266b376$export$cacd6541cfeeb6c1.None, 
     ]
 });
 let $a2188ba8c266b376$export$a1d3109c03b1d511;
-(function(GestureState1) {
-    GestureState1["Inactive"] = "inactive";
-    GestureState1["Active"] = "active";
-    GestureState1["Blocked"] = "blocked";
+(function(GestureState) {
+    GestureState["Inactive"] = "inactive";
+    GestureState["Active"] = "active";
+    GestureState["Blocked"] = "blocked";
 })($a2188ba8c266b376$export$a1d3109c03b1d511 || ($a2188ba8c266b376$export$a1d3109c03b1d511 = {}));
 let $a2188ba8c266b376$export$b8339a9622c147c0;
-(function(PointerManagerState1) {
-    PointerManagerState1["NoPointer"] = "nopointer";
-    PointerManagerState1["SinglePointer"] = "singlepointer";
-    PointerManagerState1["DualPointer"] = "dualpointer";
+(function(PointerManagerState) {
+    PointerManagerState["NoPointer"] = "nopointer";
+    PointerManagerState["SinglePointer"] = "singlepointer";
+    PointerManagerState["DualPointer"] = "dualpointer";
 })($a2188ba8c266b376$export$b8339a9622c147c0 || ($a2188ba8c266b376$export$b8339a9622c147c0 = {}));
 let $a2188ba8c266b376$export$2fb579dd5dfdbea;
-(function(PointerListenerState1) {
-    PointerListenerState1["NoActiveGesture"] = "noactivegesture";
-    PointerListenerState1["ActiveGesture"] = "activegesture";
+(function(PointerListenerState) {
+    PointerListenerState["NoActiveGesture"] = "noactivegesture";
+    PointerListenerState["ActiveGesture"] = "activegesture";
 })($a2188ba8c266b376$export$2fb579dd5dfdbea || ($a2188ba8c266b376$export$2fb579dd5dfdbea = {}));
 
 
@@ -93,17 +94,17 @@ class $1f7944f1763e45ce$export$2db6c17465f94a2 {
         return speed;
     }
     /*
-	* CALCULATE ROTATION
-	* this is not a trivial problem
-	* required output is: angle and direction (cw //ccw)
-	* direction is relative to the first touch with two fingers, not absolute to the screens default coordinate system
-	* to determine rotation direction, 3 points on the circle - with timestamps - are required
-	* imagine a steering wheel
-	* - initial state is 0 deg (0)
-	* - if the wheel has been turned ccw, its state has a negative angle
-	* - if the wheel has been turned cw, its state has a positive angle
-	* - possible values for the angle: [-360,360]
-	*/ static calculateRotationAngle(vector_1, vector_2) {
+  * CALCULATE ROTATION
+  * this is not a trivial problem
+  * required output is: angle and direction (cw //ccw)
+  * direction is relative to the first touch with two fingers, not absolute to the screens default coordinate system
+  * to determine rotation direction, 3 points on the circle - with timestamps - are required
+  * imagine a steering wheel
+  * - initial state is 0 deg (0)
+  * - if the wheel has been turned ccw, its state has a negative angle
+  * - if the wheel has been turned cw, its state has a positive angle
+  * - possible values for the angle: [-360,360]
+  */ static calculateRotationAngle(vector_1, vector_2) {
         // vector_ are vectors between 2 points in time, same finger
         // angleAector_ are vectors between 2 fingers
         const angleVector_1 = new (0, $c0ee1a209fd4fc8d$export$9b781de7bf37bf48)(vector_1.startPoint, vector_2.startPoint); // in time: occured first
@@ -111,15 +112,15 @@ class $1f7944f1763e45ce$export$2db6c17465f94a2 {
         const origin = new (0, $07c7ab2351895186$export$baf26146a414f24a)(0, 0);
         // translate the points of the vector, so that their startPoints are attached to (0,0)
         /*
-	
-				  ^
-				 /
-				/
-			   /
-			  x
-			  0
-	
-		*/ const translationVector_1 = new (0, $c0ee1a209fd4fc8d$export$9b781de7bf37bf48)(angleVector_1.startPoint, origin);
+
+          ^
+         /
+        /
+         /
+        x
+        0
+
+    */ const translationVector_1 = new (0, $c0ee1a209fd4fc8d$export$9b781de7bf37bf48)(angleVector_1.startPoint, origin);
         const translatedEndPoint_1 = this.translatePoint(angleVector_1.endPoint, translationVector_1);
         //var v_1_translated = new Vector(origin, translatedEndPoint_1);
         const translationVector_2 = new (0, $c0ee1a209fd4fc8d$export$9b781de7bf37bf48)(angleVector_2.startPoint, origin);
@@ -127,11 +128,11 @@ class $1f7944f1763e45ce$export$2db6c17465f94a2 {
         //var v2_translated = new Vector(origin, translatedEndPoint_2);
         // rotate the first angle vector so its y-coordinate becomes 0
         /*
-	
-			x------->
-			0
-	
-		*/ const rotationAngle = this.calcAngleRad(translatedEndPoint_1) * -1;
+
+      x------->
+      0
+
+    */ const rotationAngle = this.calcAngleRad(translatedEndPoint_1) * -1;
         // rottation matrix
         //var x_1_rotated =  ( translatedEndPoint_1.x * Math.cos(rotationAngle) ) - ( translatedEndPoint_1.y * Math.sin(rotationAngle) );
         //var y_1_rotated = Math.round(( translatedEndPoint_1.x * Math.sin(rotationAngle) ) + ( translatedEndPoint_1.y * Math.cos(rotationAngle) )); // should be 0
@@ -197,10 +198,15 @@ class $1f7944f1763e45ce$export$2db6c17465f94a2 {
         const vectorBetweenCenterPoints = new (0, $c0ee1a209fd4fc8d$export$9b781de7bf37bf48)(startPoint, endPoint);
         return vectorBetweenCenterPoints;
     }
-    static calculateAbsoluteDistanceChange(vector_1, vector_2) {
+    static calculateDistanceChange(vector_1, vector_2) {
         const vectorBetweenStartPoints = new (0, $c0ee1a209fd4fc8d$export$9b781de7bf37bf48)(vector_1.startPoint, vector_2.startPoint);
         const vectorBetweenEndPoints = new (0, $c0ee1a209fd4fc8d$export$9b781de7bf37bf48)(vector_1.endPoint, vector_2.endPoint);
-        const absoluteDistanceChange = vectorBetweenEndPoints.vectorLength - vectorBetweenStartPoints.vectorLength;
+        const distanceChange = vectorBetweenEndPoints.vectorLength - vectorBetweenStartPoints.vectorLength;
+        return distanceChange;
+    }
+    static calculateAbsoluteDistanceChange(vector_1, vector_2) {
+        const distanceChange = this.calculateDistanceChange(vector_1, vector_2);
+        const absoluteDistanceChange = Math.abs(distanceChange);
         return absoluteDistanceChange;
     }
     static calculateRelativeDistanceChange(vector_1, vector_2) {
@@ -237,10 +243,10 @@ class $5fe7e4b452e08fad$export$bbcc47898202c6b8 {
 
 
 let $d25d2392b002d8dc$var$PointerState;
-(function(PointerState1) {
-    PointerState1["Active"] = "active";
-    PointerState1["Removed"] = "removed";
-    PointerState1["Canceled"] = "canceled";
+(function(PointerState) {
+    PointerState["Active"] = "active";
+    PointerState["Removed"] = "removed";
+    PointerState["Canceled"] = "canceled";
 })($d25d2392b002d8dc$var$PointerState || ($d25d2392b002d8dc$var$PointerState = {}));
 class $d25d2392b002d8dc$export$b56007f12edf0c17 {
     constructor(pointerEvent, options){
@@ -383,6 +389,24 @@ class $d25d2392b002d8dc$export$b56007f12edf0c17 {
 
 
 
+const $24f1c062f8ef0b30$var$window = globalThis["window"];
+let $24f1c062f8ef0b30$export$9d2aa32114ab0612;
+if ($24f1c062f8ef0b30$var$window?.CustomEvent) // If we're in a browser environment forward the existing CustomEvent ctor
+$24f1c062f8ef0b30$export$9d2aa32114ab0612 = $24f1c062f8ef0b30$var$window.CustomEvent;
+else // eslint-disable-next-line @typescript-eslint/no-explicit-any
+$24f1c062f8ef0b30$export$9d2aa32114ab0612 = class _ extends Event {
+    constructor(type, eventInitDict){
+        super(type, eventInitDict);
+        this.detail = eventInitDict?.detail;
+    }
+    initCustomEvent() {
+        throw new Error("Unsupported deprecated method");
+    }
+};
+
+
+class $f752273e736c5336$export$6e9c3b1e1fa2b597 extends (0, $24f1c062f8ef0b30$export$9d2aa32114ab0612) {
+}
 class $f752273e736c5336$export$61ce360501d38a6f {
     constructor(domElement, options){
         this.state = (0, $a2188ba8c266b376$export$a1d3109c03b1d511).Inactive;
@@ -488,12 +512,12 @@ class $f752273e736c5336$export$61ce360501d38a6f {
     }
     validatePointerManagerState(pointerManager) {
         if (pointerManager.state == this.validPointerManagerState) return true;
-        if (this.DEBUG == true) console.log(`[Gesture] PointerManagerState invalidated: ${pointerManager.state}`);
+        if (this.DEBUG == true) console.log(`[Gesture] PointerManagerState invalidated ${this.eventBaseName}: ${pointerManager.state}`);
         return false;
     }
     validatePointerInputConstructor(pointerInput) {
         if (pointerInput instanceof this.validPointerInputConstructor) return true;
-        if (this.DEBUG == true) console.log(`[Gesture] PointerInputConstructor invalidated: ${this.validPointerInputConstructor}`);
+        if (this.DEBUG == true) console.log(`[Gesture] PointerInputConstructor invalidated ${this.eventBaseName}: ${this.validPointerInputConstructor}`);
         return false;
     }
     // validate pointerCount and GestureState.Blocked
@@ -542,25 +566,26 @@ class $f752273e736c5336$export$61ce360501d38a6f {
         if (pointerInput != null) {
             const target = pointerInput.getTarget();
             if (target instanceof EventTarget) {
-                const eventData = this.getEventData(pointerInput);
+                const eventData = this.getEventData(pointerInput, pointerManager);
                 const eventOptions = {
                     detail: eventData,
                     bubbles: this.options.bubbles
                 };
-                const event = new CustomEvent(eventName, eventOptions);
+                if (this.DEBUG === true) console.log(eventOptions);
+                const event = new $f752273e736c5336$export$6e9c3b1e1fa2b597(eventName, eventOptions);
                 if (eventOptions.bubbles == true) target.dispatchEvent(event);
                 else this.domElement.dispatchEvent(event);
                 // fire direction specific events
                 const currentDirection = eventData.live.direction;
                 const hasSupportedDirections = !!this.options.supportedDirections;
                 // do not fire events like "panendleft"
-                // only fire directional events if eventName == this.eventBaseName 
-                if (hasSupportedDirections == true && (eventName == this.eventBaseName || eventName == "swipe")) for(let d = 0; d < this.options.supportedDirections.length; d++){
+                // only fire directional events if eventName == this.eventBaseName
+                if (hasSupportedDirections == true && currentDirection != (0, $a2188ba8c266b376$export$cacd6541cfeeb6c1).None && (eventName == this.eventBaseName || eventName == "swipe")) for(let d = 0; d < this.options.supportedDirections.length; d++){
                     const direction = this.options.supportedDirections[d];
                     if (direction == currentDirection) {
                         const directionEventName = eventName + direction;
                         if (this.DEBUG == true) console.log(`[Gestures] detected and firing event ${directionEventName}`);
-                        const directionEvent = new CustomEvent(directionEventName, eventOptions);
+                        const directionEvent = new $f752273e736c5336$export$6e9c3b1e1fa2b597(directionEventName, eventOptions);
                         if (eventOptions.bubbles == true) target.dispatchEvent(directionEvent);
                         else this.domElement.dispatchEvent(directionEvent);
                     }
@@ -608,7 +633,7 @@ class $f752273e736c5336$export$61ce360501d38a6f {
             gesture.state = (0, $a2188ba8c266b376$export$a1d3109c03b1d511).Inactive;
         }
     }
-    getEventData(pointerInput) {
+    getEventData(pointerInput, pointerManager) {
         throw new Error("Gesture subclasses require a getEventData method()");
     }
 }
@@ -631,7 +656,7 @@ class $e8978caba4d46d00$export$718b85c80185d86e extends (0, $f752273e736c5336$ex
             ...nullRecognitionParameters
         }));
     }
-    getEventData(singlePointerInput) {
+    getEventData(singlePointerInput, pointerManager) {
         // provide short-cuts to the values collected in the Contact object
         // match this to the event used by hammer.js
         const globalParameters = singlePointerInput.parameters.live;
@@ -656,6 +681,10 @@ class $e8978caba4d46d00$export$718b85c80185d86e extends (0, $f752273e736c5336$ex
             direction: globalVector.direction,
             scale: 1,
             rotation: 0,
+            center: {
+                x: globalParameters.vector.endPoint.x,
+                y: globalParameters.vector.endPoint.y
+            },
             srcEvent: singlePointerInput.pointer.currentPointerEvent
         };
         const liveGestureEventData = {
@@ -683,7 +712,8 @@ class $e8978caba4d46d00$export$718b85c80185d86e extends (0, $f752273e736c5336$ex
         const eventData = {
             recognizer: this,
             global: globalGestureEventData,
-            live: liveGestureEventData
+            live: liveGestureEventData,
+            pointerManager: pointerManager
         };
         return eventData;
     }
@@ -786,6 +816,7 @@ class $5653a1f5fdc2db30$export$90610caf6d8d0242 extends (0, $e8978caba4d46d00$ex
 
 
 
+
 class $7a0f7fd2f33d0212$export$f86166cd6057c2d1 extends (0, $e8978caba4d46d00$export$718b85c80185d86e) {
     constructor(domElement, options){
         super(domElement, options);
@@ -813,9 +844,12 @@ class $7a0f7fd2f33d0212$export$f86166cd6057c2d1 extends (0, $e8978caba4d46d00$ex
     onEnd(pointerManager) {
         const singlePointerInput = pointerManager.getlastRemovedPointerInput();
         if (singlePointerInput instanceof (0, $5fe7e4b452e08fad$export$bbcc47898202c6b8)) {
-            if (this.swipeFinalSpeed < singlePointerInput.parameters.global.finalSpeed) {
+            if (this.swipeFinalSpeed < singlePointerInput.parameters.global.finalSpeed && singlePointerInput.parameters.live.vector.direction != (0, $a2188ba8c266b376$export$cacd6541cfeeb6c1).None) {
                 this.isSwipe = true;
                 this.emit(pointerManager, "swipe");
+            } else if (this.DEBUG == true) {
+                if (singlePointerInput.parameters.global.finalSpeed < this.swipeFinalSpeed) console.log(`[Pan] dismissing swipe. Final speed: ${singlePointerInput.parameters.global.finalSpeed} < ${this.swipeFinalSpeed}`);
+                else console.log(`[Pan] dismissing swipe. Direction: ${singlePointerInput.parameters.live.vector.direction}`);
             }
         }
         super.onEnd(pointerManager);
@@ -824,6 +858,8 @@ class $7a0f7fd2f33d0212$export$f86166cd6057c2d1 extends (0, $e8978caba4d46d00$ex
     onTouchMove(event) {
         if (this.state == (0, $a2188ba8c266b376$export$a1d3109c03b1d511).Active) {
             if (this.DEBUG == true) console.log("[Pan] preventing touchmove default");
+            event.preventDefault();
+            event.stopPropagation();
         }
     }
 }
@@ -887,7 +923,7 @@ class $ba0aae203ff6b3f9$export$bdba51b3ce92d5f1 {
     removePointer(pointerId) {
         if (pointerId == this.pointer_1.pointerId) return this.pointer_2;
         else if (pointerId == this.pointer_2.pointerId) return this.pointer_1;
-        else throw new Error("[DualPointerInput] cannot remove Pointer #${pointerId}. The pointer is not part of this DualPointerInput");
+        else throw new Error(`[DualPointerInput] cannot remove Pointer #${pointerId}. The pointer is not part of this DualPointerInput`);
     }
     getTarget() {
         return this.initialPointerEvent.target;
@@ -977,7 +1013,7 @@ class $a1a4c2869495e604$export$f9d89efe4b7795e7 extends (0, $f752273e736c5336$ex
             ...nullRecognitionParameters
         }));
     }
-    getEventData(dualPointerInput) {
+    getEventData(dualPointerInput, pointerManager) {
         // provide short-cuts to the values collected in the Contact object
         // match this to the event used by hammer.js
         const globalParameters = dualPointerInput.parameters.global;
@@ -992,6 +1028,7 @@ class $a1a4c2869495e604$export$f9d89efe4b7795e7 extends (0, $f752273e736c5336$ex
             direction: globalParameters.centerMovementVector.direction,
             scale: globalParameters.relativePointerDistanceChange,
             rotation: globalParameters.rotationAngle,
+            center: globalParameters.center,
             srcEvent: dualPointerInput.currentPointerEvent
         };
         const liveGestureEventData = {
@@ -1013,7 +1050,8 @@ class $a1a4c2869495e604$export$f9d89efe4b7795e7 extends (0, $f752273e736c5336$ex
         const gestureEventData = {
             recognizer: this,
             global: globalGestureEventData,
-            live: liveGestureEventData
+            live: liveGestureEventData,
+            pointerManager: pointerManager
         };
         return gestureEventData;
     }
@@ -1420,9 +1458,9 @@ class $03c52e54621b9b86$export$9371bd96776f4e82 {
     addTouchEventListeners() {
         if (this.options.handleTouchEvents == true) {
             const onTouchMove = this.onTouchMove.bind(this);
-            this.domElement.addEventListener("touchmove", onTouchMove, {
-                passive: true
-            });
+            // do NOT make the touchmove listener passive, as this listener might block touch events from
+            // interfering with pan/swipe. Passive listeners make the promise not to block scrolling.
+            this.domElement.addEventListener("touchmove", onTouchMove);
             this.touchEventHandlers["touchmove"] = onTouchMove;
         /*this.domElement.addEventListener("touchstart", (event) => {
 
@@ -1564,5 +1602,6 @@ class $03c52e54621b9b86$export$9371bd96776f4e82 {
 
 
 
-export {$a2188ba8c266b376$export$cacd6541cfeeb6c1 as Direction, $a2188ba8c266b376$export$86ae6e8ac17a67c6 as Directions, $a2188ba8c266b376$export$a1d3109c03b1d511 as GestureState, $1f7944f1763e45ce$export$2db6c17465f94a2 as Geometry, $03c52e54621b9b86$export$9371bd96776f4e82 as PointerListener, $b6ec4e8a6d9d51ec$export$4451a18ddc7083b7 as Tap, $5653a1f5fdc2db30$export$90610caf6d8d0242 as Press, $7a0f7fd2f33d0212$export$f86166cd6057c2d1 as Pan, $59226122237c359c$export$8847187e02a498e8 as TwoFingerPan, $ed7931f1d96d5294$export$826ae541ddf1527b as Pinch, $9fe2bb90b337f66c$export$152db69a76b6b79e as Rotate};
+
+export {$a2188ba8c266b376$export$cacd6541cfeeb6c1 as Direction, $a2188ba8c266b376$export$86ae6e8ac17a67c6 as Directions, $a2188ba8c266b376$export$a1d3109c03b1d511 as GestureState, $1f7944f1763e45ce$export$2db6c17465f94a2 as Geometry, $03c52e54621b9b86$export$9371bd96776f4e82 as PointerListener, $f752273e736c5336$export$6e9c3b1e1fa2b597 as GestureEvent, $b6ec4e8a6d9d51ec$export$4451a18ddc7083b7 as Tap, $5653a1f5fdc2db30$export$90610caf6d8d0242 as Press, $7a0f7fd2f33d0212$export$f86166cd6057c2d1 as Pan, $59226122237c359c$export$8847187e02a498e8 as TwoFingerPan, $ed7931f1d96d5294$export$826ae541ddf1527b as Pinch, $9fe2bb90b337f66c$export$152db69a76b6b79e as Rotate};
 //# sourceMappingURL=contact.js.map
