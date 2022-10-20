@@ -48,12 +48,42 @@ export class Tap extends SinglePointerGesture {
 
   }
 
+  validateButton(pointerManager: PointerManager): boolean {
+
+    if (this.options.supportedButtons.length > 0){
+
+      const lastRemovedPointer = pointerManager.lastRemovedPointer;
+
+      if (lastRemovedPointer != null) {
+        const pointerEvent = lastRemovedPointer.currentPointerEvent;
+      
+        // pointerEvent.button instead of pointerEvent.buttons
+        if (pointerEvent.pointerType == "mouse" && this.options.supportedButtons.indexOf(pointerEvent.button) == -1) {
+
+          if (this.DEBUG == true) {
+            console.log(
+              `dismissing ${this.eventBaseName}: supportedButtons: ${this.options.supportedButtons.toString()}, poinerEvent.button: ${pointerEvent.button}`
+            );
+          }
+
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
   validate(pointerManager: PointerManager): boolean {
 
     let isValid = this.validateGestureState();
 
     if (isValid == true){
       isValid = this.validatePointerManagerState(pointerManager);
+    }
+
+    if (isValid == true){
+      isValid = this.validateButton(pointerManager);
     }
 
     if (isValid === true) {

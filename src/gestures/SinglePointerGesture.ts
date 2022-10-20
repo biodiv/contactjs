@@ -13,6 +13,8 @@ import { Vector } from "../geometry/Vector";
 import { SinglePointerInput } from "../SinglePointerInput";
 import { PointerManager } from "../PointerManager";
 
+
+
 export abstract class SinglePointerGesture extends Gesture {
 
   initialPointerEvent: PointerEvent | null;
@@ -22,6 +24,7 @@ export abstract class SinglePointerGesture extends Gesture {
 
   constructor(domElement: HTMLElement, options?: Partial<GestureOptions>) {
     super(domElement, options);
+
     this.initialPointerEvent = null;
     this.validPointerManagerState = PointerManagerState.SinglePointer;
 
@@ -109,6 +112,47 @@ export abstract class SinglePointerGesture extends Gesture {
     };
 
     return eventData;
+  }
+
+  validateButton(pointerManager: PointerManager): boolean {
+
+    if (this.options.supportedButtons.length > 0){
+
+      const activePointerInput = pointerManager.activePointerInput;
+      const lastRemovedPointer = pointerManager.lastRemovedPointer;
+
+      let pointerEvent = null;
+
+      if (activePointerInput != null) {
+        pointerEvent = activePointerInput.getCurrentPointerEvent();
+      }
+      else if (lastRemovedPointer != null) {
+        pointerEvent = lastRemovedPointer.currentPointerEvent;
+      }
+
+      if (pointerEvent != null && pointerEvent.pointerType == "mouse" && this.options.supportedButtons.indexOf(pointerEvent.buttons) == -1) {
+
+        if (this.DEBUG == true) {
+          console.log(
+            `dismissing ${this.eventBaseName}: supportedButtons: ${this.options.supportedButtons.toString()}, poinerEvent.buttons: ${pointerEvent.buttons}`
+          );
+        }
+
+        return false;
+      }
+    
+    }
+
+    return true;
+  }
+
+  validate(pointerManager: PointerManager): boolean {
+    let isValid = this.validateButton(pointerManager);
+
+    if (isValid == true) {
+      isValid = super.validate(pointerManager);
+    }
+    return isValid;
   }
 
 }

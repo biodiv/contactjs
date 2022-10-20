@@ -33,6 +33,7 @@ export interface GestureOptions {
   blocks: Gesture[];
   bubbles: boolean;
   supportedDirections: string[];
+  supportedButtons: number[];
 }
 
 export interface GlobalGestureEventData {
@@ -107,6 +108,7 @@ export abstract class Gesture {
       bubbles: true,
       blocks: [],
       supportedDirections: [],
+      supportedButtons: [],
       DEBUG: false,
       ...options
     };
