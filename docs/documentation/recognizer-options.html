@@ -43,8 +43,9 @@ bg-color: bg-white
 										[0,1,2,3,4,8,16]
 									</td>
 									<td>
-										Has only an effect if the input is made using a mouse. Restricts the recognizer to the corresponding mouse button.
-										See <a href="https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button" target="_blank">mdn docs</a> for the button mapping.
+										Has only an effect if the input is made using a mouse. Restricts the recognizer to the corresponding mouse button.<br>
+										<kbd>Tap</kbd> uses <strong>pointerEvent.button</strong>. See <a href="https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button" target="_blank">mdn pointerEvent.button docs</a> for the button mapping.<br>
+										All other recognizers use <strong>pointerEvent.buttons</strong> See <a href="https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons" target="_blank">mdn pointerEvent.buttons docs</a> for the button mapping.
 									</td>
 								</tr>
 							</tbody>
