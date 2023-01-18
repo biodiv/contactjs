@@ -196,7 +196,8 @@ export class PointerListener {
 
     // re-target all pointerevents to the current element
     // see https://developer.mozilla.org/en-US/docs/Web/API/Element/setPointerCapture
-    this.domElement.setPointerCapture(pointerdownEvent.pointerId);
+    // setPointerCapture on pointerdownEvent.target to not disable native click events on elements inside of the element pointerListener is bound to
+    (pointerdownEvent.target as HTMLElement || this.domElement).setPointerCapture(pointerdownEvent.pointerId);
 
     this.pointerManager.addPointer(pointerdownEvent);
 

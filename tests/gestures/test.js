@@ -36,6 +36,14 @@ function loadContact() {
 
   rectangle = document.getElementById("rectangle");
 
+  document.getElementById("inner").addEventListener("click", function(event){
+    console.log("NATIVE CLICK EVENT ON INNER");
+  });
+
+  /*rectangle.addEventListener("click", function(event){
+    console.log("NATIVE CLICK EVENT");
+  });*/
+
   START_X = rectangle.getBoundingClientRect().left;
   START_Y = rectangle.getBoundingClientRect().top;
 
