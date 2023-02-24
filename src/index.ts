@@ -1,8 +1,12 @@
 export {
     Direction,
     Directions,
-    GestureState
+    GestureState,
+    PointerManagerState,
+    PointerListenerState
 } from "./input-consts";
+
+export { PointerState } from "./Pointer";
 
 export { Geometry } from "./geometry/Geometry";
 

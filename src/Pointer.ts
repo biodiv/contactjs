@@ -25,7 +25,7 @@ interface PointerOptions {
   vectorTimespan?: number;
 }
 
-enum PointerState {
+export enum PointerState {
   Active = "active", // on the surface
   Removed = "removed", // removed from surface
   Canceled = "canceled",
