@@ -22,6 +22,7 @@ bg-color: bg-white
 								<tr>
 									<th scope="col">Option</th>
 									<th scope="col">Possible Values</th>
+									<th scope="col">Default</th>
 									<th scope="col">Simplified description</th>
 								</tr>
 							</thead>
@@ -33,6 +34,9 @@ bg-color: bg-white
 										false
 									</td>
 									<td>
+										true
+									</td>
+									<td>
 										Turn event bubbling on or off
 									</td>
 								</tr>
@@ -41,6 +45,9 @@ bg-color: bg-white
 									<td>
 										number[]<br>
 										[0,1,2,3,4,8,16]
+									</td>
+									<td>
+										[]
 									</td>
 									<td>
 										Has only an effect if the input is made using a mouse. Restricts the recognizer to the corresponding mouse button.<br>
@@ -79,6 +86,7 @@ var pointerListener = new PointerListener(domElement, {
 								<tr>
 									<th scope="col">Option</th>
 									<th scope="col">Possible Values</th>
+									<th scope="col">Default</th>
 									<th scope="col">Simplified description</th>
 								</tr>
 							</thead>
@@ -89,6 +97,9 @@ var pointerListener = new PointerListener(domElement, {
 										any number
 									</td>
 									<td>
+										200
+									</td>
+									<td>
 										If the pointer is longer on the surface than the given number (in milliseconds), <kbd>Tap</kbd> becomes invalid.
 									</td>
 								</tr>
@@ -96,6 +107,9 @@ var pointerListener = new PointerListener(domElement, {
 									<th scope="row">maxDistance</th>
 									<td>
 										any number
+									</td>
+									<td>
+										30
 									</td>
 									<td>
 										If the pointer is moved more than the given distance in px, <kbd>Tap</kbd> becomes invalid.
@@ -134,6 +148,7 @@ var pointerListener = new PointerListener(domElement, {
 							<tr>
 								<th scope="col">Option</th>
 								<th scope="col">Possible Values</th>
+								<th scope="col">Default</th>
 								<th scope="col">Simplified description</th>
 							</tr>
 						</thead>
@@ -144,6 +159,9 @@ var pointerListener = new PointerListener(domElement, {
 									any number
 								</td>
 								<td>
+									600
+								</td>
+								<td>
 									If the pointer is removed from the surface before the given number in milliseconds, <kbd>Press</kbd> becomes invalid.
 								</td>
 							</tr>
@@ -151,6 +169,9 @@ var pointerListener = new PointerListener(domElement, {
 								<th scope="row">maxDistance</th>
 								<td>
 									any number
+								</td>
+								<td>
+									10
 								</td>
 								<td>
 									If the pointer is moved more than the given distance in px, <kbd>Press</kbd> becomes invalid.
@@ -171,6 +192,7 @@ var pointerListener = new PointerListener(domElement, {
 							<tr>
 								<th scope="col">Option</th>
 								<th scope="col">Possible Values</th>
+								<th scope="col">Default</th>
 								<th scope="col">Simplified description</th>
 							</tr>
 						</thead>
@@ -181,6 +203,9 @@ var pointerListener = new PointerListener(domElement, {
 									DIRECTION_ALL, DIRECTION_HORIZONTAL, DIRECTION_VERTICAL <br><br>
 									or a list[] with one or more of the following: <br>
 									DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP, DIRECTION_DOWN
+								</td>
+								<td>
+									DIRECTION_ALL
 								</td>
 								<td>
 									Define the directions which <kbd>Pan</kbd> is valid for.
