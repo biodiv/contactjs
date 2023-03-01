@@ -50,8 +50,8 @@ npm install contactjs@latest
 						First, initialize a <kbd>PointerListener</kbd> instance. This will active gesture detection on the <kbd>domElement</kbd> of your choice.
 						<div class="bg-light p-3 mt-3">
 {% highlight javascript %}
-var domElement = document.getElementById("idOfElement");
-var pointerListener = new PointerListener(domElement, options);
+const domElement = document.getElementById("idOfElement");
+const pointerListener = new PointerListener(domElement, options);
 domElement.addEventListener("tap", function(event){
 	// do something on tap
 });
@@ -68,6 +68,19 @@ domElement.addEventListener("tap", function(event){
 <meta name="viewport" content="width=device-width, initial-scale=1">
 {% endhighlight %}
 							</div>
+						</div>
+					</div>
+					<div class="mt-5">
+						<h5>One PointerListener to rule them all</h5>
+						If you initialize <kbd>PointerListener</kbd> with <kbd>document.body</kbd> as the domElement, you will be able to access contactjs events on all elements.
+						<div class="bg-light p-3 mt-3">
+{% highlight javascript %}
+const pointerListener = new PointerListener(document.body, options);
+const anyDomElement = document.getElementById("idOfElement")
+domElement.addEventListener("tap", function(event){
+	// do something on tap
+});
+{% endhighlight %}
 						</div>
 					</div>
 				</div>
