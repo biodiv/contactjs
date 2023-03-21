@@ -1,7 +1,5 @@
 "use strict";
 
-// contact.js - v1.4.1
-
 const DIRECTION_NONE = "0";
 const DIRECTION_LEFT = "left";
 const DIRECTION_RIGHT = "right";
@@ -180,7 +178,9 @@ class Contact {
 		this.currentTimestamp = pointerupEvent.timeStamp;
 	
 		var removedPointer = this.pointerInputs[pointerId];
-		removedPointer.onUp(pointerupEvent);
+		if(removedPointer) {
+			removedPointer.onUp(pointerupEvent);
+		}
 		
 		this.removePointer(pointerId);
 		

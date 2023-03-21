@@ -178,7 +178,9 @@ class Contact {
 		this.currentTimestamp = pointerupEvent.timeStamp;
 	
 		var removedPointer = this.pointerInputs[pointerId];
-		removedPointer.onUp(pointerupEvent);
+		if(removedPointer) {
+			removedPointer.onUp(pointerupEvent);
+		}
 		
 		this.removePointer(pointerId);
 		
