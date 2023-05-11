@@ -18,14 +18,14 @@ interface PressOptions extends GestureOptions {
 export class Press extends SinglePointerGesture {
   hasBeenEmitted: boolean;
 
-  private static minDuration = 600;
+  private static minDuration = 500;
 
   constructor(domElement: HTMLElement, options?: Partial<PressOptions>) {
     super(domElement, options);
 
     this.eventBaseName = "press";
 
-    let globalMinDuration = 600;
+    let globalMinDuration = 500;
     let globalMaxDistance = 10;
     let globalMaxMaximumDistance = 20;
 

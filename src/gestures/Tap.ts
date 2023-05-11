@@ -26,7 +26,7 @@ export class Tap extends SinglePointerGesture {
 
     this.eventBaseName = "tap";
 
-    let globalMaxDuration = 200;
+    let globalMaxDuration = 499;
     let liveMaxDistance = 30;
     let globalMaxDistance = 30;
 
